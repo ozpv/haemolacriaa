@@ -1,0 +1,64 @@
+[package]
+name = "haemolacriaa"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+actix-files = { version = "0.6", optional = true }
+actix-web = { version = "4", optional = true, features = ["macros"] }
+console_error_panic_hook = "0.1"
+http = { version = "1.0.0", optional = true }
+leptos = { version = "0.6" }
+leptos_meta = { version = "0.6" }
+leptos_actix = { version = "0.6", optional = true }
+leptos_router = { version = "0.6" }
+wasm-bindgen = "=0.2.91"
+
+[features]
+csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
+hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
+ssr = [
+  "dep:actix-files",
+  "dep:actix-web",
+  "dep:leptos_actix",
+  "leptos/ssr",
+  "leptos_meta/ssr",
+  "leptos_router/ssr",
+]
+
+# size-optimized profile for the WASM bundle in release mode
+[profile.wasm-release]
+inherits = "release"
+opt-level = 'z'
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[package.metadata.leptos]
+output-name = "haemolacriaa"
+# The site root folder is where cargo-leptos generate all output. WARNING: all content of this folder will be erased on a rebuild. Use it in your server setup.
+site-root = "target/site"
+# The site-root relative folder where all compiled output (JS, WASM and CSS) is written
+site-pkg-dir = "pkg"
+# tailwind css
+tailwind-input-file = "style/tailwind.css"
+# style-file = "style/main.css"
+assets-dir = "assets"
+# The IP and port (ex: 127.0.0.1:3000) where the server serves the content. Use it in your server setup.
+site-addr = "127.0.0.1:3000"
+# The port to use for automatic reload monitoring
+reload-port = 3001
+#  The browserlist query used for optimizing the CSS.
+browserquery = "defaults"
+# Set by cargo-leptos watch when building with that tool. Controls whether autoreload JS will be included in the head
+watch = false
+# The environment Leptos will run in, usually either "DEV" or "PROD"
+env = "PROD"
+bin-features = ["ssr"]
+bin-default-features = false
+lib-features = ["hydrate"]
+lib-default-features = false
+lib-profile-release = "wasm-release"
