@@ -2,9 +2,9 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
-use crate::pages::home::Home;
-use crate::components::nav::Nav;
 use crate::components::footer::Footer;
+use crate::components::nav::Nav;
+use crate::pages::home::Home;
 
 /// View multiple components in Router, pass routes in succession
 macro_rules! multi_view {
