@@ -1,10 +1,10 @@
-use icondata as ico;
 use const_format::formatcp;
+use icondata as ico;
 
 use crate::types::{
-    routes::RouteInfo,
-    links::{StreamingPlatform, SocialMediaInfo, SongInfo}, 
     images::Image,
+    links::{SocialMediaInfo, SongInfo, StreamingPlatform},
+    routes::RouteInfo,
 };
 
 /// Information section
@@ -12,7 +12,7 @@ use crate::types::{
 // Assumes you only have one, synchronized name.
 const USERNAME: &str = "haemolacriaa";
 
-// Every ID is derived from the final id on each profile URL, 
+// Every ID is derived from the final id on each profile URL,
 // make sure to ignore tracking info; this is usually contained
 // after the a '?' in the url.
 const SPOTIFY_ARTIST_ID: &str = "4RzQ0uG5y64uVDj7Az5VkN";
@@ -84,7 +84,7 @@ pub static STREAMING_PLATFORMS: [StreamingPlatform; 4] = [
 /// Footer
 pub const YEARS_ACTIVE: [&str; 2] = ["2023", "2024"];
 
-// Each item to be displayed on the footer. 
+// Each item to be displayed on the footer.
 // From left to right.
 pub static SOCIAL_MEDIA_ITEMS: [SocialMediaInfo; 5] = [
     SocialMediaInfo {
@@ -93,22 +93,22 @@ pub static SOCIAL_MEDIA_ITEMS: [SocialMediaInfo; 5] = [
             "https://music.apple.com/{}/artist/{}",
             APPLE_MUSIC_REGION,
             APPLE_MUSIC_ID
-        )
+        ),
     },
     SocialMediaInfo {
         icon: ico::SiSoundcloud,
-        url: formatcp!("https://soundcloud.com/{}", USERNAME)
+        url: formatcp!("https://soundcloud.com/{}", USERNAME),
     },
     SocialMediaInfo {
         icon: ico::SiYoutube,
-        url: formatcp!("https://youtube.com/channel/{}", YOUTUBE_CHANNEL_ID)
+        url: formatcp!("https://youtube.com/channel/{}", YOUTUBE_CHANNEL_ID),
     },
     SocialMediaInfo {
         icon: ico::SiInstagram,
-        url: formatcp!("https://instagram.com/{}", USERNAME)
+        url: formatcp!("https://instagram.com/{}", USERNAME),
     },
     SocialMediaInfo {
         icon: ico::SiSpotify,
-        url: formatcp!("https://open.spotify.com/artist/{}", SPOTIFY_ARTIST_ID)
-    }
+        url: formatcp!("https://open.spotify.com/artist/{}", SPOTIFY_ARTIST_ID),
+    },
 ];

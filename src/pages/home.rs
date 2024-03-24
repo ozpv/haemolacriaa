@@ -6,8 +6,8 @@ use crate::config::{CURRENT_SONG, SOCIAL_MEDIA_ITEMS};
 #[component]
 pub fn Home() -> impl IntoView {
     view! {
-        <body class="bg-gray-900 min-h-screen">
+        <div class="bg-gray-900 min-h-screen" id="home page">
             <StreamingList song_info=&CURRENT_SONG id="streaming-link-list" appendix=true appendix_social=&SOCIAL_MEDIA_ITEMS[3]/>
-        </body>
+        </div>
     }
 }

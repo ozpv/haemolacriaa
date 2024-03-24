@@ -28,11 +28,9 @@ fn Appendix(social_media_info: Option<&'static SocialMediaInfo>) -> impl IntoVie
 pub fn StreamingList(
     song_info: &'static SongInfo,
     id: &'static str,
-    #[prop(default = false)]
-    appendix: bool,
+    #[prop(default = false)] appendix: bool,
     // only pass Some if previous bool is true
-    #[prop(optional)]
-    appendix_social: Option<&'static SocialMediaInfo>
+    #[prop(optional)] appendix_social: Option<&'static SocialMediaInfo>,
 ) -> impl IntoView {
     view! {
         <div id=id>
@@ -53,12 +51,12 @@ pub fn StreamingList(
                     }
                 </nav>
             </div>
-            { 
+            {
                 move || if appendix && appendix_social != None {
                     view!(<Appendix social_media_info=appendix_social/>)
                 } else {
                     ().into_view()
-                } 
+                }
             }
         </div>
     }

@@ -19,33 +19,47 @@ macro_rules! multi_view {
             move || view!(<$component/> { multi_view!($($components),+) })
         }
     };
-    // todo is to extend this macro and allow for props.
+}
+
+macro_rules! todo_page {
+    () => {{
+        multi_view!(Nav, Todo, Footer)
+    }};
 }
 
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
-    
+
     view! {
         <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>
         <Title text="haemolacriaa"/>
 
-        <Nav/>
-
         <Router>
             <main>
                 <Routes>
-                    <Route path="/" view=multi_view!(Home, Footer) ssr=SsrMode::InOrder/>
-                    <Route path="/*any" view=multi_view!(<NotFound todo=true/>, Footer) ssr=SsrMode::InOrder/>
+                    <Route path="/" view=multi_view!(Nav, Home, Footer) ssr=SsrMode::InOrder/>
+                    <Route path="/blog" view=todo_page!() ssr=SsrMode::InOrder/>
+                    <Route path="/*any" view=multi_view!(Nav, NotFound, Footer) ssr=SsrMode::InOrder/>
                 </Routes>
             </main>
         </Router>
     }
 }
 
+/// Todo
+#[component]
+fn Todo() -> impl IntoView {
+    view! {
+        <div class="bg-gray-900 min-h-screen">
+            <h1 class="text-white">"Work in progress"</h1>
+        </div>
+    }
+}
+
 /// 404 Not Found
 #[component]
-fn NotFound(#[prop(optional)] todo: bool) -> impl IntoView {
+fn NotFound() -> impl IntoView {
     #[cfg(feature = "ssr")]
     {
         let resp = expect_context::<leptos_actix::ResponseOptions>();
@@ -53,12 +67,8 @@ fn NotFound(#[prop(optional)] todo: bool) -> impl IntoView {
     }
 
     view! {
-        <body class="bg-gray-900 min-h-screen">
-            <h1 class="text-white">
-                {
-                    move || if todo { "Work in progress..." } else { "404 Not Found" }
-                }
-            </h1>
-        </body>
+        <div class="bg-gray-900 min-h-screen">
+            <h1 class="text-white">"404 Not Found"</h1>
+        </div>
     }
 }

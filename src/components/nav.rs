@@ -1,7 +1,7 @@
-use leptos::*;
-use icondata as ico;
-use leptos_icons::*;
 use crate::config::NAV_ITEMS;
+use icondata as ico;
+use leptos::*;
+use leptos_icons::*;
 
 #[component]
 pub fn Nav() -> impl IntoView {
@@ -26,9 +26,9 @@ pub fn Nav() -> impl IntoView {
                     on:click=toggle_active
                     class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 md:hidden"
                 >
-                    <Icon 
+                    <Icon
                         icon=active_icon
-                        width="32px" 
+                        width="32px"
                         height="32px"
                     />
                 </button>
