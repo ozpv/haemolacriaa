@@ -41,7 +41,7 @@ pub fn Nav() -> impl IntoView {
                         class="font-sans font-medium flex flex-col p-[16px] md:p-0 mt-4 border border-gray-950 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-gray-900"
                     >
                         {
-                            NAV_ITEMS.into_iter().map(|item| {
+                            NAV_ITEMS.iter().map(|item| {
                                 view! {
                                     <li class="p-[8px]">
                                         <a

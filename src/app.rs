@@ -10,25 +10,22 @@ use crate::pages::home::Home;
 macro_rules! multi_view {
     ($component:ty) => {
         {
-            move || {
-                view!(<$component/>)
-            }
+            move || view!(<$component/>)
         }
     };
 
     ($component:ty, $($components:ty),+) => {
         {
-            move || {
-                view!(<$component/> { multi_view!($($components),+) })
-            }
+            move || view!(<$component/> { multi_view!($($components),+) })
         }
     };
+    // todo is to extend this macro and allow for props.
 }
 
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
-
+    
     view! {
         <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>
         <Title text="haemolacriaa"/>
@@ -39,16 +36,16 @@ pub fn App() -> impl IntoView {
             <main>
                 <Routes>
                     <Route path="/" view=multi_view!(Home, Footer) ssr=SsrMode::InOrder/>
-                    <Route path="/*any" view=NotFound ssr=SsrMode::InOrder/>
+                    <Route path="/*any" view=multi_view!(<NotFound todo=true/>, Footer) ssr=SsrMode::InOrder/>
                 </Routes>
             </main>
         </Router>
     }
 }
 
-/// 404 - Not Found
+/// 404 Not Found
 #[component]
-fn NotFound() -> impl IntoView {
+fn NotFound(#[prop(optional)] todo: bool) -> impl IntoView {
     #[cfg(feature = "ssr")]
     {
         let resp = expect_context::<leptos_actix::ResponseOptions>();
@@ -56,6 +53,12 @@ fn NotFound() -> impl IntoView {
     }
 
     view! {
-        <h1>"404 - Not Found"</h1>
+        <body class="bg-gray-900 min-h-screen">
+            <h1 class="text-white">
+                {
+                    move || if todo { "Work in progress..." } else { "404 Not Found" }
+                }
+            </h1>
+        </body>
     }
 }
