@@ -1,3 +1,6 @@
+# if cross-compiling from nixos, patch the binary with
+# patchelf --set-interpreter /usr/lib64/ld-linux-x86-64.so.2 haemolacriaa
+
 [package]
 name = "haemolacriaa"
 version = "0.1.0"
