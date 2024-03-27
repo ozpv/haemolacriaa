@@ -8,7 +8,7 @@ pub fn Footer() -> impl IntoView {
         <footer class="sticky top-full bg-gray-900 md:p-5">
             <div class="bg-gray-950 shadow md:rounded-lg">
                 <div class="flex items-center justify-center">
-                    <nav class="flex pt-[10px] gap-[2vw] mt-3 text-sm text-white">
+                    <nav class="flex pt-[10px] gap-[8vw] mt-3 text-sm text-white md:gap-[2vw]">
                         {
                             SOCIAL_MEDIA_ITEMS.iter().map(|item| {
                                 view! {

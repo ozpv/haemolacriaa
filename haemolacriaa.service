@@ -1,0 +1,11 @@
+[Unit]
+Description=webserver for haemolacriaa.com powered by leptos
+
+[Service]
+Type=simple
+ExecStart=/app/haemolacriaa
+WorkingDirectory=/app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

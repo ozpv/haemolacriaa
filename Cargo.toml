@@ -18,10 +18,12 @@ leptos = { version = "0.6" }
 leptos_meta = { version = "0.6" }
 leptos_actix = { version = "0.6", optional = true }
 leptos_router = { version = "0.6" }
-wasm-bindgen = "=0.2.91"
+wasm-bindgen = "=0.2.92"
 leptos_icons = "0.3.0"
 icondata = "0.3.0"
 const_format = "0.2.32"
+sqlx = "0.7.4"
+serde = "1.0.197"
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
