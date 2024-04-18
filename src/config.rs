@@ -78,7 +78,7 @@ pub const EURYDICE_SONG: SongInfo = SongInfo {
     youtube_id: "_qF4fSIdNqs",
     soundcloud_id: "eurydice",
     apple_music_id: "1707755091",
-    bandcamp_id: "haemolacriaa",
+    bandcamp_id: "eurydice",
 };
 
 pub static STREAMING_PLATFORMS: [StreamingPlatform; 5] = [
