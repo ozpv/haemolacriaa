@@ -9,6 +9,7 @@ use crate::types::images::Image;
 pub struct SocialMediaInfo {
     pub icon: Icon,
     pub url: &'static str,
+    pub active: bool,
 }
 
 /// Streaming platform section
@@ -31,10 +32,12 @@ pub struct SongInfo {
     pub name: &'static str,
     pub author: &'static str,
     pub image: Image,
-    pub spotify_track_id: &'static str,
-    pub youtube_watch_id: &'static str,
-    pub soundcloud_song_id: &'static str,
-    pub apple_music_album_id: &'static str,
+    pub is_album: bool,
+    pub spotify_id: &'static str,
+    pub youtube_id: &'static str,
+    pub soundcloud_id: &'static str,
+    pub apple_music_id: &'static str,
+    pub bandcamp_id: &'static str,
 }
 
 impl SongInfo {
@@ -49,11 +52,36 @@ impl SongInfo {
                         // Unfortunately, you must add new platforms here,
                         // unless I come up with a better algorithm :(
                         match platform.name {
-                            "Spotify" => self.spotify_track_id,
-                            "YouTube" => self.youtube_watch_id,
-                            "SoundCloud" => self.soundcloud_song_id,
-                            "Apple Music" => self.apple_music_album_id,
-                            _ => "/",
+                            "Spotify" => format!("{}{}", { 
+                                if self.is_album {
+                                    "album/"
+                                } else {
+                                    "track/"
+                                }
+                            }, self.spotify_id),
+                            "YouTube" => format!("{}{}", {
+                                if self.is_album {
+                                    "playlist?list="
+                                } else {
+                                    "watch?v="
+                                }
+                            }, self.youtube_id),
+                            "SoundCloud" => format!("{}{}", {
+                                if self.is_album {
+                                    "sets/"
+                                } else {
+                                    ""
+                                }
+                            }, self.soundcloud_id), 
+                            "Apple Music" => self.apple_music_id.to_string(),
+                            "Bandcamp" => format!("{}{}", { 
+                                if self.is_album {
+                                    "album/"
+                                } else {
+                                    "track/"
+                                }
+                            }, self.bandcamp_id), 
+                            _ => "/".to_string(),
                         }
                     }),
                 }

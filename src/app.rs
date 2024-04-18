@@ -23,7 +23,7 @@ macro_rules! multi_view {
 
 macro_rules! todo_page {
     () => {{
-        multi_view!(Nav, Todo, Footer)
+        multi_view!(Nav, Todo)
     }};
 }
 
@@ -39,7 +39,7 @@ pub fn App() -> impl IntoView {
             <main>
                 <Routes>
                     <Route path="/" view=multi_view!(Nav, Home, Footer) ssr=SsrMode::InOrder/>
-                    <Route path="/blog" view=todo_page!() ssr=SsrMode::InOrder/>
+                    <Route path="/shop" view=todo_page!() ssr=SsrMode::InOrder/>
                     <Route path="/*any" view=multi_view!(Nav, NotFound, Footer) ssr=SsrMode::InOrder/>
                 </Routes>
             </main>

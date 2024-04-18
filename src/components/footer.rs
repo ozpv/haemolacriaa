@@ -11,8 +11,12 @@ pub fn Footer() -> impl IntoView {
                     <nav class="flex pt-[10px] gap-[8vw] mt-3 text-sm text-white md:gap-[2vw]">
                         {
                             SOCIAL_MEDIA_ITEMS.iter().map(|item| {
-                                view! {
-                                    <a class="p-2 rounded-sm transition-all ease-in duration-75 hover:bg-gray-800" href={item.url}><Icon icon={item.icon} width={"16"} height={"16"} /></a>
+                                if item.active { 
+                                    view! {
+                                        <a class="p-2 rounded-sm transition-all ease-in duration-75 hover:bg-gray-800" href={item.url}><Icon icon={item.icon} width={"16"} height={"16"} /></a>
+                                    }.into_view()
+                                } else {
+                                    ().into_view()
                                 }
                             }).collect_view()
                         }

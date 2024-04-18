@@ -16,9 +16,9 @@ fn Appendix(social_media_info: Option<&'static SocialMediaInfo>) -> impl IntoVie
                                 <a class="flex text-white mt-[10px] mb-[10px] p-[8px] rounded-sm transition-all ease-in duration-75 hover:bg-gray-800" href=info.url><Icon icon=info.icon width="16" height="16"/></a>
                             </nav>
                         </div>
-                    }.into_any()
+                    }.into_view()
                 },
-                None => { view!(<br/>) }.into_any()
+                None => ().into_view()
             }
         }
     }
