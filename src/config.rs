@@ -45,7 +45,7 @@ pub static NAV_ITEMS: [RouteInfo; 2] = [
 /// Body
 
 // Current song, set it to be displayed on home page.
-pub const CURRENT_SONG: SongInfo = EURYDICE_SONG;
+pub const CURRENT_SONG: SongInfo = HAEMOLACRIAA_ALBUM;
 
 // Define any other songs or albums below
 
@@ -58,27 +58,11 @@ pub const HAEMOLACRIAA_ALBUM: SongInfo = SongInfo {
         height: "400px",
     },
     is_album: true,
-    spotify_id: "",
-    youtube_id: "",
+    spotify_id: "5TmWqQ0YoJ9t8PHPSqhZLp",
+    youtube_id: "OLAK5uy_k5kigsMsg7pFfb3_J566qnxftni1ba7jw",
     soundcloud_id: "haemolacriaa",
-    apple_music_id: "",
+    apple_music_id: "1739982491",
     bandcamp_id: "haemolacriaa",
-};
-
-pub const EURYDICE_SONG: SongInfo = SongInfo {
-    name: "eurydice",
-    author: USERNAME,
-    image: Image {
-        path: "assets/eurydice.webp",
-        width: "400px",
-        height: "400px",
-    },
-    is_album: false,
-    spotify_id: "3jVgwiRUrfanloK2E1peWf",
-    youtube_id: "_qF4fSIdNqs",
-    soundcloud_id: "eurydice",
-    apple_music_id: "1707755091",
-    bandcamp_id: "eurydice",
 };
 
 pub static STREAMING_PLATFORMS: [StreamingPlatform; 5] = [
