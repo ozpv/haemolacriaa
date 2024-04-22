@@ -41,11 +41,15 @@ pub fn StreamingList(
                 <nav id="streaming-links">
                     {
                         song_info.build_streaming_info().into_iter().map(|item| {
-                            view! {
-                                <LinkButton class="text-white text-md font-sans pt-[20px] pb-[20px] w-80" href=item.song_url id=format!("{}{}", song_info.name, "-link-button")>
-                                    <Icon icon=item.platform_icon width="24" height="24"/>
-                                    <p class="pl-4">{item.platform_name}</p>
-                                </LinkButton>
+                            if let Some((platform_name, song_url)) = item.song_id {
+                                view! {
+                                    <LinkButton class="text-white text-md font-sans pt-[20px] pb-[20px] w-80 hover:scale-105" href=song_url id=format!("{}{}", song_info.name, "-link-button")>
+                                        <Icon icon=item.platform_icon width="24" height="24"/>
+                                        <p class="pl-4">{platform_name}</p>
+                                    </LinkButton>
+                                }.into_view()
+                            } else {
+                                ().into_view()
                             }
                         }).collect_view()
                     }

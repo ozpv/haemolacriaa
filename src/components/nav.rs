@@ -21,7 +21,7 @@ pub fn Nav() -> impl IntoView {
     view! {
         <nav class="bg-gray-900 border-gray-200">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                <span class="flex items-center text-xl text-white font-sans">{env!("CARGO_PKG_NAME")}</span>
+                <span class="flex items-center text-xl text-white font-sans px-[20px]">{env!("CARGO_PKG_NAME")}</span>
                 <button
                     on:click=toggle_active
                     class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 md:hidden"
@@ -38,15 +38,15 @@ pub fn Nav() -> impl IntoView {
                     id="navbar-default"
                 >
                     <ul
-                        class="font-sans font-medium flex flex-col p-[16px] md:p-0 mt-4 border border-gray-950 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-gray-900"
+                        class="font-sans font-medium flex flex-col p-[16px] md:p-0 mt-4 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-gray-900"
                     >
                         {
                             NAV_ITEMS.iter().map(|item| {
                                 view! {
                                     <li class="p-[8px]">
                                         <a
-                                            href=move || item.path
-                                            class="text-white py-[10px] px-[10px] rounded hover:bg-gray-800 md:hover:text-blue-900 md:hover:bg-transparent"
+                                            href=item.path
+                                            class="text-white py-[10px] px-[10px] hover:bg-gray-800 md:hover:text-blue-900 md:hover:bg-transparent"
                                         >
                                             {item.name}
                                         </a>

@@ -53,43 +53,119 @@ pub const HAEMOLACRIAA_ALBUM: SongInfo = SongInfo {
     name: "haemolacriaa",
     author: USERNAME,
     image: Image {
-        path: "assets/haemolacriaa.webp",
+        path: Some("assets/haemolacriaa.webp"),
         width: "400px",
         height: "400px",
     },
     is_album: true,
-    spotify_id: "5TmWqQ0YoJ9t8PHPSqhZLp",
-    youtube_id: "OLAK5uy_k5kigsMsg7pFfb3_J566qnxftni1ba7jw",
-    soundcloud_id: "haemolacriaa",
-    apple_music_id: "1739982491",
-    bandcamp_id: "haemolacriaa",
+    spotify_id: Some("5TmWqQ0YoJ9t8PHPSqhZLp"),
+    youtube_id: Some("OLAK5uy_k5kigsMsg7pFfb3_J566qnxftni1ba7jw"),
+    soundcloud_id: Some("haemolacriaa"),
+    apple_music_id: Some("1739982491"),
+    bandcamp_id: Some("haemolacriaa"),
 };
+
+pub static OTHER_SONGS: [SongInfo; 3] = [
+    SongInfo {
+        name: "stay",
+        author: USERNAME,
+        image: Image {
+            path: Some("assets/stay.jpg"),
+            width: "400px",
+            height: "400px",
+        },
+        is_album: false,
+        spotify_id: Some("3rzuDN6mPujdByy2QfCArW"),
+        youtube_id: Some("R_sOCYxbaKo"),
+        soundcloud_id: Some("stay"),
+        apple_music_id: Some("1681486735"),
+        bandcamp_id: None,
+    },
+    SongInfo {
+        name: "still",
+        author: USERNAME,
+        image: Image {
+            path: Some("assets/still.jpg"),
+            width: "400px",
+            height: "400px",
+        },
+        is_album: false,
+        spotify_id: Some("07UyLVNFU0kyLYEM68WoPj"),
+        youtube_id: Some("A1rPrOAk0jg"),
+        soundcloud_id: Some("still"),
+        apple_music_id: Some("1667165253"),
+        bandcamp_id: None,
+    },
+    SongInfo {
+        name: "serene",
+        author: USERNAME,
+        image: Image {
+            path: Some("assets/serene.jpg"),
+            width: "400px",
+            height: "400px",
+        },
+        is_album: false,
+        spotify_id: Some("3rodixiNeB4ni5cDh9OvMz"),
+        youtube_id: Some("YvRjKwVvzH8"),
+        soundcloud_id: Some("serene"),
+        apple_music_id: Some("1656357115"),
+        bandcamp_id: None,
+    },
+];
+
+/// (x, y) x: the name of the platform, y: the base link to a song
+/// Used T to save myself from writing &'static str and your eyes
+pub enum PlatformId<T> {
+    Spotify(T, T),
+    YouTube(T, T),
+    SoundCloud(T, T),
+    AppleMusic(T, T),
+    Bandcamp(T, T),
+}
+
+impl<T> PlatformId<T> {
+    pub fn unwrap_name(&self) -> &T {
+        use PlatformId::*;
+        match self {
+            Spotify(x, _) => x,
+            YouTube(x, _) => x,
+            SoundCloud(x, _) => x,
+            AppleMusic(x, _) => x,
+            Bandcamp(x, _) => x,
+        }
+    }
+    pub fn unwrap_link(&self) -> &T {
+        use PlatformId::*;
+        match self {
+            Spotify(_, y) => y,
+            YouTube(_, y) => y,
+            SoundCloud(_, y) => y,
+            AppleMusic(_, y) => y,
+            Bandcamp(_, y) => y,
+        }
+    }
+}
 
 pub static STREAMING_PLATFORMS: [StreamingPlatform; 5] = [
     StreamingPlatform {
         icon: ico::SiSpotify,
-        name: "Spotify",
-        base_song_url: "https://open.spotify.com/",
+        id: PlatformId::Spotify("Spotify", "https://open.spotify.com/"),
     },
     StreamingPlatform {
         icon: ico::SiYoutube,
-        name: "YouTube",
-        base_song_url: "https://www.youtube.com/",
+        id: PlatformId::YouTube("YouTube", "https://www.youtube.com/"),
     },
     StreamingPlatform {
         icon: ico::SiSoundcloud,
-        name: "SoundCloud",
-        base_song_url: formatcp!("https://soundcloud.com/{}/", USERNAME),
+        id: PlatformId::SoundCloud("SoundCloud", formatcp!("https://soundcloud.com/{}/", USERNAME)),
     },
     StreamingPlatform {
         icon: ico::SiApple,
-        name: "Apple Music",
-        base_song_url: formatcp!("https://music.apple.com/{}/album/", APPLE_MUSIC_REGION),
+        id: PlatformId::AppleMusic("Apple Music", formatcp!("https://music.apple.com/{}/album/", APPLE_MUSIC_REGION)),
     },
     StreamingPlatform {
         icon: ico::SiBandcamp,
-        name: "Bandcamp",
-        base_song_url: formatcp!("https://{}.bandcamp.com/", USERNAME),
+        id: PlatformId::Bandcamp("Bandcamp", formatcp!("https://{}.bandcamp.com/", USERNAME)),
     },
 ];
 
