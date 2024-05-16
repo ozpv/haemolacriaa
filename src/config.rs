@@ -115,7 +115,7 @@ pub static OTHER_SONGS: [SongInfo; 3] = [
 
 /// (x, y) x: the name of the platform, y: the base link to a song
 /// Used T to save myself from writing &'static str and your eyes
-pub enum PlatformId<T> {
+pub enum PlatformId<T = &'static str> {
     Spotify(T, T),
     YouTube(T, T),
     SoundCloud(T, T),
@@ -157,11 +157,17 @@ pub static STREAMING_PLATFORMS: [StreamingPlatform; 5] = [
     },
     StreamingPlatform {
         icon: ico::SiSoundcloud,
-        id: PlatformId::SoundCloud("SoundCloud", formatcp!("https://soundcloud.com/{}/", USERNAME)),
+        id: PlatformId::SoundCloud(
+            "SoundCloud",
+            formatcp!("https://soundcloud.com/{}/", USERNAME),
+        ),
     },
     StreamingPlatform {
         icon: ico::SiApple,
-        id: PlatformId::AppleMusic("Apple Music", formatcp!("https://music.apple.com/{}/album/", APPLE_MUSIC_REGION)),
+        id: PlatformId::AppleMusic(
+            "Apple Music",
+            formatcp!("https://music.apple.com/{}/album/", APPLE_MUSIC_REGION),
+        ),
     },
     StreamingPlatform {
         icon: ico::SiBandcamp,

@@ -21,8 +21,8 @@ pub fn Home() -> impl IntoView {
                             .iter()
                             .map(|song| {
                                view! {
-                                       <SongCard 
-                                           song_info=song 
+                                       <SongCard
+                                           song_info=song
                                            class="ease-in duration-100 hover:scale-105 my-[20px]"
                                        />
                                }

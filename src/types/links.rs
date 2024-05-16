@@ -1,6 +1,6 @@
 use icondata::Icon;
 
-use crate::config::{STREAMING_PLATFORMS, PlatformId, PlatformId::*};
+use crate::config::{PlatformId, PlatformId::*, STREAMING_PLATFORMS};
 use crate::types::images::Image;
 
 /// Social media info section
@@ -39,8 +39,8 @@ pub struct SongInfo {
 }
 
 impl StreamingPlatform {
-    fn create_url<'a>(&self, id: &'a str) -> String {
-        format!("{}{}", &self.id.unwrap_link(), &id)
+    fn create_url<'a>(&self, id: &'a str, is_album: bool, main: &'a str, alt: &'a str) -> String {
+        format!("{}{}{}", &self.id.unwrap_link(), if is_album { &main } else { &alt }, &id)
     }
 }
 
@@ -48,37 +48,45 @@ impl SongInfo {
     pub fn build_streaming_info(&self) -> Vec<StreamingInfo> {
         STREAMING_PLATFORMS
             .iter()
-            .map(|platform| {
-                StreamingInfo {
-                    platform_icon: platform.icon,
-                    song_id: match platform.id {
-                        Spotify(x, _) => if let Some(id) = &self.spotify_id { 
-                            Some((x, platform.create_url(id))) 
+            .map(|platform| StreamingInfo {
+                platform_icon: platform.icon,
+                song_id: match platform.id {
+                    Spotify(x, _) => {
+                        if let Some(id) = &self.spotify_id {
+                            Some((x, platform.create_url(id, self.is_album, "album/", "track/")))
                         } else {
-                            None 
-                        },
-                        YouTube(x, _) => if let Some(id) = &self.youtube_id { 
-                            Some((x, platform.create_url(id))) 
+                            None
+                        }
+                    }
+                    YouTube(x, _) => {
+                        if let Some(id) = &self.youtube_id {
+                            Some((x, platform.create_url(id, self.is_album, "playlist?list=", "watch?v=")))
                         } else {
-                            None 
-                        },
-                        SoundCloud(x, _) => if let Some(id) = &self.soundcloud_id { 
-                            Some((x, platform.create_url(id))) 
+                            None
+                        }
+                    }
+                    SoundCloud(x, _) => {
+                        if let Some(id) = &self.soundcloud_id {
+                            Some((x, platform.create_url(id, self.is_album, "sets/", "")))
                         } else {
-                            None 
-                        },
-                        AppleMusic(x, _) => if let Some(id) = &self.apple_music_id { 
-                            Some((x, platform.create_url(id))) 
+                            None
+                        }
+                    }
+                    AppleMusic(x, _) => {
+                        if let Some(id) = &self.apple_music_id {
+                            Some((x, platform.create_url(id, true, "", "")))
                         } else {
-                            None 
-                        },
-                        Bandcamp(x, _) => if let Some(id) = &self.bandcamp_id { 
-                            Some((x, platform.create_url(id))) 
+                            None
+                        }
+                    }
+                    Bandcamp(x, _) => {
+                        if let Some(id) = &self.bandcamp_id {
+                            Some((x, platform.create_url(id, self.is_album, "album/", "track/")))
                         } else {
-                            None 
-                        },
-                    }, 
-                }
+                            None
+                        }
+                    }
+                },
             })
             .collect()
     }
