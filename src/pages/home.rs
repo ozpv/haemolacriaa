@@ -5,7 +5,8 @@ use crate::config::{CURRENT_SONG, OTHER_SONGS};
 
 #[component]
 pub fn Home() -> impl IntoView {
-    let (list, set_list) = create_signal((&CURRENT_SONG, format!("{}-link-list", &CURRENT_SONG.name)));
+    let (list, set_list) =
+        create_signal((&CURRENT_SONG, format!("{}-link-list", &CURRENT_SONG.name)));
 
     view! {
         <div class="bg-gray-900 min-h-screen" id="home page">
@@ -24,7 +25,7 @@ pub fn Home() -> impl IntoView {
                             .map(|song| {
                                view! {
                                        <SongCard
-                                           on:click=move |_| { 
+                                           on:click=move |_| {
                                                set_list.set((song, format!("{}-link-list", song.name)));
                                            }
                                            song_info=song

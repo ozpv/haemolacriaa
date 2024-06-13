@@ -1,11 +1,12 @@
 use leptos::*;
+use leptos_dom::{log, window};
 use leptos_meta::*;
 use leptos_router::*;
 
 use crate::components::footer::Footer;
 use crate::components::nav::Nav;
-use crate::pages::home::Home;
 use crate::error::{AppError, ErrorPage};
+use crate::pages::home::Home;
 
 /// View multiple components in Router, pass routes in succession
 macro_rules! multi_view {

@@ -28,6 +28,14 @@ icondata = "0.3.0"
 const_format = "0.2.32"
 sqlx = { version = "0.7.4", features = ["runtime-tokio", "sqlite"], optional = true }
 serde = "1.0.197"
+leptos_dom = "0.6.12"
+
+[dependencies.web-sys]
+version = "0.3.69"
+features = ["Navigator"]
+
+[build-dependencies]
+image = { version = "0.25.1" }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]

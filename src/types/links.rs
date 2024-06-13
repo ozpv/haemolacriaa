@@ -40,7 +40,12 @@ pub struct SongInfo {
 
 impl StreamingPlatform {
     fn create_url<'a>(&self, id: &'a str, is_album: bool, main: &'a str, alt: &'a str) -> String {
-        format!("{}{}{}", &self.id.unwrap_link(), if is_album { &main } else { &alt }, &id)
+        format!(
+            "{}{}{}",
+            &self.id.unwrap_link(),
+            if is_album { &main } else { &alt },
+            &id
+        )
     }
 }
 
@@ -53,14 +58,25 @@ impl SongInfo {
                 song_id: match platform.id {
                     Spotify(x, _) => {
                         if let Some(id) = &self.spotify_id {
-                            Some((x, platform.create_url(id, self.is_album, "album/", "track/")))
+                            Some((
+                                x,
+                                platform.create_url(id, self.is_album, "album/", "track/"),
+                            ))
                         } else {
                             None
                         }
                     }
                     YouTube(x, _) => {
                         if let Some(id) = &self.youtube_id {
-                            Some((x, platform.create_url(id, self.is_album, "playlist?list=", "watch?v=")))
+                            Some((
+                                x,
+                                platform.create_url(
+                                    id,
+                                    self.is_album,
+                                    "playlist?list=",
+                                    "watch?v=",
+                                ),
+                            ))
                         } else {
                             None
                         }
@@ -81,7 +97,10 @@ impl SongInfo {
                     }
                     Bandcamp(x, _) => {
                         if let Some(id) = &self.bandcamp_id {
-                            Some((x, platform.create_url(id, self.is_album, "album/", "track/")))
+                            Some((
+                                x,
+                                platform.create_url(id, self.is_album, "album/", "track/"),
+                            ))
                         } else {
                             None
                         }

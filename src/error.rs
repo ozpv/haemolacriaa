@@ -2,7 +2,7 @@ use http::status::StatusCode;
 use leptos::*;
 use thiserror::Error;
 
-use crate::components::{nav::Nav, footer::Footer};
+use crate::components::{footer::Footer, nav::Nav};
 
 #[derive(Clone, Debug, Error)]
 pub enum AppError {
@@ -17,7 +17,7 @@ impl AppError {
         use AppError::*;
         match self {
             NotFound => StatusCode::NOT_FOUND,
-            ResourceNotFound(_) => StatusCode::NOT_FOUND, 
+            ResourceNotFound(_) => StatusCode::NOT_FOUND,
         }
     }
 }

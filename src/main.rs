@@ -2,10 +2,10 @@
 #[tokio::main]
 async fn main() {
     use axum::Router;
-    use leptos::*;
-    use leptos_axum::{generate_route_list, LeptosRoutes};
     use haemolacriaa::app::*;
     use haemolacriaa::fileserv::file_and_error_handler;
+    use leptos::*;
+    use leptos_axum::{generate_route_list, LeptosRoutes};
 
     let conf = get_configuration(None).await.unwrap();
     let leptos_options = conf.leptos_options;
