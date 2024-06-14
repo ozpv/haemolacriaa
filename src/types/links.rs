@@ -57,53 +57,43 @@ impl SongInfo {
                 platform_icon: platform.icon,
                 song_id: match platform.id {
                     Spotify(x, _) => {
-                        if let Some(id) = &self.spotify_id {
-                            Some((
-                                x,
+                        self.spotify_id
+                            .as_ref()
+                            .map(|id| (
+                                x, 
                                 platform.create_url(id, self.is_album, "album/", "track/"),
                             ))
-                        } else {
-                            None
-                        }
                     }
                     YouTube(x, _) => {
-                        if let Some(id) = &self.youtube_id {
-                            Some((
+                        self.youtube_id
+                            .map(|id| (
                                 x,
                                 platform.create_url(
                                     id,
                                     self.is_album,
                                     "playlist?list=",
                                     "watch?v=",
-                                ),
+                                )
                             ))
-                        } else {
-                            None
-                        }
                     }
                     SoundCloud(x, _) => {
-                        if let Some(id) = &self.soundcloud_id {
-                            Some((x, platform.create_url(id, self.is_album, "sets/", "")))
-                        } else {
-                            None
-                        }
+                        self.soundcloud_id
+                            .map(|id| 
+                                (x, platform.create_url(id, self.is_album, "sets/", ""))
+                            )
                     }
                     AppleMusic(x, _) => {
-                        if let Some(id) = &self.apple_music_id {
-                            Some((x, platform.create_url(id, true, "", "")))
-                        } else {
-                            None
-                        }
+                        self.apple_music_id
+                            .map(|id| 
+                                (x, platform.create_url(id, true, "", ""))
+                            )
                     }
                     Bandcamp(x, _) => {
-                        if let Some(id) = &self.bandcamp_id {
-                            Some((
+                        self.bandcamp_id
+                            .map(|id| (
                                 x,
-                                platform.create_url(id, self.is_album, "album/", "track/"),
+                                platform.create_url(id, self.is_album, "album/", "track/")
                             ))
-                        } else {
-                            None
-                        }
                     }
                 },
             })

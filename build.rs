@@ -1,17 +1,17 @@
-use image::{ImageFormat, open};
-use std::fs::{File, read_dir};
+use image::{open, ImageFormat};
+use std::fs::{read_dir, File};
 use std::path::Path;
 
 /// Doesn't actually optimize yet
 /// I'm going to have to figure out
 /// Encoding settings
-fn encode_as_webp<'a>(assets_dir: &'a str) {
+fn encode_as_webp(assets_dir: &str) {
     let assets_dir = Path::new(assets_dir);
 
     read_dir(assets_dir)
         .expect("Failed to read assets directory")
         .filter_map(|file| file.ok())
-        .map(|entry| entry.path())
+        .map(|file| file.path())
         .filter_map(|file| {
             if file
                 .extension()
@@ -24,7 +24,8 @@ fn encode_as_webp<'a>(assets_dir: &'a str) {
         })
         .for_each(|file| {
             let image = open(file.clone()).unwrap();
-            let new_file = &mut File::create(Path::new(&format!("{}.webp", file.display()))).unwrap();
+            let new_file =
+                &mut File::create(Path::new(&format!("{}.webp", file.display()))).unwrap();
             println!("Optimized the following image: {file:?}");
             image.write_to(new_file, ImageFormat::WebP).unwrap();
         });

@@ -58,11 +58,12 @@ pub fn ErrorPage(
                 each=move || {errors.clone().into_iter().enumerate()}
                 key=|(index, _error)| *index
                 children=move |error| {
-                    let error_string = error.1.to_string();
+                    //let error_string = error.1.to_string();
                     let error_code = error.1.status_code();
                     view! {
-                        <h2 class="text-white text-center text-2xl font-sans">{error_code.to_string()}</h2>
-                        <p class="text-white text-center text-lg font-sans">"Error: " {error_string}</p>
+                        <h2 class="text-white text-center text-2xl font-sans p-[20px]">{error_code.to_string()}</h2>
+                        //<p class="text-white text-center text-lg font-sans">"Error: " {error_string}</p>
+                        <a class="block text-white justify-center text-center font-sans hover:text-blue-900" href="/">{"Return home"}</a>
                     }
                 }
             />

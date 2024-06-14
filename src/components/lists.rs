@@ -58,7 +58,7 @@ pub fn StreamingList(
                 </nav>
             </div>
             {
-                move || if appendix && appendix_social != None {
+                move || if appendix && appendix_social.is_some() {
                     view!(<Appendix social_media_info=appendix_social/>)
                 } else {
                     ().into_view()
