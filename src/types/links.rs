@@ -58,7 +58,6 @@ impl SongInfo {
                 song_id: match platform.id {
                     Spotify(x, _) => {
                         self.spotify_id
-                            .as_ref()
                             .map(|id| (
                                 x, 
                                 platform.create_url(id, self.is_album, "album/", "track/"),

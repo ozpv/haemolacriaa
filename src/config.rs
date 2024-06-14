@@ -70,7 +70,7 @@ pub static OTHER_SONGS: [SongInfo; 3] = [
         name: "stay",
         author: USERNAME,
         image: Image {
-            path: Some("assets/stay.jpg"),
+            path: Some("assets/stay.webp"),
             width: "400px",
             height: "400px",
         },
@@ -85,7 +85,7 @@ pub static OTHER_SONGS: [SongInfo; 3] = [
         name: "still",
         author: USERNAME,
         image: Image {
-            path: Some("assets/still.jpg"),
+            path: Some("assets/still.webp"),
             width: "400px",
             height: "400px",
         },
@@ -100,7 +100,7 @@ pub static OTHER_SONGS: [SongInfo; 3] = [
         name: "serene",
         author: USERNAME,
         image: Image {
-            path: Some("assets/serene.jpg"),
+            path: Some("assets/serene.webp"),
             width: "400px",
             height: "400px",
         },
