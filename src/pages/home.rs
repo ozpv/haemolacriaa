@@ -10,7 +10,7 @@ pub fn Home() -> impl IntoView {
 
     view! {
         <div class="bg-gray-900 min-h-screen" id="home page">
-            <StreamingList list_info=list />
+            <StreamingList list_info=list/>
             <Divider/>
             <div class="" id="previous-releases">
                 <span class="flex justify-center mt-[30px]" id="Text">

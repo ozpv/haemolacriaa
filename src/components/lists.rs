@@ -8,18 +8,16 @@ use crate::types::links::{SocialMediaInfo, SongInfo};
 fn Appendix(social_media_info: Option<&'static SocialMediaInfo>) -> impl IntoView {
     view! {
         {
-            move || match social_media_info {
-                Some(info) => {
-                    view! {
+            social_media_info
+                .map_or(().into_view(), |info| {
+                     view! {
                         <div class="flex justify-center">
                             <nav id="social-media-links">
                                 <a class="flex text-white mt-[10px] mb-[10px] p-[8px] rounded-sm transition-all ease-in duration-75 hover:bg-gray-800" href=info.url><Icon icon=info.icon width="16" height="16"/></a>
                             </nav>
                         </div>
                     }.into_view()
-                },
-                None => ().into_view()
-            }
+                })
         }
     }
 }
@@ -27,9 +25,8 @@ fn Appendix(social_media_info: Option<&'static SocialMediaInfo>) -> impl IntoVie
 #[component]
 pub fn StreamingList(
     list_info: ReadSignal<(&'static SongInfo, String)>,
-    #[prop(default = false)] appendix: bool,
-    // only pass Some if previous bool is true
-    #[prop(optional)] appendix_social: Option<&'static SocialMediaInfo>,
+    #[prop(optional)] 
+    appendix_social: Option<&'static SocialMediaInfo>,
 ) -> impl IntoView {
     let song_info = move || list_info.get().0;
     let id = move || list_info.get().1;
@@ -42,27 +39,30 @@ pub fn StreamingList(
             <div class="flex justify-center">
                 <nav id="streaming-links">
                     {
-                        move || song_info().build_streaming_info().into_iter().map(|item| {
-                            if let Some((platform_name, song_url)) = item.song_id {
-                                view! {
-                                    <LinkButton class="text-white text-md font-sans pt-[20px] pb-[20px] w-80 hover:scale-105" href=song_url id=format!("{}-link-button", platform_name)>
-                                        <Icon icon=item.platform_icon width="24" height="24"/>
-                                        <p class="pl-4">{platform_name}</p>
-                                    </LinkButton>
-                                }.into_view()
-                            } else {
-                                ().into_view()
+                        move || song_info()
+                            .build_streaming_info()
+                            .into_iter()
+                            .map(|item| {
+                                item.song_id.map_or(().into_view(), |(platform_name, song_url)| {
+                                    view! {
+                                        <LinkButton class="text-white text-md font-sans pt-[20px] pb-[20px] w-80 hover:scale-105" href=song_url id=format!("{}-link-button", platform_name)>
+                                            <Icon icon=item.platform_icon width="24" height="24"/>
+                                            <p class="pl-4">{platform_name}</p>
+                                        </LinkButton>
+                                    }.into_view()
+                                })
                             }
-                        }).collect_view()
+                            ).collect_view()
                     }
                 </nav>
             </div>
             {
-                move || if appendix && appendix_social.is_some() {
-                    view!(<Appendix social_media_info=appendix_social/>)
-                } else {
-                    ().into_view()
-                }
+                appendix_social
+                    .map_or(().into_view(), |_| {
+                        view! {
+                            <Appendix social_media_info=appendix_social/>
+                        }
+                    })
             }
         </div>
     }

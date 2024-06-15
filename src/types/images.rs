@@ -1,6 +1,6 @@
 pub struct Image {
     pub path: Option<&'static str>,
-    // Any valid CSS units (em, px, in...)
+    /// Any valid CSS units (em, px, in...)
     pub width: &'static str,
     pub height: &'static str,
 }
