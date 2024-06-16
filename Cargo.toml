@@ -28,6 +28,7 @@ icondata = "0.3.0"
 const_format = "0.2.32"
 sqlx = { version = "0.7.4", features = ["runtime-tokio", "postgres"], optional = true }
 serde = "1.0.197"
+uuid = { version = "1.8.0", features = ["serde"], optional = true }
 
 [build-dependencies]
 image = { version = "0.25.1" }
@@ -42,6 +43,7 @@ ssr = [
   "dep:tower-http",
   "dep:leptos_axum",
   "dep:sqlx",
+  "dep:uuid",
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",

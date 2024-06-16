@@ -1,5 +1,3 @@
-#![feature(const_trait_impl, effects)]
-
 pub mod app;
 pub mod components;
 pub mod config;

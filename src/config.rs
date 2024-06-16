@@ -76,7 +76,7 @@ pub static OTHER_SONGS: [ConstSong; 3] = [
         },
         is_album: false,
         spotify_id: Some("3rzuDN6mPujdByy2QfCArW"),
-        youtube_id: Some("R_sOCYxbaKo"),
+        youtube_id: Some("b_IEnLvLn3Y"),
         soundcloud_id: Some("stay"),
         apple_music_id: Some("1681486735"),
         bandcamp_id: None,

@@ -1,4 +1,10 @@
-#[cfg(feature = "ssr")]
+#[cfg(feature = "ssr")] 
+pub struct AppState {
+    pub db_pool: Pool<Postgres>,
+    pub leptos_options: LeptosOptions,
+}
+
+#[cfg(feature = "ssr")] 
 #[tokio::main]
 async fn main() {
     use axum::Router;
@@ -24,13 +30,18 @@ async fn main() {
         .unwrap_or_else(|_| "postgres://postgres:password@localhost".to_string());
 
     // set up postgres connection pool
-    /*let pool = PgPoolOptions::new()
+    let db_pool = PgPoolOptions::new()
         .max_connections(5)
         .acquire_timeout(Duration::from_secs(3))
         .connect(&db_connection_str)
         .await
-        .expect("can't connect to database");
-    */
+        .expect("Failed to connect to database");
+
+    // app state
+    let state = AppState {
+        db_pool,
+        leptos_options,
+    };
 
     // build our application with a route
     let app = Router::new()
@@ -43,7 +54,7 @@ async fn main() {
                .delete(song_db::delete_song_by_id))
         .leptos_routes(&leptos_options, routes, App)
         .fallback(file_and_error_handler)
-        .with_state(leptos_options);
+        .with_state(Arc::new(state));
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     logging::log!("listening on http://{}", &addr);
