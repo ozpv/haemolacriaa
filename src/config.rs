@@ -2,8 +2,8 @@ use const_format::formatcp;
 use icondata as ico;
 
 use crate::types::{
-    images::Image,
-    links::{SocialMediaInfo, SongInfo, StreamingPlatform},
+    images::ConstImage,
+    links::{SocialMediaInfo, ConstSong, StreamingPlatform},
     routes::RouteInfo,
 };
 
@@ -45,14 +45,14 @@ pub static NAV_ITEMS: [RouteInfo; 2] = [
 /// Body
 
 // Current song, set it to be displayed on home page.
-pub const CURRENT_SONG: SongInfo = HAEMOLACRIAA_ALBUM;
+pub const CURRENT_SONG: ConstSong = HAEMOLACRIAA_ALBUM;
 
 // Define any other songs or albums below
 
-pub const HAEMOLACRIAA_ALBUM: SongInfo = SongInfo {
+pub const HAEMOLACRIAA_ALBUM: ConstSong = ConstSong {
     name: "haemolacriaa",
     author: USERNAME,
-    image: Image {
+    image: ConstImage {
         path: Some("assets/haemolacriaa.webp"),
         width: "400px",
         height: "400px",
@@ -65,11 +65,11 @@ pub const HAEMOLACRIAA_ALBUM: SongInfo = SongInfo {
     bandcamp_id: Some("haemolacriaa"),
 };
 
-pub static OTHER_SONGS: [SongInfo; 3] = [
-    SongInfo {
+pub static OTHER_SONGS: [ConstSong; 3] = [
+    ConstSong {
         name: "stay",
         author: USERNAME,
-        image: Image {
+        image: ConstImage {
             path: Some("assets/stay.webp"),
             width: "400px",
             height: "400px",
@@ -81,10 +81,10 @@ pub static OTHER_SONGS: [SongInfo; 3] = [
         apple_music_id: Some("1681486735"),
         bandcamp_id: None,
     },
-    SongInfo {
+    ConstSong {
         name: "still",
         author: USERNAME,
-        image: Image {
+        image: ConstImage {
             path: Some("assets/still.webp"),
             width: "400px",
             height: "400px",
@@ -96,10 +96,10 @@ pub static OTHER_SONGS: [SongInfo; 3] = [
         apple_music_id: Some("1667165253"),
         bandcamp_id: None,
     },
-    SongInfo {
+    ConstSong {
         name: "serene",
         author: USERNAME,
-        image: Image {
+        image: ConstImage {
             path: Some("assets/serene.webp"),
             width: "400px",
             height: "400px",

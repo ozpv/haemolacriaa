@@ -2,7 +2,7 @@ use leptos::*;
 use leptos_icons::*;
 
 use crate::components::buttons::LinkButton;
-use crate::types::links::{SocialMediaInfo, SongInfo};
+use crate::types::links::{SocialMediaInfo, Song};
 
 #[component]
 fn Appendix(social_media_info: Option<&'static SocialMediaInfo>) -> impl IntoView {
@@ -24,9 +24,8 @@ fn Appendix(social_media_info: Option<&'static SocialMediaInfo>) -> impl IntoVie
 
 #[component]
 pub fn StreamingList(
-    list_info: ReadSignal<(&'static SongInfo, String)>,
-    #[prop(optional)] 
-    appendix_social: Option<&'static SocialMediaInfo>,
+    list_info: ReadSignal<(Song, String)>,
+    #[prop(optional)] appendix_social: Option<&'static SocialMediaInfo>,
 ) -> impl IntoView {
     let song_info = move || list_info.get().0;
     let id = move || list_info.get().1;

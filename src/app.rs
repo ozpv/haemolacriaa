@@ -22,12 +22,13 @@ macro_rules! multi_view {
         }
     };
 }
-
+/*
 macro_rules! todo_page {
     () => {{
         multi_view!(Nav, Todo)
     }};
 }
+*/
 
 #[component]
 pub fn App() -> impl IntoView {

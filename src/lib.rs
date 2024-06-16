@@ -1,3 +1,5 @@
+#![feature(const_trait_impl, effects)]
+
 pub mod app;
 pub mod components;
 pub mod config;
@@ -6,6 +8,8 @@ pub mod error;
 pub mod fileserv;
 pub mod pages;
 pub mod types;
+#[cfg(feature = "ssr")]
+pub mod song_db;
 
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen::prelude::wasm_bindgen]
