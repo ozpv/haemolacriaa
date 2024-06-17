@@ -169,7 +169,7 @@ Now we need to allow our test machine to connect to the DB
 Append this line to pg_hba.conf:
 ```
 vim /etc/postgresql/15/main/pg_hba.conf
-hostssl   songdb             songuser             <your-ip>/0        scream-sha-256
+hostssl   songdb             songuser             <your-ip>/0        scram-sha-256
 :wq
 ```
 
