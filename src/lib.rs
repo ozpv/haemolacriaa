@@ -8,6 +8,8 @@ pub mod pages;
 pub mod types;
 #[cfg(feature = "ssr")]
 pub mod song_db;
+#[cfg(feature = "ssr")]
+pub mod app_state;
 
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen::prelude::wasm_bindgen]

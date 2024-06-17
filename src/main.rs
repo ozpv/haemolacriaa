@@ -1,20 +1,14 @@
 #[cfg(feature = "ssr")] 
-pub struct AppState {
-    pub db_pool: Pool<Postgres>,
-    pub leptos_options: LeptosOptions,
-}
-
-#[cfg(feature = "ssr")] 
 #[tokio::main]
 async fn main() {
-    use axum::Router;
+    use axum::{routing::get, Router};
     use haemolacriaa::app::*;
     use haemolacriaa::fileserv::file_and_error_handler;
+    use haemolacriaa::app_state::AppState;
+    use haemolacriaa::song_db;
     use leptos::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
-    use sqlx::postgres::{PgPool, PgPoolOptions};
-    use haemolacriaa::song_db;
-    use axum::routing::get;
+    use sqlx::postgres::{PgSslMode, PgConnectOptions, PgPoolOptions};
     use std::time::Duration;
 
     // Setting get_configuration(None) means we'll be using cargo-leptos's env values
@@ -26,14 +20,32 @@ async fn main() {
     let leptos_options = conf.leptos_options;
     let addr = leptos_options.site_addr;
     let routes = generate_route_list(App);
-    let db_connection_str = std::env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "postgres://postgres:password@localhost".to_string());
 
-    // set up postgres connection pool
+    // to build the postgres connection
+    let user = std::env::var("PG_USER").expect("Failed to get postgres user!");
+    let password = std::env::var("PG_PASSWORD").expect("Failed to get postgres password!");
+    let host = std::env::var("PG_HOST").expect("Failed to get postgres host!");
+    let port = std::env::var("PG_PORT")
+        .expect("Failed to get postgres port!")
+        .parse::<u16>()
+        .ok()
+        .expect("Failed to parse port as a u16!");
+    let db = std::env::var("PG_DATABASE").expect("Failed to get postgres database!");
+
+    // setup postgres options
+    let db_options = PgConnectOptions::new() 
+        .host(&host)
+        .port(port)
+        .username(&user)
+        .password(&password)
+        .database(&db)
+        .ssl_mode(PgSslMode::Require);
+
+    // setup postgres connection pool
     let db_pool = PgPoolOptions::new()
         .max_connections(5)
         .acquire_timeout(Duration::from_secs(3))
-        .connect(&db_connection_str)
+        .connect_with(db_options)
         .await
         .expect("Failed to connect to database");
 
@@ -52,9 +64,9 @@ async fn main() {
                get(song_db::get_song_by_id)
                .patch(song_db::update_song_entry)
                .delete(song_db::delete_song_by_id))
-        .leptos_routes(&leptos_options, routes, App)
+        .leptos_routes(&state, routes, App)
         .fallback(file_and_error_handler)
-        .with_state(Arc::new(state));
+        .with_state(state);
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     logging::log!("listening on http://{}", &addr);

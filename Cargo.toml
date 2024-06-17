@@ -10,7 +10,7 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-axum = { version = "0.7", optional = true }
+axum = { version = "0.7", optional = true, features = ["macros"] }
 console_error_panic_hook = "0.1"
 leptos = { version = "0.6" }
 leptos_meta = { version = "0.6" }
@@ -26,7 +26,7 @@ wasm-bindgen = "=0.2.92"
 leptos_icons = "0.3.0"
 icondata = "0.3.0"
 const_format = "0.2.32"
-sqlx = { version = "0.7.4", features = ["runtime-tokio", "postgres"], optional = true }
+sqlx = { version = "0.7.4", features = ["runtime-tokio", "postgres", "tls-rustls"], optional = true }
 serde = "1.0.197"
 uuid = { version = "1.8.0", features = ["serde"], optional = true }
 
