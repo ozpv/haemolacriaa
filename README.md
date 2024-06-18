@@ -145,6 +145,11 @@ alter user songuser with encrypted password '<password-here>';
 grant all privileges on database songdb to songuser;
 ```
 
+Then set our new database's owner to our new user (important)
+```
+alter database songdb owner to songuser;
+```
+
 Now we need to edit the config to listen on our VPS's static ipv4 
 Use this command to find the directory of the config files, and exit:
 ```
