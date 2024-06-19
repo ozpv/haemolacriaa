@@ -2,8 +2,8 @@ use const_format::formatcp;
 use icondata as ico;
 
 use crate::types::{
-    images::ConstImage,
-    links::{SocialMediaInfo, ConstSong, StreamingPlatform},
+    images::Image,
+    links::{SocialMediaInfo, Song, StreamingPlatform},
     routes::RouteInfo,
 };
 
@@ -45,17 +45,17 @@ pub static NAV_ITEMS: [RouteInfo; 2] = [
 /// Body
 
 // Current song, set it to be displayed on home page.
-pub const CURRENT_SONG: ConstSong = HAEMOLACRIAA_ALBUM;
+pub const CURRENT_SONG: Song<&'static str> = HAEMOLACRIAA_ALBUM;
 
 // Define any other songs or albums below
 
-pub const HAEMOLACRIAA_ALBUM: ConstSong = ConstSong {
+pub const HAEMOLACRIAA_ALBUM: Song<&'static str> = Song {
     name: "haemolacriaa",
     author: USERNAME,
-    image: ConstImage {
-        path: Some("assets/haemolacriaa.webp"),
-        width: "400px",
-        height: "400px",
+    image: Image {
+        path: "assets/haemolacriaa.webp",
+        width: Some("400px"),
+        height: Some("400px"),
     },
     is_album: true,
     spotify_id: Some("5TmWqQ0YoJ9t8PHPSqhZLp"),
@@ -63,16 +63,17 @@ pub const HAEMOLACRIAA_ALBUM: ConstSong = ConstSong {
     soundcloud_id: Some("haemolacriaa"),
     apple_music_id: Some("1739982491"),
     bandcamp_id: Some("haemolacriaa"),
+    publish_date: chrono::NaiveDate::from_ymd_opt(2024, 4, 19),
 };
 
-pub static OTHER_SONGS: [ConstSong; 3] = [
-    ConstSong {
+pub static OTHER_SONGS: [Song<&'static str>; 3] = [
+    Song {
         name: "stay",
         author: USERNAME,
-        image: ConstImage {
-            path: Some("assets/stay.webp"),
-            width: "400px",
-            height: "400px",
+        image: Image {
+            path: "assets/stay.webp",
+            width: Some("400px"), 
+            height: Some("400px"),
         },
         is_album: false,
         spotify_id: Some("3rzuDN6mPujdByy2QfCArW"),
@@ -80,14 +81,15 @@ pub static OTHER_SONGS: [ConstSong; 3] = [
         soundcloud_id: Some("stay"),
         apple_music_id: Some("1681486735"),
         bandcamp_id: None,
+        publish_date: chrono::NaiveDate::from_ymd_opt(2023, 4, 14),
     },
-    ConstSong {
+    Song {
         name: "still",
         author: USERNAME,
-        image: ConstImage {
-            path: Some("assets/still.webp"),
-            width: "400px",
-            height: "400px",
+        image: Image {
+            path: "assets/still.webp",
+            width: Some("400px"),
+            height: Some("400px"),
         },
         is_album: false,
         spotify_id: Some("07UyLVNFU0kyLYEM68WoPj"),
@@ -95,14 +97,15 @@ pub static OTHER_SONGS: [ConstSong; 3] = [
         soundcloud_id: Some("still"),
         apple_music_id: Some("1667165253"),
         bandcamp_id: None,
+        publish_date: chrono::NaiveDate::from_ymd_opt(2023, 1, 27),
     },
-    ConstSong {
+    Song {
         name: "serene",
         author: USERNAME,
-        image: ConstImage {
-            path: Some("assets/serene.webp"),
-            width: "400px",
-            height: "400px",
+        image: Image {
+            path: "assets/serene.webp",
+            width: Some("400px"),
+            height: Some("400px"),
         },
         is_album: false,
         spotify_id: Some("3rodixiNeB4ni5cDh9OvMz"),
@@ -110,6 +113,7 @@ pub static OTHER_SONGS: [ConstSong; 3] = [
         soundcloud_id: Some("serene"),
         apple_music_id: Some("1656357115"),
         bandcamp_id: None,
+        publish_date: chrono::NaiveDate::from_ymd_opt(2022, 12, 4),
     },
 ];
 

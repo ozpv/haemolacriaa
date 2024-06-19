@@ -5,19 +5,16 @@ use thiserror::Error;
 use crate::components::{footer::Footer, nav::Nav};
 
 #[derive(Clone, Debug, Error)]
-pub enum AppError {
+pub enum ServerError {
     #[error("Not Found")]
     NotFound,
-    #[error("The resource {0} is not found on this server.")]
-    ResourceNotFound(String),
 }
 
-impl AppError {
+impl ServerError {
     pub fn status_code(&self) -> StatusCode {
-        use AppError::*;
+        use ServerError::*;
         match self {
             NotFound => StatusCode::NOT_FOUND,
-            ResourceNotFound(_) => StatusCode::NOT_FOUND,
         }
     }
 }
@@ -36,9 +33,9 @@ pub fn ErrorPage(
     };
     let errors = errors.get_untracked();
 
-    let errors: Vec<AppError> = errors
+    let errors: Vec<ServerError> = errors
         .into_iter()
-        .filter_map(|(_k, v)| v.downcast_ref::<AppError>().cloned())
+        .filter_map(|(_k, v)| v.downcast_ref::<ServerError>().cloned())
         .collect();
     println!("Error: {errors:?}");
 

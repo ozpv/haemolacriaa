@@ -1,36 +1,23 @@
 use serde::{Serialize, Deserialize};
+#[cfg(feature = "ssr")]
+use sqlx::Type;
 
-pub struct ConstImage {
-    pub path: Option<&'static str>,
+#[derive(Copy, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "ssr", derive(Type))]
+pub struct Image<T = String> {
+    pub path: T,
     /// Any valid CSS units (em, px, in...)
-    pub width: &'static str,
-    pub height: &'static str,
+    /// Defaults to what makes sense (Usually 400px)
+    pub width: Option<T>,
+    pub height: Option<T>,
 }
 
-impl ConstImage {
-    pub fn to_image(&self) -> Image {
+impl<'a> From<Image<&'a str>> for Image<String> {
+    fn from(i: Image<&'a str>) -> Image<String> {
         Image {
-            path: self.path.map(|p| p.to_string()),
-            width: self.width.to_string(),
-            height: self.height.to_string(),
+            path: i.path.to_owned(),
+            width: i.width.map(|w| w.to_owned()),
+            height: i.height.map(|h| h.to_owned()),
         }
     }
-}
-
-impl Default for ConstImage {
-    fn default() -> Self {
-        Self {
-            path: None,
-            width: "400px",
-            height: "400px",
-        }
-    }
-}
-
-#[derive(Clone, Serialize, Deserialize)]
-pub struct Image {
-    pub path: Option<String>,
-    /// Any valid CSS units (em, px, in...)
-    pub width: String,
-    pub height: String,
 }

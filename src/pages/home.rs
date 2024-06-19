@@ -2,11 +2,12 @@ use leptos::*;
 
 use crate::components::{card::SongCard, lists::StreamingList, misc::Divider};
 use crate::config::{CURRENT_SONG, OTHER_SONGS};
+use crate::types::links::Song;
 
 #[component]
 pub fn Home() -> impl IntoView {
     let (list, set_list) =
-        create_signal((CURRENT_SONG.to_song(), format!("{}-link-list", &CURRENT_SONG.name)));
+        create_signal((Song::<String>::from(CURRENT_SONG), format!("{}-link-list", &CURRENT_SONG.name)));
 
     view! {
         <div class="bg-gray-900 min-h-screen" id="home page">
@@ -22,7 +23,7 @@ pub fn Home() -> impl IntoView {
                     {
                         OTHER_SONGS
                             .iter()
-                            .map(|song| song.to_song())
+                            .map(|song| Song::<String>::from(*song))
                             .map(|song| {
                                view! {
                                        <SongCard

@@ -1,8 +1,10 @@
 use icondata::Icon;
 use serde::{Serialize,Deserialize};
+#[cfg(feature = "ssr")]
+use sqlx::FromRow;
 
 use crate::config::{PlatformId, PlatformId::*, STREAMING_PLATFORMS};
-use crate::types::images::{ConstImage, Image};
+use crate::types::images::Image;
 
 // Social media info section
 
@@ -21,7 +23,16 @@ pub struct StreamingPlatform {
 }
 
 impl StreamingPlatform {
-    fn create_url<'a>(&self, id: &String, is_album: bool, main: &'a str, alt: &'a str) -> String {
+    fn create_url<'a, T>(
+        &self, 
+        id: &T, 
+        is_album: bool, 
+        main: &'a str, 
+        alt: &'a str
+    ) -> String 
+        where
+            T: std::fmt::Display
+    {
         format!(
             "{}{}{}",
             &self.id.unwrap_link(),
@@ -38,21 +49,40 @@ pub struct StreamingInfo {
 
 // Song info section
 
-#[derive(Clone, Serialize, Deserialize)]
-pub struct Song {
-    pub name: String,
-    pub author: String,
-    pub image: Image,
+#[derive(Copy, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "ssr", derive(FromRow))]
+pub struct Song<T = String> {
+    pub name: T,
+    pub author: T,
+    pub image: Image<T>,
     pub is_album: bool,
-    pub spotify_id: Option<String>,
-    pub youtube_id: Option<String>,
-    pub soundcloud_id: Option<String>,
-    pub apple_music_id: Option<String>,
-    pub bandcamp_id: Option<String>,
+    pub spotify_id: Option<T>,
+    pub youtube_id: Option<T>,
+    pub soundcloud_id: Option<T>,
+    pub apple_music_id: Option<T>,
+    pub bandcamp_id: Option<T>,
+    pub publish_date: Option<chrono::NaiveDate>,
 }
 
-impl Song {
-   pub fn get_key(&self) -> String {
+impl<'a> From<Song<&'a str>> for Song<String> {
+    fn from(s: Song<&'a str>) -> Song<String> {
+        Song {
+            name: s.name.to_owned(),
+            author: s.author.to_owned(),
+            image: Image::from(s.image),
+            is_album: s.is_album,
+            spotify_id: s.spotify_id.map(|st| st.to_owned()),
+            youtube_id: s.youtube_id.map(|st| st.to_owned()),
+            soundcloud_id: s.soundcloud_id.map(|st| st.to_owned()),
+            apple_music_id: s.apple_music_id.map(|st| st.to_owned()),
+            bandcamp_id: s.bandcamp_id.map(|st| st.to_owned()),
+            publish_date: s.publish_date,
+        }
+    }
+}
+
+impl<T: std::fmt::Display> Song<T> {
+    pub fn get_key(&self) -> String {
         format!(
             "{}{}", 
             self.name,
@@ -62,38 +92,8 @@ impl Song {
                 "song"
             },
         )
-   }
-}
-
-pub struct ConstSong {
-    pub name: &'static str,
-    pub author: &'static str,
-    pub image: ConstImage,
-    pub is_album: bool,
-    pub spotify_id: Option<&'static str>,
-    pub youtube_id: Option<&'static str>,
-    pub soundcloud_id: Option<&'static str>,
-    pub apple_music_id: Option<&'static str>,
-    pub bandcamp_id: Option<&'static str>,
-}
-
-impl ConstSong {
-    pub fn to_song(&self) -> Song {
-        Song {
-            name: self.name.to_string(),
-            author: self.author.to_string(),
-            image: self.image.to_image(),
-            is_album: self.is_album,
-            spotify_id: self.spotify_id.map(|s| s.to_string()),
-            youtube_id: self.youtube_id.map(|s| s.to_string()),
-            soundcloud_id: self.soundcloud_id.map(|s| s.to_string()),
-            apple_music_id: self.apple_music_id.map(|s| s.to_string()),
-            bandcamp_id: self.bandcamp_id.map(|s| s.to_string()),
-        }
     }
-}
 
-impl Song {
     pub fn build_streaming_info(self) -> Vec<StreamingInfo> {
         STREAMING_PLATFORMS
             .iter()

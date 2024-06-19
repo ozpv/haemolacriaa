@@ -32,5 +32,6 @@ fn encode_as_webp(assets_dir: &str) {
 }
 
 fn main() {
+    println!("cargo:rerun-if-changed=migrations");
     encode_as_webp("assets");
 }
