@@ -67,14 +67,14 @@ http {
         proxy_hide_header X-Runtime;
 
         server {
-                server_name www.haemolacriaa.com;
-                return 301 $scheme://haemolacriaa.com$request_uri;
+                server_name www.<example.com>;
+                return 301 $scheme://<example.com>$request_uri;
         }
 
         server {
                 listen 80;
                 listen [::]:80;
-                server_name haemolacriaa.com;
+                server_name <example.com>;
 
                 return 301 https://$host$request_uri;
         }
@@ -83,11 +83,11 @@ http {
                 listen [::]:443 ssl;
                 listen 443 ssl;
 
-                ssl_certificate "/etc/letsencrypt/live/haemolacriaa.com/fullchain.pem";
-                ssl_certificate_key "/etc/letsencrypt/live/haemolacriaa.com/privkey.pem";
-                ssl_trusted_certificate "/etc/letsencrypt/live/haemolacriaa.com/chain.pem";
+                ssl_certificate "/etc/letsencrypt/live/<example.com>/fullchain.pem";
+                ssl_certificate_key "/etc/letsencrypt/live/<example.com>/privkey.pem";
+                ssl_trusted_certificate "/etc/letsencrypt/live/<example.com>/chain.pem";
 
-                server_name haemolacriaa.com;
+                server_name <example.com>;
 
                 location / {
                         proxy_pass http://127.0.0.1:3000;
