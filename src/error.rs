@@ -1,22 +1,30 @@
-use http::status::StatusCode;
+use http::StatusCode;
 use leptos::*;
 use thiserror::Error;
 
 use crate::components::{footer::Footer, nav::Nav};
 
 #[derive(Clone, Debug, Error)]
-pub enum ServerError {
+pub enum AppError {
     #[error("Not Found")]
     NotFound,
 }
 
-impl ServerError {
+impl AppError {
     pub fn status_code(&self) -> StatusCode {
-        use ServerError::*;
+        use AppError::*;
         match self {
             NotFound => StatusCode::NOT_FOUND,
         }
     }
+}
+
+#[cfg(feature = "ssr")]
+pub enum AuthError {
+    WrongCredentials,
+    MissingCredentials,
+    TokenCreation,
+    InvalidToken,
 }
 
 #[component]
@@ -33,9 +41,9 @@ pub fn ErrorPage(
     };
     let errors = errors.get_untracked();
 
-    let errors: Vec<ServerError> = errors
+    let errors: Vec<AppError> = errors
         .into_iter()
-        .filter_map(|(_k, v)| v.downcast_ref::<ServerError>().cloned())
+        .filter_map(|(_k, v)| v.downcast_ref::<AppError>().cloned())
         .collect();
     println!("Error: {errors:?}");
 

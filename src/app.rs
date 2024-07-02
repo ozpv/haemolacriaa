@@ -4,7 +4,7 @@ use leptos_router::*;
 
 use crate::components::footer::Footer;
 use crate::components::nav::Nav;
-use crate::error::{ServerError, ErrorPage};
+use crate::error::{AppError, ErrorPage};
 use crate::pages::home::Home;
 use crate::pages::shop::Shop;
 
@@ -40,7 +40,7 @@ pub fn App() -> impl IntoView {
 
         <Router fallback=|| {
             let mut outside_errors = Errors::default();
-            outside_errors.insert_with_default_key(ServerError::NotFound);
+            outside_errors.insert_with_default_key(AppError::NotFound);
             view! {
                 <ErrorPage outside_errors/>
             }

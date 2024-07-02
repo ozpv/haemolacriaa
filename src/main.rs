@@ -2,10 +2,11 @@
 #[tokio::main]
 async fn main() {
     use axum::{routing::get, Router};
+    use tower_http::compression::CompressionLayer;
     use haemolacriaa::app::*;
     use haemolacriaa::fileserv::file_and_error_handler;
     use haemolacriaa::app_state::AppState;
-    use haemolacriaa::song_db;
+    use haemolacriaa::{song_db, jwt};
     use leptos::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use sqlx::postgres::{PgSslMode, PgConnectOptions, PgPoolOptions};
@@ -61,12 +62,14 @@ async fn main() {
                get(song_db::get_latest_song_album)
                .post(song_db::add_song))
         .route("/api/song/:id", 
-               get(song_db::get_song_by_id)
+               get(song_db::get_song_by_name)
                .patch(song_db::update_song_entry)
-               .delete(song_db::delete_song_by_id))
+               .delete(song_db::delete_song_by_name))
+        .route("/api/token", get(jwt::get_token))
         .leptos_routes(&state, routes, App)
         .fallback(file_and_error_handler)
-        .with_state(state);
+        .with_state(state)
+        .layer(CompressionLayer::new());
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     logging::log!("listening on http://{}", &addr);
