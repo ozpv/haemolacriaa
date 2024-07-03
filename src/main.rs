@@ -11,6 +11,7 @@ async fn main() {
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use sqlx::postgres::{PgSslMode, PgConnectOptions, PgPoolOptions};
     use std::time::Duration;
+    use std::sync::Arc;
 
     // Setting get_configuration(None) means we'll be using cargo-leptos's env values
     // For deployment these variables are:
@@ -61,7 +62,7 @@ async fn main() {
         .route("/api/song", 
                get(song_db::get_latest_song_album)
                .post(song_db::add_song))
-        .route("/api/song/:id", 
+        .route("/api/song/:name", 
                get(song_db::get_song_by_name)
                .patch(song_db::update_song_entry)
                .delete(song_db::delete_song_by_name))
