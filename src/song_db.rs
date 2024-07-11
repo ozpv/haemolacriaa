@@ -1,6 +1,5 @@
 use axum::{extract::State, http::StatusCode, response::IntoResponse, Json, extract::Path};
 use sqlx::Row;
-use std::sync::Arc;
 
 use crate::types::links::Song;
 use crate::app_state::AppState;

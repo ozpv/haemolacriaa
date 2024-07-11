@@ -1,7 +1,7 @@
 #[cfg(feature = "ssr")] 
 #[tokio::main]
 async fn main() {
-    use axum::{routing::get, Router};
+    use axum::{middleware, routing::{get, post, patch}, Router};
     use tower_http::compression::CompressionLayer;
     use haemolacriaa::app::*;
     use haemolacriaa::fileserv::file_and_error_handler;
@@ -11,7 +11,6 @@ async fn main() {
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use sqlx::postgres::{PgSslMode, PgConnectOptions, PgPoolOptions};
     use std::time::Duration;
-    use std::sync::Arc;
 
     // Setting get_configuration(None) means we'll be using cargo-leptos's env values
     // For deployment these variables are:
@@ -51,22 +50,31 @@ async fn main() {
         .await
         .expect("Failed to connect to database");
 
+    // run migrations
+    sqlx::migrate!()
+        .run(&db_pool)
+        .await
+        .expect("Failed to run SQLx migrations!");
+
     // app state
     let state = AppState {
         db_pool,
         leptos_options,
     };
-
+    
+    // protected routes requiring jwt auth
+    let protected = Router::new()
+        .route("/api/song", post(song_db::add_song))
+        .route("/api/song/:name", 
+               patch(song_db::update_song_entry)
+               .delete(song_db::delete_song_by_name)
+        ).layer(middleware::from_fn(jwt::auth_mw));
+    
     // build our application with a route
     let app = Router::new()
-        .route("/api/song", 
-               get(song_db::get_latest_song_album)
-               .post(song_db::add_song))
-        .route("/api/song/:name", 
-               get(song_db::get_song_by_name)
-               .patch(song_db::update_song_entry)
-               .delete(song_db::delete_song_by_name))
-        .route("/api/token", get(jwt::get_token))
+        .route("/api/song", get(song_db::get_latest_song_album))
+        .route("/api/song/:name", get(song_db::get_song_by_name))
+        .merge(protected)
         .leptos_routes(&state, routes, App)
         .fallback(file_and_error_handler)
         .with_state(state)

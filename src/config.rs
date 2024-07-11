@@ -45,28 +45,44 @@ pub static NAV_ITEMS: [RouteInfo; 2] = [
 /// Body
 
 // Current song, set it to be displayed on home page.
-pub const CURRENT_SONG: Song<&'static str> = HAEMOLACRIAA_ALBUM;
+pub const CURRENT_SONG: Song<&'static str> = SWARM_SONG;
 
 // Define any other songs or albums below
 
-pub const HAEMOLACRIAA_ALBUM: Song<&'static str> = Song {
-    name: "haemolacriaa",
+pub const SWARM_SONG: Song<&'static str> = Song {
+    name: "swarm",
     author: USERNAME,
     image: Image {
-        path: "assets/haemolacriaa.webp",
+        path: "assets/swarm.webp",
         width: Some("400px"),
         height: Some("400px"),
     },
-    is_album: true,
-    spotify_id: Some("5TmWqQ0YoJ9t8PHPSqhZLp"),
-    youtube_id: Some("OLAK5uy_k5kigsMsg7pFfb3_J566qnxftni1ba7jw"),
-    soundcloud_id: Some("haemolacriaa"),
-    apple_music_id: Some("1739982491"),
-    bandcamp_id: Some("haemolacriaa"),
-    publish_date: chrono::NaiveDate::from_ymd_opt(2024, 4, 19),
+    is_album: false,
+    spotify_id: None,
+    youtube_id: None,
+    soundcloud_id: None,
+    apple_music_id: None,
+    bandcamp_id: None,
+    publish_date: chrono::NaiveDate::from_ymd_opt(2024, 7, 19),
 };
 
 pub static OTHER_SONGS: [Song<&'static str>; 3] = [
+    Song {
+        name: "haemolacriaa",
+        author: USERNAME,
+        image: Image {
+            path: "assets/haemolacriaa.webp",
+            width: Some("400px"),
+            height: Some("400px"),
+        },
+        is_album: true,
+        spotify_id: Some("5TmWqQ0YoJ9t8PHPSqhZLp"),
+        youtube_id: Some("OLAK5uy_k5kigsMsg7pFfb3_J566qnxftni1ba7jw"),
+        soundcloud_id: Some("haemolacriaa"),
+        apple_music_id: Some("1739982491"),
+        bandcamp_id: Some("haemolacriaa"),
+        publish_date: chrono::NaiveDate::from_ymd_opt(2024, 4, 19),
+    },
     Song {
         name: "stay",
         author: USERNAME,
@@ -98,22 +114,6 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         apple_music_id: Some("1667165253"),
         bandcamp_id: None,
         publish_date: chrono::NaiveDate::from_ymd_opt(2023, 1, 27),
-    },
-    Song {
-        name: "serene",
-        author: USERNAME,
-        image: Image {
-            path: "assets/serene.webp",
-            width: Some("400px"),
-            height: Some("400px"),
-        },
-        is_album: false,
-        spotify_id: Some("3rodixiNeB4ni5cDh9OvMz"),
-        youtube_id: Some("YvRjKwVvzH8"),
-        soundcloud_id: Some("serene"),
-        apple_music_id: Some("1656357115"),
-        bandcamp_id: None,
-        publish_date: chrono::NaiveDate::from_ymd_opt(2022, 12, 4),
     },
 ];
 
