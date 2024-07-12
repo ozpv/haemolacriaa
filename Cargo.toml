@@ -10,7 +10,7 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-axum = { version = "0.7", optional = true, features = ["macros"] }
+axum = { version = "0.7", optional = true, features = ["macros", "multipart"] }
 console_error_panic_hook = "0.1"
 leptos = { version = "0.6" }
 leptos_meta = { version = "0.6" }

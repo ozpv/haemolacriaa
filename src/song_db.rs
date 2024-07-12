@@ -1,20 +1,16 @@
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json, extract::Path};
+use axum::{extract::Path, extract::State, http::StatusCode, response::IntoResponse, Json};
 use sqlx::Row;
 
-use crate::types::links::Song;
 use crate::app_state::AppState;
+use crate::types::links::Song;
 
-pub async fn get_latest_song_album(
-    State(state): State<AppState>,
-) -> impl IntoResponse {
+pub async fn get_latest_song_album(State(state): State<AppState>) -> impl IntoResponse {
     let q = "SELECT * FROM 
             song 
             WHERE 
             publish_date=(SELECT MAX(publish_date) FROM song)";
 
-    let r = sqlx::query(q)
-        .fetch_one(&state.db_pool)
-        .await;
+    let r = sqlx::query(q).fetch_one(&state.db_pool).await;
 
     match r {
         Ok(row) => {
@@ -31,7 +27,7 @@ pub async fn get_latest_song_album(
                 publish_date: row.get("publish_date"),
             };
             (StatusCode::OK, Json(song)).into_response()
-        },
+        }
         Err(_) => StatusCode::NOT_FOUND.into_response(),
     }
 }
@@ -42,10 +38,7 @@ pub async fn get_song_by_name(
 ) -> impl IntoResponse {
     let q = "SELECT * FROM song WHERE name=$1";
 
-    let r = sqlx::query(q)
-        .bind(&name)
-        .fetch_one(&state.db_pool)
-        .await;
+    let r = sqlx::query(q).bind(&name).fetch_one(&state.db_pool).await;
 
     match r {
         Ok(row) => {
@@ -62,16 +55,13 @@ pub async fn get_song_by_name(
                 publish_date: row.get("publish_date"),
             };
             (StatusCode::OK, Json(song)).into_response()
-        },
+        }
         Err(_) => StatusCode::NOT_FOUND.into_response(),
     }
 }
 
-pub async fn add_song(
-    State(state): State<AppState>,
-    Json(song): Json<Song<String>>
-) -> StatusCode {
-    let q = "SELECT FROM song WHERE name=$1"; 
+pub async fn add_song(State(state): State<AppState>, Json(song): Json<Song<String>>) -> StatusCode {
+    let q = "SELECT FROM song WHERE name=$1";
 
     let r = sqlx::query(q)
         .bind(&song.name)
@@ -79,7 +69,7 @@ pub async fn add_song(
         .await;
 
     if let Ok(_) = r {
-        return StatusCode::OK
+        return StatusCode::OK;
     }
 
     let s = song;
@@ -104,26 +94,21 @@ pub async fn add_song(
         .await;
 
     match r {
-        Ok(_) => {
-            StatusCode::CREATED
-        },
+        Ok(_) => StatusCode::CREATED,
         Err(e) => {
             println!("{e:?}");
             StatusCode::INTERNAL_SERVER_ERROR
-        }, 
+        }
     }
 }
 
 pub async fn delete_song_by_name(
     State(state): State<AppState>,
-    Path(name): Path<String>, 
+    Path(name): Path<String>,
 ) -> StatusCode {
     let q = "DELETE FROM song WHERE name=$1";
 
-    let r = sqlx::query(q)
-        .bind(&name)
-        .execute(&state.db_pool)
-        .await;
+    let r = sqlx::query(q).bind(&name).execute(&state.db_pool).await;
 
     match r {
         Ok(_) => StatusCode::OK,
@@ -133,15 +118,18 @@ pub async fn delete_song_by_name(
 
 pub async fn update_song_entry(
     State(state): State<AppState>,
-    Path(name): Path<String>, 
+    Path(name): Path<String>,
     Json(song): Json<Song<String>>,
 ) -> StatusCode {
     if song.name != name {
-        return StatusCode::BAD_REQUEST
+        return StatusCode::BAD_REQUEST;
     }
 
     // this is lazy but is easier
-    if delete_song_by_name(State(state.clone()), Path(name)).await.is_success() {
+    if delete_song_by_name(State(state.clone()), Path(name))
+        .await
+        .is_success()
+    {
         add_song(State(state.clone()), Json(song)).await
     } else {
         StatusCode::INTERNAL_SERVER_ERROR

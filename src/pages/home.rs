@@ -6,8 +6,10 @@ use crate::types::links::Song;
 
 #[component]
 pub fn Home() -> impl IntoView {
-    let (list, set_list) =
-        create_signal((Song::<String>::from(CURRENT_SONG), format!("{}-link-list", &CURRENT_SONG.name)));
+    let (list, set_list) = create_signal((
+        Song::<String>::from(CURRENT_SONG),
+        format!("{}-link-list", &CURRENT_SONG.name),
+    ));
 
     view! {
         <div class="bg-gray-900 min-h-screen" id="home page">

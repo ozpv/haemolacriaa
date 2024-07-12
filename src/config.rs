@@ -88,7 +88,7 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         author: USERNAME,
         image: Image {
             path: "assets/stay.webp",
-            width: Some("400px"), 
+            width: Some("400px"),
             height: Some("400px"),
         },
         is_album: false,

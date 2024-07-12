@@ -1,16 +1,20 @@
-#[cfg(feature = "ssr")] 
+#[cfg(feature = "ssr")]
 #[tokio::main]
 async fn main() {
-    use axum::{middleware, routing::{get, post, patch}, Router};
-    use tower_http::compression::CompressionLayer;
+    use axum::{
+        middleware,
+        routing::{get, patch, post},
+        Router,
+    };
     use haemolacriaa::app::*;
-    use haemolacriaa::fileserv::file_and_error_handler;
     use haemolacriaa::app_state::AppState;
-    use haemolacriaa::{song_db, jwt};
+    use haemolacriaa::fileserv::file_and_error_handler;
+    use haemolacriaa::{jwt, song_db};
     use leptos::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
-    use sqlx::postgres::{PgSslMode, PgConnectOptions, PgPoolOptions};
+    use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
     use std::time::Duration;
+    use tower_http::compression::CompressionLayer;
 
     // Setting get_configuration(None) means we'll be using cargo-leptos's env values
     // For deployment these variables are:
@@ -34,7 +38,7 @@ async fn main() {
     let db = std::env::var("PG_DATABASE").expect("Failed to get postgres database!");
 
     // setup postgres options
-    let db_options = PgConnectOptions::new() 
+    let db_options = PgConnectOptions::new()
         .host(&host)
         .port(port)
         .username(&user)
@@ -61,15 +65,16 @@ async fn main() {
         db_pool,
         leptos_options,
     };
-    
+
     // protected routes requiring jwt auth
     let protected = Router::new()
         .route("/api/song", post(song_db::add_song))
-        .route("/api/song/:name", 
-               patch(song_db::update_song_entry)
-               .delete(song_db::delete_song_by_name)
-        ).layer(middleware::from_fn(jwt::auth_mw));
-    
+        .route(
+            "/api/song/:name",
+            patch(song_db::update_song_entry).delete(song_db::delete_song_by_name),
+        )
+        .layer(middleware::from_fn(jwt::auth_mw));
+
     // build our application with a route
     let app = Router::new()
         .route("/api/song", get(song_db::get_latest_song_album))

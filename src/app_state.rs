@@ -1,6 +1,6 @@
-use sqlx::{Pool, Postgres};
-use leptos::LeptosOptions;
 use axum::extract::FromRef;
+use leptos::LeptosOptions;
+use sqlx::{Pool, Postgres};
 
 #[derive(FromRef, Debug, Clone)]
 pub struct AppState {

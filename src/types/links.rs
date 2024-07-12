@@ -1,5 +1,5 @@
 use icondata::Icon;
-use serde::{Serialize,Deserialize};
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use sqlx::FromRow;
 
@@ -23,15 +23,9 @@ pub struct StreamingPlatform {
 }
 
 impl StreamingPlatform {
-    fn create_url<'a, T>(
-        &self, 
-        id: &T, 
-        is_album: bool, 
-        main: &'a str, 
-        alt: &'a str
-    ) -> String 
-        where
-            T: std::fmt::Display
+    fn create_url<'a, T>(&self, id: &T, is_album: bool, main: &'a str, alt: &'a str) -> String
+    where
+        T: std::fmt::Display,
     {
         format!(
             "{}{}{}",
@@ -84,13 +78,9 @@ impl<'a> From<Song<&'a str>> for Song<String> {
 impl<T: std::fmt::Display> Song<T> {
     pub fn get_key(&self) -> String {
         format!(
-            "{}{}", 
+            "{}{}",
             self.name,
-            if self.is_album {
-                "album"
-            } else {
-                "song"
-            },
+            if self.is_album { "album" } else { "song" },
         )
     }
 
@@ -114,10 +104,12 @@ impl<T: std::fmt::Display> Song<T> {
                     }),
                     SoundCloud(x, _) => self
                         .soundcloud_id
-                        .as_ref().map(|id| (x, platform.create_url(id, self.is_album, "sets/", ""))),
+                        .as_ref()
+                        .map(|id| (x, platform.create_url(id, self.is_album, "sets/", ""))),
                     AppleMusic(x, _) => self
                         .apple_music_id
-                        .as_ref().map(|id| (x, platform.create_url(id, true, "", ""))),
+                        .as_ref()
+                        .map(|id| (x, platform.create_url(id, true, "", ""))),
                     Bandcamp(x, _) => self.bandcamp_id.as_ref().map(|id| {
                         (
                             x,
