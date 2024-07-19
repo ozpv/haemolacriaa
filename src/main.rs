@@ -49,7 +49,7 @@ async fn main() {
     // setup postgres connection pool
     let db_pool = PgPoolOptions::new()
         .max_connections(5)
-        .acquire_timeout(Duration::from_secs(3))
+        .acquire_timeout(Duration::from_secs(30))
         .connect_with(db_options)
         .await
         .expect("Failed to connect to database");

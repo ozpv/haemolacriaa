@@ -7,7 +7,8 @@ use crate::types::links::Song;
 #[component]
 pub fn Home() -> impl IntoView {
     let (list, set_list) = create_signal((
-        Song::<String>::from(CURRENT_SONG),
+        CURRENT_SONG,
+        //Song::<String>::from(CURRENT_SONG),
         format!("{}-link-list", &CURRENT_SONG.name),
     ));
 
@@ -25,14 +26,14 @@ pub fn Home() -> impl IntoView {
                     {
                         OTHER_SONGS
                             .iter()
-                            .map(|song| Song::<String>::from(*song))
+                            //.map(|song| Song::<String>::from(*song))
                             .map(|song| {
                                view! {
                                        <SongCard
                                            on:click=move |_| {
-                                               set_list.set((song.clone(), format!("{}-link-list", song.name)));
+                                               set_list.set((*song, format!("{}-link-list", song.name)));
                                            }
-                                           song_info=song.clone()
+                                           song_info=*song
                                            class="ease-in duration-100 hover:scale-105 my-[20px]"
                                        />
                                }

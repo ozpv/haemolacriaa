@@ -58,11 +58,11 @@ pub const SWARM_SONG: Song<&'static str> = Song {
         height: Some("400px"),
     },
     is_album: false,
-    spotify_id: None,
-    youtube_id: None,
-    soundcloud_id: None,
-    apple_music_id: None,
-    bandcamp_id: None,
+    spotify_id: Some("7aLZxnXz0ZTkOJOlVmeqZQ"), 
+    youtube_id: Some("dbLlehkojoI"),
+    soundcloud_id: Some("swarm"),
+    apple_music_id: Some("1756360277"),
+    bandcamp_id: None, 
     publish_date: chrono::NaiveDate::from_ymd_opt(2024, 7, 19),
 };
 
