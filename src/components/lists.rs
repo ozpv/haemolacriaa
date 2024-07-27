@@ -25,8 +25,7 @@ fn Appendix(social_media_info: Option<&'static SocialMediaInfo>) -> impl IntoVie
 #[component]
 pub fn StreamingList(
     list_info: ReadSignal<(Song<&'static str>, String)>,
-    #[prop(optional)] 
-    appendix_social: Option<&'static SocialMediaInfo>,
+    #[prop(optional)] appendix_social: Option<&'static SocialMediaInfo>,
 ) -> impl IntoView {
     let song_info = move || list_info.get().0;
     let id = move || list_info.get().1;

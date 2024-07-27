@@ -2,7 +2,6 @@ use leptos::*;
 
 use crate::components::{card::SongCard, lists::StreamingList, misc::Divider};
 use crate::config::{CURRENT_SONG, OTHER_SONGS};
-use crate::types::links::Song;
 
 #[component]
 pub fn Home() -> impl IntoView {
