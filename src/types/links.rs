@@ -43,7 +43,7 @@ pub struct StreamingInfo {
 
 // Song info section
 
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(FromRow))]
 pub struct Song<T = String> {
     pub name: T,

@@ -12,17 +12,17 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 axum = { version = "0.7", optional = true, features = ["macros", "multipart"] }
 console_error_panic_hook = "0.1"
-leptos = { version = "0.6" }
-leptos_meta = { version = "0.6" }
-leptos_axum = { version = "0.6", optional = true }
-leptos_router = { version = "0.6" }
+leptos = { version = "0.6.14" }
+leptos_meta = { version = "0.6.14" }
+leptos_axum = { version = "0.6.14", optional = true }
+leptos_router = { version = "0.6.14" }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
 tower = { version = "0.4", optional = true }
 tower-http = { version = "0.5", features = ["compression-gzip", "fs"], optional = true }
 thiserror = "1"
 tracing = { version = "0.1", optional = true }
 http = "1"
-wasm-bindgen = "=0.2.92"
+wasm-bindgen = "=0.2.93"
 leptos_icons = "0.3.0"
 icondata = "0.3.0"
 const_format = "0.2.32"

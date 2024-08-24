@@ -5,7 +5,7 @@ use leptos_icons::*;
 #[component]
 pub fn Footer() -> impl IntoView {
     view! {
-        <footer class="sticky top-full bg-gray-900 md:p-5">
+        <footer class="sticky top-full bg-gray-900 p-5">
             <div class="bg-gray-900">
                 <hr class="border-gray-800 mx-auto w-full md:w-[90%]" />
                 <div class="flex items-center justify-center">

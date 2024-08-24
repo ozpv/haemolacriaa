@@ -1,6 +1,6 @@
 pub mod app;
 #[cfg(feature = "ssr")]
-pub mod app_state;
+pub mod state;
 pub mod components;
 pub mod config;
 pub mod error;

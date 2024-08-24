@@ -1,137 +1,117 @@
-use axum::{extract::Path, extract::State, http::StatusCode, response::IntoResponse, Json};
 use sqlx::Row;
+use leptos::{server, ServerFnError};
 
-use crate::app_state::AppState;
+use crate::state::AppState;
 use crate::types::links::Song;
 
-pub async fn get_latest_song_album(State(state): State<AppState>) -> impl IntoResponse {
+#[server(GetLatestRelease, "/api", "GetJson", "get_latest_release")]
+pub async fn get_latest_release() -> Result<Song, ServerFnError> {
+    let pool = AppState::pool()?;
+
     let q = "SELECT * FROM 
             song 
             WHERE 
             publish_date=(SELECT MAX(publish_date) FROM song)";
 
-    let r = sqlx::query(q).fetch_one(&state.db_pool).await;
+    let row = sqlx::query(q).fetch_one(&pool).await?;
 
-    match r {
-        Ok(row) => {
-            let song = Song {
-                name: row.get("name"),
-                author: row.get("author"),
-                image: row.get("song_image"),
-                is_album: row.get("is_album"),
-                spotify_id: row.get("spotify_id"),
-                youtube_id: row.get("youtube_id"),
-                soundcloud_id: row.get("soundcloud_id"),
-                apple_music_id: row.get("apple_music_id"),
-                bandcamp_id: row.get("bandcamp_id"),
-                publish_date: row.get("publish_date"),
-            };
-            (StatusCode::OK, Json(song)).into_response()
-        }
-        Err(_) => StatusCode::NOT_FOUND.into_response(),
-    }
-}
+    Ok(Song {
+       name: row.get("name"),
+        author: row.get("author"),
+        image: row.get("song_image"),
+        is_album: row.get("is_album"),
+        spotify_id: row.get("spotify_id"),
+        youtube_id: row.get("youtube_id"),
+        soundcloud_id: row.get("soundcloud_id"),
+        apple_music_id: row.get("apple_music_id"),
+        bandcamp_id: row.get("bandcamp_id"),
+        publish_date: row.get("publish_date"), 
+    })
+} 
 
-pub async fn get_song_by_name(
-    State(state): State<AppState>,
-    Path(name): Path<String>,
-) -> impl IntoResponse {
+#[server(GetSongByName, "/api", "GetJson", "get_song_by_name")]
+pub async fn get_song_by_name(name: String) -> Result<Song, ServerFnError> {
+    let pool = AppState::pool()?;
+
     let q = "SELECT * FROM song WHERE name=$1";
 
-    let r = sqlx::query(q).bind(&name).fetch_one(&state.db_pool).await;
+    let row = sqlx::query(q).bind(&name).fetch_one(&pool).await?;
 
-    match r {
-        Ok(row) => {
-            let song = Song {
-                name: row.get("name"),
-                author: row.get("author"),
-                image: row.get("song_image"),
-                is_album: row.get("is_album"),
-                spotify_id: row.get("spotify_id"),
-                youtube_id: row.get("youtube_id"),
-                soundcloud_id: row.get("soundcloud_id"),
-                apple_music_id: row.get("apple_music_id"),
-                bandcamp_id: row.get("bandcamp_id"),
-                publish_date: row.get("publish_date"),
-            };
-            (StatusCode::OK, Json(song)).into_response()
-        }
-        Err(_) => StatusCode::NOT_FOUND.into_response(),
-    }
+    Ok(Song {
+        name: row.get("name"),
+        author: row.get("author"),
+        image: row.get("song_image"),
+        is_album: row.get("is_album"),
+        spotify_id: row.get("spotify_id"),
+        youtube_id: row.get("youtube_id"),
+        soundcloud_id: row.get("soundcloud_id"),
+        apple_music_id: row.get("apple_music_id"),
+        bandcamp_id: row.get("bandcamp_id"),
+        publish_date: row.get("publish_date"),
+    })
 }
 
-pub async fn add_song(State(state): State<AppState>, Json(song): Json<Song<String>>) -> StatusCode {
+
+#[server(AddSong, "/api", "Url", "add_song")]
+pub async fn add_song(song: Song) -> Result<(), ServerFnError> {
+    let pool = AppState::pool()?;
+
     let q = "SELECT FROM song WHERE name=$1";
 
-    let r = sqlx::query(q)
+    let row = sqlx::query(q)
         .bind(&song.name)
-        .fetch_one(&state.db_pool)
+        .fetch_one(&pool)
         .await;
 
-    if let Ok(_) = r {
-        return StatusCode::OK;
+    if let Ok(_) = row {
+        return Err(ServerFnError::new("Song with name already exists in DB!".to_owned()));
     }
-
-    let s = song;
 
     let q = "INSERT INTO song 
         (name,author,song_image,is_album,spotify_id,youtube_id,soundcloud_id,apple_music_id,bandcamp_id,publish_date)
         VALUES
         ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)";
 
-    let r = sqlx::query(q)
-        .bind(&s.name)
-        .bind(&s.author)
-        .bind(&s.image)
-        .bind(&s.is_album)
-        .bind(&s.spotify_id)
-        .bind(&s.youtube_id)
-        .bind(&s.soundcloud_id)
-        .bind(&s.apple_music_id)
-        .bind(&s.bandcamp_id)
-        .bind(&s.publish_date)
-        .execute(&state.db_pool)
-        .await;
+    sqlx::query(q)
+        .bind(&song.name)
+        .bind(&song.author)
+        .bind(&song.image)
+        .bind(&song.is_album)
+        .bind(&song.spotify_id)
+        .bind(&song.youtube_id)
+        .bind(&song.soundcloud_id)
+        .bind(&song.apple_music_id)
+        .bind(&song.bandcamp_id)
+        .bind(&song.publish_date)
+        .execute(&pool)
+        .await?;
 
-    match r {
-        Ok(_) => StatusCode::CREATED,
-        Err(e) => {
-            println!("{e:?}");
-            StatusCode::INTERNAL_SERVER_ERROR
-        }
-    }
+    Ok(())
 }
 
-pub async fn delete_song_by_name(
-    State(state): State<AppState>,
-    Path(name): Path<String>,
-) -> StatusCode {
+#[server(DeleteSongByName, "/api", "Url", "delete_song_by_name")]
+pub async fn delete_song_by_name(name: String) -> Result<(), ServerFnError> {
+    let pool = AppState::pool()?;
+
     let q = "DELETE FROM song WHERE name=$1";
 
-    let r = sqlx::query(q).bind(&name).execute(&state.db_pool).await;
+    sqlx::query(q).bind(&name).execute(&pool).await?;
 
-    match r {
-        Ok(_) => StatusCode::OK,
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
-    }
+    Ok(())
 }
 
-pub async fn update_song_entry(
-    State(state): State<AppState>,
-    Path(name): Path<String>,
-    Json(song): Json<Song<String>>,
-) -> StatusCode {
+#[server(UpdateSongEntry, "/api", "Url", "update_song_entry")]
+pub async fn update_song_entry(name: String, song: Song) -> Result<(), ServerFnError> {
     if song.name != name {
-        return StatusCode::BAD_REQUEST;
+        return Err(ServerFnError::new("Failed to update song entry because names do not match!".to_owned()));
     }
 
-    // this is lazy but is easier
-    if delete_song_by_name(State(state.clone()), Path(name))
+    if delete_song_by_name(name)
         .await
-        .is_success()
+        .is_ok()
     {
-        add_song(State(state.clone()), Json(song)).await
+        add_song(song).await
     } else {
-        StatusCode::INTERNAL_SERVER_ERROR
+        Err(ServerFnError::new("Failed to update song entry because deletion of song failed!".to_owned()))
     }
 }
