@@ -64,8 +64,8 @@ pub async fn get_range_of_songs(
     let q = "SELECT * FROM song LIMIT $1 OFFSET $2";
 
     let songs = sqlx::query(q)
-        .bind(&range.start.to_string())
         .bind(&range.end.to_string())
+        .bind(&range.start.to_string())
         .fetch_all(&pool)
         .await?;
 
