@@ -24,15 +24,14 @@ fn Appendix(social_media_info: Option<&'static SocialMediaInfo>) -> impl IntoVie
 
 #[component]
 pub fn StreamingList(
-    list_info: ReadSignal<(Song<&'static str>, String)>,
+    list_info: RwSignal<Song>,
     #[prop(optional)] appendix_social: Option<&'static SocialMediaInfo>,
 ) -> impl IntoView {
-    let song_info = move || list_info.get().0;
-    let id = move || list_info.get().1;
+    let song_info = move || list_info.get();
 
     view! {
-        <div id=id>
-            <img class="block mx-auto pt-[16px] shadow-2xl" src=move || song_info().image.path width=move || song_info().image.width.unwrap_or("400px") height=move || song_info().image.height.unwrap_or("400px") alt=move || song_info().name/>
+        <div id=move || song_info().name + "-link-list">
+            <img class="block mx-auto pt-[16px] shadow-2xl" src=move || song_info().image.path width=move || song_info().image.width.unwrap_or("400px".to_owned()) height=move || song_info().image.height.unwrap_or("400px".to_owned()) alt=move || song_info().name/>
             <h1 class="block text-white text-center text-3xl font-bold font-sans pt-[36px]">{move || song_info().name}</h1>
             <h2 class="block text-white-800 text-center text-lg font-medium font-sans pt-[16px] pb-[10px]">{move || song_info().author}</h2>
             <div class="flex justify-center">

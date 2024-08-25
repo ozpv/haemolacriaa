@@ -5,18 +5,18 @@ use leptos_icons::*;
 
 #[component]
 pub fn Nav() -> impl IntoView {
-    let (active, activity) = create_signal(false);
+    let activity = create_rw_signal(false);
     let toggle_active = move |_| activity.update(|status| *status = !*status);
 
     let active_icon = Signal::derive(move || {
-        if active.get() {
+        if activity.get() {
             ico::BsXLg
         } else {
             ico::BsList
         }
     });
 
-    let hidden_status = move || !active.get();
+    let hidden_status = move || !activity.get();
 
     view! {
         <nav class="bg-gray-900 border-gray-200">

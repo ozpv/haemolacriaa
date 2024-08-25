@@ -1,6 +1,4 @@
 pub mod app;
-#[cfg(feature = "ssr")]
-pub mod state;
 pub mod components;
 pub mod config;
 pub mod error;
@@ -9,8 +7,9 @@ pub mod fileserv;
 #[cfg(feature = "ssr")]
 pub mod jwt;
 pub mod pages;
-#[cfg(feature = "ssr")]
 pub mod song_db;
+#[cfg(feature = "ssr")]
+pub mod state;
 pub mod types;
 #[cfg(feature = "ssr")]
 pub mod upload;

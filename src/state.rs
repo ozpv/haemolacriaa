@@ -1,5 +1,5 @@
 use axum::extract::FromRef;
-use leptos::{use_context, ServerFnError, LeptosOptions};
+use leptos::{use_context, LeptosOptions, ServerFnError};
 use leptos_router::RouteListing;
 use sqlx::{Pool, Postgres};
 

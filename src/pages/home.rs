@@ -2,18 +2,18 @@ use leptos::*;
 
 use crate::components::{card::SongCard, lists::StreamingList, misc::Divider};
 use crate::config::{CURRENT_SONG, OTHER_SONGS};
+use crate::song_db::{get_latest_release, get_range_of_songs};
+use crate::types::links::Song;
 
 #[component]
 pub fn Home() -> impl IntoView {
-    let (list, set_list) = create_signal((
-        CURRENT_SONG,
-        //Song::<String>::from(CURRENT_SONG),
-        format!("{}-link-list", &CURRENT_SONG.name),
-    ));
+    let active_list = create_rw_signal(Song::<String>::from(CURRENT_SONG));
 
     view! {
         <div class="bg-gray-900 min-h-screen" id="home page">
-            <StreamingList list_info=list/>
+
+            <StreamingList list_info=active_list/>
+
             <Divider/>
             <div class="" id="previous-releases">
                 <span class="flex justify-center mt-[30px]" id="Text">
@@ -25,17 +25,18 @@ pub fn Home() -> impl IntoView {
                     {
                         OTHER_SONGS
                             .iter()
-                            //.map(|song| Song::<String>::from(*song))
+                            .map(|song| Song::<String>::from(*song))
                             .map(|song| {
-                               view! {
-                                       <SongCard
-                                           on:click=move |_| {
-                                               set_list.set((*song, format!("{}-link-list", song.name)));
-                                           }
-                                           song_info=*song
-                                           class="ease-in duration-100 hover:scale-105 my-[20px]"
-                                       />
-                               }
+                                view! {
+                                    <SongCard
+                                        on:click=move |_| {
+                                            active_list.set(song.clone());
+                                        }
+                                        title=song.name.clone()
+                                        image=song.image.clone()
+                                        class="ease-in duration-100 hover:scale-105 my-[20px]"
+                                    />
+                                }
                             })
                             .collect_view()
                     }

@@ -1,17 +1,17 @@
 use axum::{
-    middleware,
-    routing::{get},
-    Router,
     body::Body,
-    response::{Response, IntoResponse},
-    extract::{State, Request},
+    extract::{Request, State},
+    middleware,
+    response::{IntoResponse, Response},
+    routing::get,
+    Router,
 };
 use haemolacriaa::app::*;
-use haemolacriaa::state::AppState;
 use haemolacriaa::fileserv::file_and_error_handler;
-use haemolacriaa::{jwt};
+use haemolacriaa::jwt;
+use haemolacriaa::state::AppState;
 use leptos::*;
-use leptos_axum::{generate_route_list, LeptosRoutes, handle_server_fns_with_context};
+use leptos_axum::{generate_route_list, handle_server_fns_with_context, LeptosRoutes};
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
 use std::time::Duration;
 use tower_http::compression::CompressionLayer;
