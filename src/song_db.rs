@@ -56,9 +56,7 @@ pub async fn get_song_by_name(name: String) -> Result<Song, ServerFnError> {
 }
 
 #[server(GetRangeOfSongs, "/api", "GetJson", "get_range_of_songs")]
-pub async fn get_range_of_songs(
-    range: Range<usize>
-) -> Result<Vec<Song>, ServerFnError> {
+pub async fn get_range_of_songs(range: Range<usize>) -> Result<Vec<Song>, ServerFnError> {
     let pool = AppState::pool()?;
 
     let q = "SELECT * FROM song LIMIT $1 OFFSET $2";
@@ -86,8 +84,7 @@ pub async fn get_range_of_songs(
                 bandcamp_id: row.get("bandcamp_id"),
                 publish_date: row.get("publish_date"),
             })
-            .collect()
-        )
+            .collect())
     }
 }
 

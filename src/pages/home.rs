@@ -10,7 +10,7 @@ pub fn Home() -> impl IntoView {
     let active_list = create_rw_signal(Song::<String>::from(CURRENT_SONG));
 
     view! {
-        <div class="bg-gray-900 min-h-screen" id="home page">
+        <div class="bg-gray-900 min-h-screen" id="home-page">
 
             <StreamingList list_info=active_list/>
 
