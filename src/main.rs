@@ -92,16 +92,16 @@ async fn main() {
     };
 
     // protected routes requiring jwt auth
-    let protected = Router::new()
-        .route(
-            "/api/*fn_name",
-            get(server_fn_handler).post(server_fn_handler),
-        )
-        .layer(middleware::from_fn(jwt::auth_mw));
+    //let protected = Router::new()
+    //    .route(
+    //        "/api/*fn_name",
+    //        get(server_fn_handler).post(server_fn_handler),
+    //    )
+    //    .layer(middleware::from_fn(jwt::auth_mw));
 
     // build our application with a route
     let app = Router::new()
-        .merge(protected)
+        //.merge(protected)
         .leptos_routes_with_handler(routes, get(leptos_routes_handler))
         .fallback(file_and_error_handler)
         .with_state(state)

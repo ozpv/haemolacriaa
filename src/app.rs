@@ -51,7 +51,7 @@ pub fn App() -> impl IntoView {
                 <Routes>
                     <Route path="/" view=multi_view!(Nav, Home, Footer) ssr=SsrMode::InOrder/>
                     <Route path="/shop" view=multi_view!(Nav, Shop, Footer) ssr=SsrMode::InOrder/>
-                    <Route path="/releases/:name" view=multi_view!(Nav, Releases, Footer) ssr=SsrMode::InOrder/>
+                    //<Route path="/releases/:name" view=multi_view!(Nav, Releases, Footer) ssr=SsrMode::InOrder/>
                 </Routes>
             </main>
         </Router>

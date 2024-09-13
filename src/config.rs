@@ -45,28 +45,44 @@ pub static NAV_ITEMS: [RouteInfo; 2] = [
 /// Body
 
 // Current song, set it to be displayed on home page.
-pub const CURRENT_SONG: Song<&'static str> = SWARM_SONG;
+pub const CURRENT_SONG: Song<&'static str> = LEAVE_SONG;
 
 // Define any other songs or albums below
 
-pub const SWARM_SONG: Song<&'static str> = Song {
-    name: "swarm",
+pub const LEAVE_SONG: Song<&'static str> = Song {
+    name: "leave",
     author: USERNAME,
     image: Image {
-        path: "assets/swarm.webp",
+        path: "assets/leave.webp",
         width: Some("400px"),
         height: Some("400px"),
     },
     is_album: false,
-    spotify_id: Some("7aLZxnXz0ZTkOJOlVmeqZQ"),
-    youtube_id: Some("dbLlehkojoI"),
-    soundcloud_id: Some("swarm"),
-    apple_music_id: Some("1756360277"),
+    spotify_id: Some("5lcsNMrZi4BgbBdMCL1Esl"),
+    youtube_id: Some("b23ieCaa_fs"),
+    soundcloud_id: Some("leave"),
+    apple_music_id: Some("1765816897"),
     bandcamp_id: None,
-    publish_date: chrono::NaiveDate::from_ymd_opt(2024, 7, 19),
+    publish_date: chrono::NaiveDate::from_ymd_opt(2024, 9, 13),
 };
 
 pub static OTHER_SONGS: [Song<&'static str>; 3] = [
+    Song {
+        name: "swarm",
+        author: USERNAME,
+        image: Image {
+            path: "assets/swarm.webp",
+            width: Some("400px"),
+            height: Some("400px"),
+        },
+        is_album: false,
+        spotify_id: Some("7aLZxnXz0ZTkOJOlVmeqZQ"),
+        youtube_id: Some("dbLlehkojoI"),
+        soundcloud_id: Some("swarm"),
+        apple_music_id: Some("1756360277"),
+        bandcamp_id: None,
+        publish_date: chrono::NaiveDate::from_ymd_opt(2024, 7, 19),
+    },
     Song {
         name: "haemolacriaa",
         author: USERNAME,
@@ -98,22 +114,6 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         apple_music_id: Some("1681486735"),
         bandcamp_id: None,
         publish_date: chrono::NaiveDate::from_ymd_opt(2023, 4, 14),
-    },
-    Song {
-        name: "still",
-        author: USERNAME,
-        image: Image {
-            path: "assets/still.webp",
-            width: Some("400px"),
-            height: Some("400px"),
-        },
-        is_album: false,
-        spotify_id: Some("07UyLVNFU0kyLYEM68WoPj"),
-        youtube_id: Some("A1rPrOAk0jg"),
-        soundcloud_id: Some("still"),
-        apple_music_id: Some("1667165253"),
-        bandcamp_id: None,
-        publish_date: chrono::NaiveDate::from_ymd_opt(2023, 1, 27),
     },
 ];
 
