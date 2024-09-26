@@ -5,3 +5,4 @@ pub mod footer;
 pub mod lists;
 pub mod misc;
 pub mod nav;
+pub mod forms;

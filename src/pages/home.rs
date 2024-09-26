@@ -2,7 +2,6 @@ use leptos::*;
 
 use crate::components::{card::SongCard, lists::StreamingList, misc::Divider};
 use crate::config::{CURRENT_SONG, OTHER_SONGS};
-use crate::song_db::{get_latest_release, get_range_of_songs};
 use crate::types::links::Song;
 
 #[component]

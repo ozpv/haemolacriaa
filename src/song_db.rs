@@ -42,7 +42,7 @@ pub async fn get_song_by_name(name: String) -> Result<Song, ServerFnError> {
     let row = sqlx::query(q).bind(&name).fetch_one(&pool).await?;
 
     Ok(Song {
-        name: row.get("name"),
+        name, 
         author: row.get("author"),
         image: row.get("song_image"),
         is_album: row.get("is_album"),
