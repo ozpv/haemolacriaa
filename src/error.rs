@@ -19,14 +19,6 @@ impl AppError {
     }
 }
 
-#[cfg(feature = "ssr")]
-pub enum AuthError {
-    WrongCredentials,
-    MissingCredentials,
-    TokenCreation,
-    InvalidToken,
-}
-
 #[component]
 pub fn ErrorPage(
     #[prop(optional)] outside_errors: Option<Errors>,

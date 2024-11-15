@@ -2,25 +2,26 @@ pub mod app;
 pub mod components;
 pub mod config;
 pub mod error;
-#[cfg(feature = "ssr")]
-pub mod fileserv;
-#[cfg(feature = "ssr")]
-pub mod jwt;
 pub mod pages;
 pub mod song_db;
-#[cfg(feature = "ssr")]
-pub mod state;
 pub mod types;
 
-#[cfg(feature = "ssr")]
-pub mod lazy {
-    use crate::jwt::Keys;
-    use once_cell::sync::Lazy;
+cfg_if::cfg_if! {
+    if #[cfg(feature = "ssr")] {
+        pub mod fileserv;
+        pub mod jwt;
+        pub mod state;
 
-    pub static KEYS: Lazy<Keys> = Lazy::new(|| {
-        let secret = std::env::var("JWT_SECRET").expect("Failed to parse jwt secret!");
-        Keys::new(secret.as_bytes())
-    });
+        pub mod lazy {
+            use crate::jwt::Keys;
+            use once_cell::sync::Lazy;
+
+            pub static KEYS: Lazy<Keys> = Lazy::new(|| {
+                let secret = std::env::var("JWT_SECRET").expect("Failed to parse jwt secret!");
+                Keys::new(secret.as_bytes())
+            });
+        }
+    }
 }
 
 #[cfg(feature = "hydrate")]

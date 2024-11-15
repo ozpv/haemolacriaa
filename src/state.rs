@@ -12,8 +12,7 @@ pub struct AppState {
 
 impl AppState {
     pub fn pool() -> Result<Pool<Postgres>, ServerFnError> {
-        use_context::<Pool<Postgres>>().ok_or_else(|| {
-            ServerFnError::ServerError("Failed to get DB Pool, missing from context".to_owned())
-        })
+        use_context::<Pool<Postgres>>()
+            .ok_or_else(|| ServerFnError::new("Failed to get DB Pool, missing from context"))
     }
 }
