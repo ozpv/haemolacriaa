@@ -5,8 +5,8 @@ use leptos_router::*;
 use crate::components::footer::Footer;
 use crate::components::nav::Nav;
 use crate::error::{AppError, ErrorPage};
+use crate::pages::admin::Admin;
 use crate::pages::home::Home;
-use crate::pages::releases::Releases;
 use crate::pages::shop::Shop;
 
 /// View multiple components in Router, pass routes in succession
@@ -51,7 +51,7 @@ pub fn App() -> impl IntoView {
                 <Routes>
                     <Route path="/" view=multi_view!(Nav, Home, Footer) ssr=SsrMode::InOrder/>
                     <Route path="/shop" view=multi_view!(Nav, Shop, Footer) ssr=SsrMode::InOrder/>
-                    //<Route path="/releases/:name" view=multi_view!(Nav, Releases, Footer) ssr=SsrMode::InOrder/>
+                    <Route path="/admin" view=Admin ssr=SsrMode::InOrder/>
                 </Routes>
             </main>
         </Router>

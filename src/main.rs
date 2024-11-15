@@ -14,7 +14,6 @@ use leptos::*;
 use leptos_axum::{generate_route_list, handle_server_fns_with_context, LeptosRoutes};
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
 use std::time::Duration;
-use tower_http::compression::CompressionLayer;
 
 async fn server_fn_handler(
     State(app_state): State<AppState>,
@@ -91,21 +90,20 @@ async fn main() {
         leptos_routes: routes.clone(),
     };
 
-    // protected routes requiring jwt auth
-    //let protected = Router::new()
-    //    .route(
-    //        "/api/*fn_name",
-    //        get(server_fn_handler).post(server_fn_handler),
-    //    )
+    // server functions with auth
+    let protected = Router::new()
+        .route(
+            "/api/*fn_name",
+            get(server_fn_handler).post(server_fn_handler),
+        );
     //    .layer(middleware::from_fn(jwt::auth_mw));
 
     // build our application with a route
     let app = Router::new()
-        //.merge(protected)
+        .merge(protected)
         .leptos_routes_with_handler(routes, get(leptos_routes_handler))
         .fallback(file_and_error_handler)
-        .with_state(state)
-        .layer(CompressionLayer::new());
+        .with_state(state);
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     logging::log!("listening on http://{}", &addr);
