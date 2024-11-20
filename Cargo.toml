@@ -37,8 +37,9 @@ web-sys = { version = "0.3.70" }
 cfg-if = "1.0.0"
 
 [build-dependencies]
-# image = { version = "0.25.1" }
+image = { version = "0.25.5" }
 sha256 = { version = "1.5.0" }
+webp = { version = "0.3.0" }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]

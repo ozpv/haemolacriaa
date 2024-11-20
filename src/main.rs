@@ -96,7 +96,7 @@ cfg_if::cfg_if! {
                 "/api/*fn_name",
                 get(server_fn_handler).post(server_fn_handler),
             );
-            //    .layer(middleware::from_fn(jwt::auth_mw));
+            // .layer(middleware::from_fn(jwt::auth_mw));
 
             // build our application with a route
             let app = Router::new()
@@ -110,6 +110,10 @@ cfg_if::cfg_if! {
             axum::serve(listener, app.into_make_service())
                 .await
                 .unwrap();
+        }
+    } else {
+        fn main() {
+
         }
     }
 }
