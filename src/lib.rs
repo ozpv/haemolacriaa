@@ -6,6 +6,21 @@ pub mod pages;
 pub mod song_db;
 pub mod types;
 
+pub mod util {
+    pub type Result<T, E = leptos::ServerFnError> = std::result::Result<T, E>;
+
+    // stuff is used but it says that it isn't
+    #[allow(unused_macros)]
+    macro_rules! err {
+        ($s:tt) => {
+            Err(leptos::ServerFnError::new($s))
+        };
+    }
+
+    #[allow(unused_imports)]
+    pub(crate) use err;
+}
+
 cfg_if::cfg_if! {
     if #[cfg(feature = "ssr")] {
         pub mod fileserv;

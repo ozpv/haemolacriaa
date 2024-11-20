@@ -1,4 +1,5 @@
-use leptos::{server, ServerFnError};
+use crate::util::*;
+use leptos::server;
 #[cfg(feature = "ssr")]
 use sqlx::Row;
 
@@ -9,7 +10,7 @@ use crate::types::links::Song;
 use std::ops::Range;
 
 #[server(GetLatestRelease, "/api", "GetJson")]
-pub async fn get_latest_release() -> Result<Song, ServerFnError> {
+pub async fn get_latest_release() -> Result<Song> {
     let pool = AppState::pool()?;
 
     let q = "SELECT * FROM 
@@ -34,7 +35,7 @@ pub async fn get_latest_release() -> Result<Song, ServerFnError> {
 }
 
 #[server(GetSongByName, "/api", "GetJson")]
-pub async fn get_song_by_name(name: String) -> Result<Song, ServerFnError> {
+pub async fn get_song_by_name(name: String) -> Result<Song> {
     let pool = AppState::pool()?;
 
     let q = "SELECT * FROM song WHERE name=$1";
@@ -56,7 +57,7 @@ pub async fn get_song_by_name(name: String) -> Result<Song, ServerFnError> {
 }
 
 #[server(GetRangeOfSongs, "/api", "GetJson")]
-pub async fn get_range_of_songs(range: Range<usize>) -> Result<Vec<Song>, ServerFnError> {
+pub async fn get_range_of_songs(range: Range<usize>) -> Result<Vec<Song>> {
     let pool = AppState::pool()?;
 
     let q = "SELECT * FROM song LIMIT $1 OFFSET $2";
@@ -68,7 +69,7 @@ pub async fn get_range_of_songs(range: Range<usize>) -> Result<Vec<Song>, Server
         .await?;
 
     if songs.len() == 0 {
-        Err(ServerFnError::new("Failed to find any songs!"))
+        err!("Failed to find any songs!")
     } else {
         Ok(songs
             .iter()
@@ -89,7 +90,7 @@ pub async fn get_range_of_songs(range: Range<usize>) -> Result<Vec<Song>, Server
 }
 
 #[server(AddSong, "/api", "Url")]
-pub async fn add_song(song: Song) -> Result<(), ServerFnError> {
+pub async fn add_song(song: Song) -> Result<()> {
     let pool = AppState::pool()?;
 
     let q = "SELECT * FROM song WHERE name=$1";
@@ -97,7 +98,7 @@ pub async fn add_song(song: Song) -> Result<(), ServerFnError> {
     let row = sqlx::query(q).bind(&song.name).fetch_one(&pool).await;
 
     if let Ok(_) = row {
-        return Err(ServerFnError::new("Song with name already exists in DB!"));
+        return err!("Song with name already exists in DB!");
     }
 
     let q = "INSERT INTO song 
@@ -123,7 +124,7 @@ pub async fn add_song(song: Song) -> Result<(), ServerFnError> {
 }
 
 #[server(DeleteSongByName, "/api", "Url")]
-pub async fn delete_song_by_name(name: String) -> Result<(), ServerFnError> {
+pub async fn delete_song_by_name(name: String) -> Result<()> {
     let pool = AppState::pool()?;
 
     let q = "DELETE FROM song WHERE name=$1";
@@ -134,18 +135,14 @@ pub async fn delete_song_by_name(name: String) -> Result<(), ServerFnError> {
 }
 
 #[server(UpdateSongEntry, "/api", "Url")]
-pub async fn update_song_entry(name: String, song: Song) -> Result<(), ServerFnError> {
+pub async fn update_song_entry(name: String, song: Song) -> Result<()> {
     if song.name != name {
-        return Err(ServerFnError::new(
-            "Failed to update song entry because names do not match!",
-        ));
+        return err!("Failed to update song entry because names do not match!");
     }
 
     if delete_song_by_name(name).await.is_ok() {
         add_song(song).await
     } else {
-        Err(ServerFnError::new(
-            "Failed to update song entry because deletion of song failed!",
-        ))
+        err!("Failed to update song entry because deletion of song failed!")
     }
 }

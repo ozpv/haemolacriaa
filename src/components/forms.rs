@@ -1,3 +1,4 @@
+use crate::util::*;
 #[cfg(feature = "ssr")]
 use http::header::CONTENT_TYPE;
 use leptos::ev::SubmitEvent;
@@ -12,14 +13,17 @@ use web_sys::{FormData, HtmlFormElement};
 /// and add multiple CONTENT_TYPE selections
 
 #[server(input = MultipartFormData)]
-pub async fn upload_file(data: MultipartData) -> Result<(), ServerFnError> {
+pub async fn upload_file(data: MultipartData) -> Result<()> {
     let mut data = data.into_inner().unwrap();
 
     while let Ok(Some(field)) = data.next_field().await {
-        let name = field.file_name().expect("No filename on field").to_string();
+        let name = field
+            .file_name()
+            .expect("There to be a file name")
+            .to_string();
 
         if field.headers().get(CONTENT_TYPE).unwrap() != "image/webp" {
-            return Err(ServerFnError::new("File is not WebP"));
+            return err!("File is not WebP");
         }
 
         let filename = format!("/home/ozpv/Pictures/{name}");
