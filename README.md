@@ -1,7 +1,7 @@
 # haemolacriaa 
 My personal website written in rust with Leptos and Actix 
 
-# Deployment via VPS (my way) 
+# Deployment via VPS 
 
 ## Setup the webserver
 
@@ -214,7 +214,7 @@ PG_PORT=5432
 PG_DATABASE=songdb
 ```
 
-\<your-songuser-password\> is the password you gave the user "songuser" earlier. I recommend that you set these via the service file that we set up previously.
+\<your-songuser-password\> is the password you gave the user "songuser" earlier. I recommend that you set these variables via the service file we previously set up.
 Finally, restart the haemolacriaa service. Everything should be working.
 ```
 systemctl restart haemolacriaa
