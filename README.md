@@ -25,19 +25,20 @@ and then change these settings back so you can generate a new key
 and run this command again 
 
 Next, we want to install Nginx and certbot so we can use it 
-as a reverse proxy for our web apps, and have https connections to them
+as a reverse proxy for multiple web apps, and have secure https connections for each one
 ```
 apt-get install nginx python3-certbot-nginx
 ```
 
-Then tell the firewall to allow nginx
+By default, the firewall might block connections to HTTP and HTTPS ports, allow them like so:
 ```
 ufw allow 80
 ufw allow 443
 ufw allow 'Nginx Full'
 ```
 
-Now, we are going to turn off the nginx service and generate our https certificate
+Now, we are going to turn off the nginx service to generate our https certificate.
+Replace \<example.com\> with your domain:
 ```
 systemctl stop nginx
 certbot certonly --standalone --register-unsafely-without-email -d <example.com>
@@ -48,13 +49,14 @@ To enable auto renew, we will use a cron job:
 crontab -e
 ```
 
-this will open in your favorite editor, just append this line:
+This will open a file in your favorite editor (obviously vim), just append this line:
 ```
 0 0 1 * * certbot --nginx renew
 ```
 
 Now we need to setup our nginx config file! 
-This is an example nginx config, write this to /etc/nginx/nginx.conf:
+This is an example nginx config.
+Replace each occurrence of \<example.com\> with your domain, and write this to /etc/nginx/nginx.conf:
 ```
 events {
         worker_connections 1024;
@@ -120,6 +122,9 @@ systemctl enable haemolacriaa
 systemctl start haemolacriaa
 ```
 
+You might notice that our haemolacriaa service failed to start, and that's because it requires a database connection on the same host.
+Which is what we'll set up next.
+
 ## Setup postgresql
 
 Install postgresql on the VPS:
@@ -127,24 +132,24 @@ Install postgresql on the VPS:
 apt-get install postgresql
 ```
 
-change to the postgres user, and open psql
+Change to the postgres user, and open psql
 ```
 su - postgres
 psql
 ```
 
-change the postgres user default password:
+The first thing you should do is change the default password for the user postgres. Replace \<password-here\> with a password of your choice:
 ```
 alter user postgres with encrypted password '<password-here>';
 ```
 
-add a user and our new database:
+Add a user and our new database:
 ```
 create user songuser;
 create database songdb;
 ```
 
-set the new user's password and give database permissions:
+Set the new user's password and give database permissions:
 ```
 alter user songuser with encrypted password '<password-here>';
 grant all privileges on database songdb to songuser;
@@ -162,49 +167,55 @@ SHOW config_file;
 \q
 ```
 
-Open up the file in your editor, at this time my config is located in
+Open up the config file in your editor (vim), currently my config is located in
 /etc/postgresql/15/main/
 ```
 vim /etc/postgresql/15/main/postgresql.conf
 ```
 
-Navigate to the line with /listen_address, or append this line 
-in the file, and quit:
+Navigate (in vim) to the line by using /listen_address, or append this line 
+to the file. Replace \<your-server-ip\> with the ipv4 address of your VPS and quit:
 ```
 listen_addresses = 'localhost,<your-server-ip>'
 :wq
 ```
 
-Now we need to allow our test machine to connect to the DB
-Append this line to pg_hba.conf:
+Now we need to allow our dev machine to connect to the DB if we want to run tests and edit the web app.
+Append this line to pg_hba.conf, replace \<your-ip\> with your personal ip address:
 ```
 vim /etc/postgresql/15/main/pg_hba.conf
 hostssl   songdb             songuser             <your-ip>/0        scram-sha-256
 :wq
 ```
 
-Note that your machine likely doesn't have a static IP, if your IP changes, 
-you will have to update <your-ip> before connecting again.
+Note that your machine likely doesn't have a static IP. If your IP changes, 
+you will have to update \<your-ip\> before connecting again or calculate a proper subnet mask (the number beyond the trailing slash).
 
-Then, exit the shell and restart postgresql, allowing traffic to the port of the DB
+Then, exit the shell and restart postgresql, allowing traffic to the port of the DB.
 ```
 exit
 systemctl restart postgresql
 ufw allow 5432
 ```
 
-Test the connection on your own machine, exit the ssh and do:
+Test the connection on your own machine, exit the ssh connection to the VPS and do:
 ```
 psql postgres://songuser:<your-songuser-password>@<your-domain>:5432/songdb
 \q
 ```
 
-So far, there should be no errors, now to connect the web server to the
-database, you need to run it with the following environment variables:
+So far, there should be no errors. To connect the web server to the
+database, you will need to run it with the following environment variables:
 ```
 PG_USER=songuser
 PG_PASSWORD=<your-songuser-password>
-PG_HOST=<your-domain>
+PG_HOST=127.0.0.1
 PG_PORT=5432
 PG_DATABASE=songdb
+```
+
+\<your-songuser-password\> is the password you gave the user "songuser" earlier. I recommend that you set these via the service file that we set up previously.
+Finally, restart the haemolacriaa service. Everything should be working.
+```
+systemctl restart haemolacriaa
 ```
