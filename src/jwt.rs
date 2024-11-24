@@ -1,77 +1,59 @@
-use crate::lazy::KEYS;
-use axum::{
-    body::Body, extract::Request, middleware::Next, response::IntoResponse, response::Response,
-    Json,
-};
+use crate::lazy::JWT_SECRET;
+use crate::util::*;
 use chrono::Utc;
-use http::header::AUTHORIZATION;
-use http::StatusCode;
-use jsonwebtoken::{decode, DecodingKey, Validation};
-use serde::Deserialize;
-use serde_json::json;
+use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
+use leptos::server;
+use serde::{Deserialize, Serialize};
 
-pub enum AuthError {
-    InvalidToken,
-    WrongCredentials,
-    MissingCredentials,
-}
-
-impl IntoResponse for AuthError {
-    fn into_response(self) -> Response {
-        use AuthError::*;
-        let (status, message) = match self {
-            WrongCredentials => (StatusCode::UNAUTHORIZED, "Wrong credentials"),
-            MissingCredentials => (StatusCode::BAD_REQUEST, "Missing credentials"),
-            InvalidToken => (StatusCode::BAD_REQUEST, "Invalid token"),
-        };
-
-        let body = Json(json!({
-            "error": message,
-        }));
-
-        (status, body).into_response()
-    }
-}
-
-pub struct Keys {
-    decode: DecodingKey,
-}
-
-impl Keys {
-    pub fn new(secret: &[u8]) -> Self {
-        Self {
-            decode: DecodingKey::from_secret(secret),
-        }
-    }
-}
-
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct Claims {
-    exp: usize,
+    sub: String,
+    exp: u64,
 }
 
-pub async fn auth_mw(mut req: Request, next: Next) -> Result<Response<Body>, AuthError> {
-    let auth_header = req.headers_mut().get(AUTHORIZATION);
+/// Pass Some(exp) otherwise the token will expire after 7 days
+/// Encoded with HS256 algoritm
+#[cfg(feature = "encode")]
+#[server(EncodeJwt, "/api", "GetJson")]
+pub async fn encode_jwt(exp: Option<u64>, sub: String) -> Result<String> {
+    use chrono::Duration;
+    use jsonwebtoken::{encode, EncodingKey, Header};
 
-    let auth_header = match auth_header {
-        Some(header) => header.to_str().map_err(|_| AuthError::MissingCredentials)?,
-        None => return Err(AuthError::MissingCredentials),
-    };
+    let exp = exp.unwrap_or((Utc::now() + Duration::days(7)).timestamp() as u64);
 
-    let mut header = auth_header.split_whitespace();
+    let claims = Claims { sub, exp };
 
-    let (_, token) = (header.next(), header.next());
+    Ok(encode(
+        &Header::default(),
+        &claims,
+        &EncodingKey::from_secret(JWT_SECRET.as_bytes()),
+    )?)
+}
 
-    let token_data = decode::<Claims>(
-        &token.unwrap().to_string(),
-        &KEYS.decode,
-        &Validation::default(),
-    )
-    .map_err(|_| AuthError::WrongCredentials)?;
+/// Pass any token encoded with JWT_SECRET
+/// Decodes HS256 algoritm
+#[server(DecodeJwt, "/api", "GetJson")]
+pub async fn decode_jwt(token: String) -> Result<Claims> {
+    let token_claims = decode::<Claims>(
+        &token,
+        &DecodingKey::from_secret(JWT_SECRET.as_bytes()),
+        &Validation::new(Algorithm::HS256),
+    )?;
 
-    if token_data.claims.exp <= Utc::now().timestamp() as usize {
-        Err(AuthError::WrongCredentials)
+    Ok(Claims {
+        sub: token_claims.claims.sub,
+        exp: token_claims.claims.exp,
+    })
+}
+
+/// Pass in a token and get () if valid
+#[server(VerifyJwt, "/api", "Url")]
+pub async fn verify_jwt(token: String) -> Result<()> {
+    let claims = decode_jwt(token).await;
+
+    if (Utc::now().timestamp() as u64) < claims?.exp {
+        Ok(())
     } else {
-        Ok(next.run(req).await)
+        err!("Failed to verify jwt")
     }
 }

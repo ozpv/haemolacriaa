@@ -17,14 +17,14 @@ leptos_meta = { version = "0.6" }
 leptos_axum = { version = "0.6", optional = true }
 leptos_router = { version = "0.6" }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
-tower = { version = "0.4", features = ["util"], optional = true }
-tower-http = { version = "0.5", features = ["fs"], optional = true }
-thiserror = "1"
+tower = { version = "0.5", features = ["util"], optional = true }
+tower-http = { version = "0.6", features = ["fs"], optional = true }
+thiserror = "2"
 tracing = { version = "0.1", optional = true }
 http = "1"
 wasm-bindgen = "=0.2.93"
 leptos_icons = "0.3.0"
-icondata = "0.3.0"
+icondata = "0.5.0"
 const_format = "0.2.32"
 sqlx = { version = "0.8.0", features = ["runtime-tokio", "postgres", "tls-rustls", "chrono"], optional = true }
 serde = "1.0.197"
@@ -42,6 +42,8 @@ sha256 = { version = "1.5.0" }
 webp = { version = "0.3.0" }
 
 [features]
+# for encoding jwts
+# encode = []
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
 ssr = [

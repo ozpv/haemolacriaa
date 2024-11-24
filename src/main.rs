@@ -19,28 +19,29 @@ cfg_if::cfg_if! {
 
         async fn server_fn_handler(
             State(app_state): State<AppState>,
-            request: Request<Body>,
+            req: Request<Body>,
         ) -> impl IntoResponse {
             handle_server_fns_with_context(
                 move || {
                     provide_context(app_state.db_pool.clone());
                 },
-                request,
+                req,
             )
             .await
         }
 
-        async fn leptos_routes_handler(State(app_state): State<AppState>, req: Request<Body>) -> Response {
-            let handler = leptos_axum::render_route_with_context(
+        async fn leptos_routes_handler(
+            State(app_state): State<AppState>,
+            req: Request<Body>,
+        ) -> impl IntoResponse {
+            leptos_axum::render_route_with_context(
                 app_state.leptos_options.clone(),
                 app_state.leptos_routes.clone(),
                 move || {
                     provide_context(app_state.db_pool.clone());
                 },
                 App,
-            );
-
-            handler(req).await.into_response()
+            )(req).await
         }
 
         #[tokio::main]
@@ -112,7 +113,7 @@ cfg_if::cfg_if! {
                 .unwrap();
         }
     } else {
-        fn main() {
+        pub fn main() {
 
         }
     }

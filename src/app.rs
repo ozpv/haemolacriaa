@@ -2,7 +2,9 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
+use crate::util::*;
 use crate::components::footer::Footer;
+use crate::components::forms::LoginForm;
 use crate::components::nav::Nav;
 use crate::error::{AppError, ErrorPage};
 use crate::pages::admin::Admin;
@@ -23,17 +25,14 @@ macro_rules! multi_view {
         }
     };
 }
-/*
-macro_rules! todo_page {
-    () => {{
-        multi_view!(Nav, Todo)
-    }};
-}
-*/
 
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
+
+    let logged_in: Action<(), Result<(), ServerFnError>> = create_action(|_: &()| async {
+        err!("Not implemented yet")
+    });
 
     view! {
         <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>
@@ -51,7 +50,36 @@ pub fn App() -> impl IntoView {
                 <Routes>
                     <Route path="/" view=multi_view!(Nav, Home, Footer) ssr=SsrMode::InOrder/>
                     <Route path="/shop" view=multi_view!(Nav, Shop, Footer) ssr=SsrMode::InOrder/>
-                    <Route path="/admin" view=Admin ssr=SsrMode::InOrder/>
+
+                    // login page
+                    <Route path="/login" view=move || view! {
+                        <Suspense>
+                            // if user is logged in, redirect to /admin
+                            { logged_in.dispatch(()); }
+                            <Show when=move || logged_in.value().get().is_some_and(|res| res.is_ok())>
+                                <Redirect path="/admin"/>
+                            </Show>
+                        </Suspense>
+                        // otherwise show the login panel
+                        <Outlet/>
+                    }>
+                        <Route path="" view=multi_view!(Nav, LoginForm)/>
+                    </Route>
+
+                    // admin panel
+                    <Route path="/admin" view=move || view! {
+                        <Suspense>
+                            // check if logged in, if not redirect to /login
+                            { logged_in.dispatch(()); }
+                            <Show when=move || logged_in.value().get().is_none_or(|res| res.is_err())>
+                                <Redirect path="/login"/>
+                            </Show>
+                        </Suspense>
+                        // else (if logged in) show the children
+                        <Outlet/>
+                    }>
+                        <Route path="" view=Admin/>
+                    </Route>
                 </Routes>
             </main>
         </Router>
@@ -62,6 +90,7 @@ pub fn App() -> impl IntoView {
 #[component]
 fn Todo() -> impl IntoView {
     view! {
+        <Nav/>
         <div class="bg-gray-900 min-h-screen">
             <h1 class="text-white">"Work in progress"</h1>
         </div>

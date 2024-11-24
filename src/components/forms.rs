@@ -1,17 +1,19 @@
 use crate::util::*;
-#[cfg(feature = "ssr")]
-use http::header::CONTENT_TYPE;
-use leptos::ev::SubmitEvent;
-use leptos::*;
+use leptos::{ev::SubmitEvent, html::Input, *};
 use server_fn::codec::{MultipartData, MultipartFormData};
-#[cfg(feature = "ssr")]
-use tokio::{fs::File, io::AsyncWriteExt};
 use wasm_bindgen::JsCast;
 use web_sys::{FormData, HtmlFormElement};
 
+cfg_if::cfg_if! {
+    if #[cfg(feature = "ssr")] {
+        use http::header::CONTENT_TYPE;
+        use tokio::{fs::File, io::AsyncWriteExt};
+        use crate::jwt::verify_jwt;
+    }
+}
+
 /// TODO: upload in chunks with progress
 /// and add multiple CONTENT_TYPE selections
-
 #[server(input = MultipartFormData)]
 pub async fn upload_file(data: MultipartData) -> Result<()> {
     let mut data = data.into_inner().unwrap();
@@ -40,6 +42,7 @@ pub async fn upload_file(data: MultipartData) -> Result<()> {
     Ok(())
 }
 
+// TODO: call upload file from Action to display if there is an error
 #[component]
 pub fn FileUploadForm() -> impl IntoView {
     // upload file on submit
@@ -64,5 +67,63 @@ pub fn FileUploadForm() -> impl IntoView {
             <input type="file" id="file-input" name="file" accept="image/webp"/>
             <button type="submit">"Upload"</button>
         </form>
+    }
+}
+
+/// "login" with a valid token encoded with JWT_SECRET
+#[server(Login, "/api", "Url")]
+pub async fn login(token: String, redirect_url: Option<String>) -> Result<(), ServerFnError> {
+    if verify_jwt(token).await.is_ok() {
+        if let Some(redirect_url) = redirect_url {
+            leptos_axum::redirect(&redirect_url);
+        }
+        Ok(())
+    } else {
+        err!("Failed to login")
+    }
+}
+
+#[component]
+pub fn LoginForm() -> impl IntoView {
+    let token_input_element = create_node_ref::<Input>();
+
+    // catch the login status
+    // Option<Result<(), ServerFnError>>
+    let login_action = create_action(|token: &String| {
+        let token = token.clone();
+        async move { login(token, Some("/admin".to_string())).await }
+    });
+
+    let on_submit = move |ev: SubmitEvent| {
+        // prevent refresh
+        ev.prevent_default();
+
+        let token = token_input_element
+            .get()
+            .expect("token <input> tag should exist")
+            .value();
+
+        // call the login api
+        login_action.dispatch(token);
+    };
+
+    view! {
+        <form on:submit=on_submit>
+            <label>"Enter a valid token:"</label>
+            <input type="password" id="token-input" node_ref=token_input_element name="token-input"/>
+            <button type="submit">"Login"</button>
+        </form>
+
+        // Info if token is valid
+        {move || login_action.value().get().map_or(
+            ().into_view(),
+            // there is Some result
+            |res| match res {
+                Ok(_) => view! {
+                    <p>"Logged in!"</p>
+                },
+                Err(_) => view! { <p>"Login failure. Please try again."</p> },
+            }.into_view())
+        }
     }
 }
