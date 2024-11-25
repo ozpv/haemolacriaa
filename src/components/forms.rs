@@ -6,15 +6,19 @@ use web_sys::{FormData, HtmlFormElement};
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "ssr")] {
-        use http::header::CONTENT_TYPE;
+        use http::{StatusCode, header::CONTENT_TYPE};
         use tokio::{fs::File, io::AsyncWriteExt};
         use crate::jwt::verify_jwt;
+        use leptos_axum::{extract, ResponseOptions};
+        use http::{HeaderMap, HeaderValue, header};
+        use time::Duration;
+        use cookie::Cookie;
     }
 }
 
 /// TODO: upload in chunks with progress
 /// and add multiple CONTENT_TYPE selections
-#[server(input = MultipartFormData)]
+#[server(input = MultipartFormData, prefix = "/api/opr")]
 pub async fn upload_file(data: MultipartData) -> Result<()> {
     let mut data = data.into_inner().unwrap();
 
@@ -71,15 +75,56 @@ pub fn FileUploadForm() -> impl IntoView {
 }
 
 /// "login" with a valid token encoded with JWT_SECRET
-#[server(Login, "/api", "Url")]
-pub async fn login(token: String, redirect_url: Option<String>) -> Result<(), ServerFnError> {
-    if verify_jwt(token).await.is_ok() {
+#[server(Login, "/api", "Url", "login")]
+pub async fn login(token: String, redirect_url: Option<String>) -> Result<()> {
+    if verify_jwt(token.clone()).await.is_ok() {
+        let response = expect_context::<ResponseOptions>();
+
+        let cookie = Cookie::build(("tok", &token))
+            .secure(true)
+            .http_only(true)
+            .max_age(Duration::days(7))
+            .build();
+
+        let Ok(header_value) = HeaderValue::from_str(&cookie.to_string()) else {
+            expect_context::<ResponseOptions>().set_status(StatusCode::INTERNAL_SERVER_ERROR);
+            return err!("Something went wrong");
+        };
+
+        response.insert_header(header::SET_COOKIE, header_value);
+
         if let Some(redirect_url) = redirect_url {
             leptos_axum::redirect(&redirect_url);
         }
         Ok(())
     } else {
         err!("Failed to login")
+    }
+}
+
+/// Similar to the middleware
+#[server(LoggedIn, "/api", "Url", "logged_in")]
+pub async fn logged_in() -> Result<()> {
+    let headers = extract::<HeaderMap>().await?;
+
+    // TODO: make this pattern simpler
+    let Some(token) = headers.get_all(header::COOKIE).iter().find_map(|cookie| {
+        let cookie =
+            Cookie::parse(cookie.to_str().expect("Cookie to parse")).expect("Cookie is broken");
+
+        if cookie.name() == "tok" {
+            Some(cookie.value().to_string())
+        } else {
+            None
+        }
+    }) else {
+        return err!("Failed to find cookie in header");
+    };
+
+    if verify_jwt(token).await.is_ok() {
+        Ok(())
+    } else {
+        err!("Failed to login, token is invalid")
     }
 }
 
@@ -125,5 +170,7 @@ pub fn LoginForm() -> impl IntoView {
                 Err(_) => view! { <p>"Login failure. Please try again."</p> },
             }.into_view())
         }
+
+        <a href="/admin">"Goto admin"</a>
     }
 }

@@ -18,7 +18,7 @@ pub mod util {
             Err(leptos::ServerFnError::new($s))
         };
 
-        ($s:tt, $c:tt) => {
+        ($s:tt, $c:expr) => {
             leptos::expect_context::<ResponseOptions>().set_status($c);
             Err(leptos::ServerFnError::new($s))
         };

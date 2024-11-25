@@ -9,7 +9,7 @@ use crate::types::links::Song;
 
 use std::ops::Range;
 
-#[server(GetLatestRelease, "/api", "GetJson")]
+#[server(GetLatestRelease, "/api/song", "GetJson")]
 pub async fn get_latest_release() -> Result<Song> {
     let pool = AppState::pool()?;
 
@@ -34,7 +34,7 @@ pub async fn get_latest_release() -> Result<Song> {
     })
 }
 
-#[server(GetSongByName, "/api", "GetJson")]
+#[server(GetSongByName, "/api/song", "GetJson")]
 pub async fn get_song_by_name(name: String) -> Result<Song> {
     let pool = AppState::pool()?;
 
@@ -56,7 +56,7 @@ pub async fn get_song_by_name(name: String) -> Result<Song> {
     })
 }
 
-#[server(GetRangeOfSongs, "/api", "GetJson")]
+#[server(GetRangeOfSongs, "/api/song", "GetJson")]
 pub async fn get_range_of_songs(range: Range<usize>) -> Result<Vec<Song>> {
     let pool = AppState::pool()?;
 
@@ -89,7 +89,7 @@ pub async fn get_range_of_songs(range: Range<usize>) -> Result<Vec<Song>> {
     }
 }
 
-#[server(AddSong, "/api", "Url")]
+#[server(AddSong, "/api/song", "Url")]
 pub async fn add_song(song: Song) -> Result<()> {
     let pool = AppState::pool()?;
 
@@ -123,7 +123,7 @@ pub async fn add_song(song: Song) -> Result<()> {
     Ok(())
 }
 
-#[server(DeleteSongByName, "/api", "Url")]
+#[server(DeleteSongByName, "/api/song", "Url")]
 pub async fn delete_song_by_name(name: String) -> Result<()> {
     let pool = AppState::pool()?;
 
@@ -134,7 +134,7 @@ pub async fn delete_song_by_name(name: String) -> Result<()> {
     Ok(())
 }
 
-#[server(UpdateSongEntry, "/api", "Url")]
+#[server(UpdateSongEntry, "/api/song", "Url")]
 pub async fn update_song_entry(name: String, song: Song) -> Result<()> {
     if song.name != name {
         return err!("Failed to update song entry because names do not match!");

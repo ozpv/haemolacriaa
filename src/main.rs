@@ -4,8 +4,8 @@ cfg_if::cfg_if! {
             body::Body,
             extract::{Request, State},
             middleware,
-            response::{IntoResponse, Response},
-            routing::get,
+            response::IntoResponse,
+            routing::{post, get},
             Router,
         };
         use haemolacriaa::app::*;
@@ -93,15 +93,23 @@ cfg_if::cfg_if! {
             };
 
             // server functions
-            let server = Router::new().route(
-                "/api/*fn_name",
+            let unprotected = Router::new()
+                .route("/api/login", post(server_fn_handler))
+                .route("/api/logged_in", post(server_fn_handler));
+
+            // protected server functions
+            let protected = Router::new().route(
+                "/api/song/*fn_name",
                 get(server_fn_handler).post(server_fn_handler),
-            );
-            // .layer(middleware::from_fn(jwt::auth_mw));
+            ).route(
+                "/api/opr/*fn_name",
+                get(server_fn_handler).post(server_fn_handler),
+            ).layer(middleware::from_fn(jwt::protected_check));
 
             // build our application with a route
             let app = Router::new()
-                .merge(server)
+                .merge(unprotected)
+                .merge(protected)
                 .leptos_routes_with_handler(routes, get(leptos_routes_handler))
                 .fallback(file_and_error_handler)
                 .with_state(state);

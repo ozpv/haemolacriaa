@@ -2,9 +2,8 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
-use crate::util::*;
 use crate::components::footer::Footer;
-use crate::components::forms::LoginForm;
+use crate::components::forms::{logged_in, LoginForm};
 use crate::components::nav::Nav;
 use crate::error::{AppError, ErrorPage};
 use crate::pages::admin::Admin;
@@ -30,9 +29,7 @@ macro_rules! multi_view {
 pub fn App() -> impl IntoView {
     provide_meta_context();
 
-    let logged_in: Action<(), Result<(), ServerFnError>> = create_action(|_: &()| async {
-        err!("Not implemented yet")
-    });
+    let logged_in = create_action(|_: &()| async { logged_in().await });
 
     view! {
         <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>

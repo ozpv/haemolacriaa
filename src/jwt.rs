@@ -1,7 +1,13 @@
+#![allow(unexpected_cfgs)]
+
 use crate::lazy::JWT_SECRET;
 use crate::util::*;
+use axum::{extract::Request, middleware::Next, response::Response};
 use chrono::Utc;
+use headers::{Cookie, HeaderMapExt};
+use http::StatusCode;
 use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
+#[allow(unused_imports)]
 use leptos::server;
 use serde::{Deserialize, Serialize};
 
@@ -13,8 +19,9 @@ pub struct Claims {
 
 /// Pass Some(exp) otherwise the token will expire after 7 days
 /// Encoded with HS256 algoritm
+/// add the feature encode to Cargo.toml to include
 #[cfg(feature = "encode")]
-#[server(EncodeJwt, "/api", "GetJson")]
+// #[server(EncodeJwt, "/api", "GetJson")]
 pub async fn encode_jwt(exp: Option<u64>, sub: String) -> Result<String> {
     use chrono::Duration;
     use jsonwebtoken::{encode, EncodingKey, Header};
@@ -32,7 +39,7 @@ pub async fn encode_jwt(exp: Option<u64>, sub: String) -> Result<String> {
 
 /// Pass any token encoded with JWT_SECRET
 /// Decodes HS256 algoritm
-#[server(DecodeJwt, "/api", "GetJson")]
+// #[server(DecodeJwt, "/api", "GetJson")]
 pub async fn decode_jwt(token: String) -> Result<Claims> {
     let token_claims = decode::<Claims>(
         &token,
@@ -46,14 +53,32 @@ pub async fn decode_jwt(token: String) -> Result<Claims> {
     })
 }
 
-/// Pass in a token and get () if valid
-#[server(VerifyJwt, "/api", "Url")]
-pub async fn verify_jwt(token: String) -> Result<()> {
-    let claims = decode_jwt(token).await;
+/// Pass in a token and get Ok(()) if valid
+// #[server(VerifyJwt, "/api", "Url")]
+pub async fn verify_jwt(token: String) -> Result<(), StatusCode> {
+    let claims = decode_jwt(token)
+        .await
+        .map_err(|_| StatusCode::UNAUTHORIZED)?;
 
-    if (Utc::now().timestamp() as u64) < claims?.exp {
+    if (Utc::now().timestamp() as u64) < claims.exp {
         Ok(())
     } else {
-        err!("Failed to verify jwt")
+        Err(StatusCode::UNAUTHORIZED)
+    }
+}
+
+pub async fn protected_check(req: Request, next: Next) -> Result<Response, StatusCode> {
+    let Some(cookie) = req.headers().typed_get::<Cookie>() else {
+        return Err(StatusCode::UNAUTHORIZED);
+    };
+
+    let Some(token) = cookie.get("tok") else {
+        return Err(StatusCode::UNAUTHORIZED);
+    };
+
+    if verify_jwt(token.to_string()).await.is_ok() {
+        Ok(next.run(req).await)
+    } else {
+        Err(StatusCode::UNAUTHORIZED)
     }
 }

@@ -35,6 +35,9 @@ once_cell = { version = "1.19.0", optional = true }
 server_fn = { version = "0.6.15", features = ["multipart"] }
 web-sys = { version = "0.3.70" }
 cfg-if = "1.0.0"
+headers = "0.4.0"
+cookie = "0.18.1"
+time = "0.3.36"
 
 [build-dependencies]
 image = { version = "0.25.5" }
@@ -44,7 +47,6 @@ webp = { version = "0.3.0" }
 [features]
 # for encoding jwts
 # encode = []
-csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
 ssr = [
   "dep:axum",
