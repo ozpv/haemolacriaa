@@ -8,7 +8,6 @@ use crate::types::{
 };
 
 /// Information section
-
 // Assumes you only have one, synchronized name.
 const USERNAME: &str = "haemolacriaa";
 
@@ -29,7 +28,6 @@ const APPLE_MUSIC_ID: &str = "1549699645";
 const YOUTUBE_CHANNEL_ID: &str = "UCQDQqA9iaWtlNkwXiCQogYQ";
 
 /// Navbar
-
 // Each route displayed in the navbar.
 pub static NAV_ITEMS: [RouteInfo; 2] = [
     RouteInfo {
@@ -43,7 +41,6 @@ pub static NAV_ITEMS: [RouteInfo; 2] = [
 ];
 
 /// Body
-
 // Current song, set it to be displayed on home page.
 pub const CURRENT_SONG: Song<&'static str> = LEAVE_SONG;
 
@@ -131,21 +128,21 @@ impl<T> PlatformId<T> {
     pub fn unwrap_name(&self) -> &T {
         use PlatformId::*;
         match self {
-            Spotify(x, _) => x,
-            YouTube(x, _) => x,
-            SoundCloud(x, _) => x,
-            AppleMusic(x, _) => x,
-            Bandcamp(x, _) => x,
+            Spotify(x, _)
+            | YouTube(x, _)
+            | SoundCloud(x, _)
+            | AppleMusic(x, _)
+            | Bandcamp(x, _) => x,
         }
     }
     pub fn unwrap_link(&self) -> &T {
         use PlatformId::*;
         match self {
-            Spotify(_, y) => y,
-            YouTube(_, y) => y,
-            SoundCloud(_, y) => y,
-            AppleMusic(_, y) => y,
-            Bandcamp(_, y) => y,
+            Spotify(_, y)
+            | YouTube(_, y)
+            | SoundCloud(_, y)
+            | AppleMusic(_, y)
+            | Bandcamp(_, y) => y,
         }
     }
 }

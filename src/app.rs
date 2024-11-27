@@ -29,7 +29,7 @@ macro_rules! multi_view {
 pub fn App() -> impl IntoView {
     provide_meta_context();
 
-    let logged_in = create_action(|_: &()| async { logged_in().await });
+    let logged_in = create_action(|(): &()| async { logged_in().await });
 
     view! {
         <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>

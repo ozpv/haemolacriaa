@@ -20,9 +20,7 @@ fn encode_as_webp(path: &Path) -> Result<(), Box<dyn Error>> {
         res.decode()?
     };
 
-    let encoder = Encoder::from_image(&image)?;
-
-    let encoded = encoder.encode(90.0);
+    let encoded = Encoder::from_image(&image)?.encode(90.0);
 
     let new_path = {
         let mut res = path.parent().unwrap().to_owned();

@@ -1,12 +1,11 @@
 /** @type {import('tailwindcss').Config} */
-
 export default {
-  content: [
-    './src/*.rs',
-    './src/components/*.rs',
-    './src/pages/*.rs',
-  ],
-
+  content: {
+    files: ["./src/**/*.rs"],
+    transform: {
+      rs: (content) => content.replace(/(?:^|\s)class:/g, ' '),
+    },
+  },
   theme: {
     colors: {
       transparent: 'transparent',

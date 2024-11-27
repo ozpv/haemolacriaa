@@ -2,6 +2,7 @@ use icondata::Icon;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 use sqlx::FromRow;
+use std::borrow::ToOwned;
 
 use crate::config::{PlatformId, PlatformId::*, STREAMING_PLATFORMS};
 use crate::types::images::Image;
@@ -65,11 +66,11 @@ impl<'a> From<Song<&'a str>> for Song<String> {
             author: s.author.to_owned(),
             image: Image::from(s.image),
             is_album: s.is_album,
-            spotify_id: s.spotify_id.map(|st| st.to_owned()),
-            youtube_id: s.youtube_id.map(|st| st.to_owned()),
-            soundcloud_id: s.soundcloud_id.map(|st| st.to_owned()),
-            apple_music_id: s.apple_music_id.map(|st| st.to_owned()),
-            bandcamp_id: s.bandcamp_id.map(|st| st.to_owned()),
+            spotify_id: s.spotify_id.map(ToOwned::to_owned),
+            youtube_id: s.youtube_id.map(ToOwned::to_owned),
+            soundcloud_id: s.soundcloud_id.map(ToOwned::to_owned),
+            apple_music_id: s.apple_music_id.map(ToOwned::to_owned),
+            bandcamp_id: s.bandcamp_id.map(ToOwned::to_owned),
             publish_date: s.publish_date,
         }
     }

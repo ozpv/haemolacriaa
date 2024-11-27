@@ -164,7 +164,7 @@ pub fn LoginForm() -> impl IntoView {
             ().into_view(),
             // there is Some result
             |res| match res {
-                Ok(_) => view! {
+                Ok(()) => view! {
                     <p>"Logged in!"</p>
                 },
                 Err(_) => view! { <p>"Login failure. Please try again."</p> },
