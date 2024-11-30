@@ -41,12 +41,7 @@ fn encode_as_webp(path: &Path) -> Result<(), Box<dyn Error>> {
 fn add_hash_to_filename(path: &PathBuf) -> Result<(), Box<dyn Error>> {
     let hash = try_digest(path.clone())?;
 
-    'outer: {
-        let Some((_, current_hash)) =
-            ({ path.file_stem().unwrap().to_str().unwrap().split_once('-') })
-        else {
-            break 'outer;
-        };
+    if let Some((_, current_hash)) = path.file_stem().unwrap().to_str().unwrap().split_once('-') {
         if current_hash == hash {
             return Ok(());
         }
@@ -94,19 +89,24 @@ fn remove_hash(path: &PathBuf) -> Result<(), Box<dyn Error>> {
 
 fn main() -> Result<(), Box<dyn Error>> {
     println!("cargo:rerun-if-changed=migrations");
+    println!("cargo:rerun-if-changed=assets");
+
+    // pass the var RM_HASH to remove instead
+    // can be set to anything
+    let opt = std::env::var_os("RM_HASH");
 
     read_dir("./assets")
         .expect("Dir should exist!")
         .for_each(|entry| {
-            // add_hash_to_filename(&entry.expect("Entry should exist").path())
-            //     .expect("Failed to rename file!");
+            let entry = entry.expect("There to be a file").path();
 
-            // use only if files have hash in name
-            // remove_hash(&entry.expect("Entry should exist").path()).expect("Failed to rename file!");
-
-            // encode the dir as WebP
-            encode_as_webp(&entry.expect("Entry should exist").path())
-                .expect("Failed to encode as WebP");
+            if let Some(_) = opt {
+                remove_hash(&entry).expect("Failed to rename file!");
+            } else {
+                encode_as_webp(&entry).expect("Failed to encode as WebP");
+                // hash after encode
+                add_hash_to_filename(&entry).expect("Failed to rename file!");
+            }
         });
 
     Ok(())
