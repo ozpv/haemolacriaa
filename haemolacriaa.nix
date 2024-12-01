@@ -3,7 +3,6 @@
 pkgs.mkShell {
   packages = with pkgs; [
     rustup
-    trunk
     cargo-binutils
     cargo-leptos
     cargo-generate
@@ -11,5 +10,6 @@ pkgs.mkShell {
     binaryen
     postgresql
     sqlx-cli
+	wasm-bindgen-cli
   ];
 }

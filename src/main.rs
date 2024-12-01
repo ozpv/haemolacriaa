@@ -1,121 +1,77 @@
+use leptos::{config::LeptosOptions, IntoView};
+
 cfg_if::cfg_if! {
     if #[cfg(feature = "ssr")] {
         use axum::{
-            body::Body,
-            extract::{Request, State},
-            middleware,
-            response::IntoResponse,
-            routing::{post, get},
             Router,
         };
         use haemolacriaa::app::*;
-        use haemolacriaa::fileserv::file_and_error_handler;
         use haemolacriaa::jwt;
         use haemolacriaa::state::AppState;
-        use leptos::*;
-        use leptos_axum::{generate_route_list, handle_server_fns_with_context, LeptosRoutes};
+        use leptos::{logging::log, prelude::get_configuration};
+        use leptos_axum::{generate_route_list, LeptosRoutes};
         use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
         use std::time::Duration;
 
-        async fn server_fn_handler(
-            State(app_state): State<AppState>,
-            req: Request<Body>,
-        ) -> impl IntoResponse {
-            handle_server_fns_with_context(
-                move || {
-                    provide_context(app_state.db_pool.clone());
-                },
-                req,
-            )
-            .await
-        }
-
-        async fn leptos_routes_handler(
-            State(app_state): State<AppState>,
-            req: Request<Body>,
-        ) -> impl IntoResponse {
-            leptos_axum::render_route_with_context(
-                app_state.leptos_options.clone(),
-                app_state.leptos_routes.clone(),
-                move || {
-                    provide_context(app_state.db_pool.clone());
-                },
-                App,
-            )(req).await
-        }
-
         #[tokio::main]
         async fn main() {
-            let conf = get_configuration(None).await.unwrap();
+            let conf = get_configuration(None).unwrap();
             let leptos_options = conf.leptos_options;
             let addr = leptos_options.site_addr;
             let routes = generate_route_list(App);
 
             // to build the postgres connection
-            let user = std::env::var("PG_USER").expect("Failed to get postgres user!");
-            let password = std::env::var("PG_PASSWORD").expect("Failed to get postgres password!");
-            let host = std::env::var("PG_HOST").expect("Failed to get postgres host!");
-            let port = std::env::var("PG_PORT")
-                .expect("Failed to get postgres port!")
-                .parse::<u16>()
-                .ok()
-                .expect("Failed to parse port as a u16!");
-            let db = std::env::var("PG_DATABASE").expect("Failed to get postgres database!");
+            //let user = std::env::var("PG_USER").expect("Failed to get postgres user!");
+            //let password = std::env::var("PG_PASSWORD").expect("Failed to get postgres password!");
+            //let host = std::env::var("PG_HOST").expect("Failed to get postgres host!");
+            //let port = std::env::var("PG_PORT")
+            //    .expect("Failed to get postgres port!")
+            //    .parse::<u16>()
+            //    .ok()
+            //    .expect("Failed to parse port as a u16!");
+            //let db = std::env::var("PG_DATABASE").expect("Failed to get postgres database!");
 
-            // setup postgres options
-            let db_options = PgConnectOptions::new()
-                .host(&host)
-                .port(port)
-                .username(&user)
-                .password(&password)
-                .database(&db)
-                .ssl_mode(PgSslMode::Require);
+            //// setup postgres options
+            //let db_options = PgConnectOptions::new()
+            //    .host(&host)
+            //    .port(port)
+            //    .username(&user)
+            //    .password(&password)
+            //    .database(&db)
+            //    .ssl_mode(PgSslMode::Require);
 
-            // setup postgres connection pool
-            let db_pool = PgPoolOptions::new()
-                .max_connections(5)
-                .acquire_timeout(Duration::from_secs(3))
-                .connect_with(db_options)
-                .await
-                .expect("Failed to connect to database");
+            //// setup postgres connection pool
+            //let db_pool = PgPoolOptions::new()
+            //    .max_connections(5)
+            //    .acquire_timeout(Duration::from_secs(3))
+            //    .connect_with(db_options)
+            //    .await
+            //    .expect("Failed to connect to database");
 
-            // run migrations
-            sqlx::migrate!()
-                .run(&db_pool)
-                .await
-                .expect("Failed to run SQLx migrations!");
+            //// run migrations
+            //sqlx::migrate!()
+            //    .run(&db_pool)
+            //    .await
+            //    .expect("Failed to run SQLx migrations!");
 
-            // app state
-            let state = AppState {
-                db_pool,
-                leptos_options,
-                leptos_routes: routes.clone(),
-            };
-
-            // server functions
-            let unprotected = Router::new()
-                .route("/api/login", post(server_fn_handler))
-                .route("/api/logged_in", post(server_fn_handler));
-
-            // protected server functions
-            let protected = Router::new().route(
-                "/api/song/*fn_name",
-                get(server_fn_handler).post(server_fn_handler),
-            ).route(
-                "/api/opr/*fn_name",
-                get(server_fn_handler).post(server_fn_handler),
-            ).layer(middleware::from_fn(jwt::protected_check));
+            //// app state
+            //let state = AppState {
+            //    db_pool,
+            //    leptos_options: leptos_options.clone(),
+            //    leptos_routes: routes.clone(),
+            //};
 
             // build our application with a route
             let app = Router::new()
-                .merge(unprotected)
-                .merge(protected)
-                .leptos_routes_with_handler(routes, get(leptos_routes_handler))
-                .fallback(file_and_error_handler)
-                .with_state(state);
+                .leptos_routes(&leptos_options, routes, {
+                    let leptos_options = leptos_options.clone();
+                    move || shell(leptos_options.clone())
+                })
+                .fallback(leptos_axum::file_and_error_handler::<LeptosOptions, _>(shell))
+                .with_state(leptos_options);
 
             let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-            logging::log!("listening on http://{}", &addr);
+            log!("listening on http://{}", &addr);
             axum::serve(listener, app.into_make_service())
                 .await
                 .unwrap();

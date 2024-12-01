@@ -7,7 +7,7 @@ pub mod song_db;
 pub mod types;
 
 pub mod util {
-    pub type Result<T, E = leptos::ServerFnError> = std::result::Result<T, E>;
+    pub type Result<T, E = server_fn::ServerFnError> = std::result::Result<T, E>;
 
     /// err(REASON) <- to abstract and hide real error info
     /// err(REASON, STATUSCODE) <- set the STATUSCODE of the response
@@ -15,12 +15,12 @@ pub mod util {
     #[allow(unused_macros)]
     macro_rules! err {
         ($s:tt) => {
-            Err(leptos::ServerFnError::new($s))
+            Err(server_fn::ServerFnError::new($s))
         };
 
         ($s:tt, $c:expr) => {
             leptos::expect_context::<ResponseOptions>().set_status($c);
-            Err(leptos::ServerFnError::new($s))
+            Err(server_fn::ServerFnError::new($s))
         };
     }
 
@@ -30,7 +30,6 @@ pub mod util {
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "ssr")] {
-        pub mod fileserv;
         pub mod jwt;
         pub mod state;
 
@@ -44,12 +43,9 @@ cfg_if::cfg_if! {
     } else if #[cfg(feature = "hydrate")] {
         #[wasm_bindgen::prelude::wasm_bindgen]
         pub fn hydrate() {
-            use app::*;
-            use leptos::*;
-
+            use crate::app::*;
             console_error_panic_hook::set_once();
-
-            mount_to_body(App);
+            leptos::mount::hydrate_body(App);
         }
     }
 }

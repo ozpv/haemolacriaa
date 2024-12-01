@@ -1,13 +1,13 @@
 use axum::extract::FromRef;
-use leptos::{use_context, LeptosOptions, ServerFnError};
-use leptos_router::RouteListing;
+use leptos::prelude::{use_context, LeptosOptions, ServerFnError};
+use leptos_axum::AxumRouteListing;
 use sqlx::{Pool, Postgres};
 
 #[derive(FromRef, Debug, Clone)]
 pub struct AppState {
     pub db_pool: Pool<Postgres>,
     pub leptos_options: LeptosOptions,
-    pub leptos_routes: Vec<RouteListing>,
+    pub leptos_routes: Vec<AxumRouteListing>,
 }
 
 impl AppState {

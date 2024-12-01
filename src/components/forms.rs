@@ -1,5 +1,5 @@
-use crate::util::*;
-use leptos::{ev::SubmitEvent, html::Input, *};
+use leptos::{ev::SubmitEvent, html::Input, task::spawn_local, prelude::*}; 
+use crate::util::err;
 use server_fn::codec::{MultipartData, MultipartFormData};
 use wasm_bindgen::JsCast;
 use web_sys::{FormData, HtmlFormElement};
@@ -19,7 +19,7 @@ cfg_if::cfg_if! {
 /// TODO: upload in chunks with progress
 /// and add multiple CONTENT_TYPE selections
 #[server(input = MultipartFormData, prefix = "/api/opr")]
-pub async fn upload_file(data: MultipartData) -> Result<()> {
+pub async fn upload_file(data: MultipartData) -> Result<(), ServerFnError> {
     let mut data = data.into_inner().unwrap();
 
     while let Ok(Some(field)) = data.next_field().await {
@@ -76,7 +76,7 @@ pub fn FileUploadForm() -> impl IntoView {
 
 /// "login" with a valid token encoded with JWT_SECRET
 #[server(Login, "/api", "Url", "login")]
-pub async fn login(token: String, redirect_url: Option<String>) -> Result<()> {
+pub async fn login(token: String, redirect_url: Option<String>) -> Result<(), ServerFnError> {
     if verify_jwt(token.clone()).await.is_ok() {
         let response = expect_context::<ResponseOptions>();
 
@@ -104,7 +104,7 @@ pub async fn login(token: String, redirect_url: Option<String>) -> Result<()> {
 
 /// Similar to the middleware
 #[server(LoggedIn, "/api", "Url", "logged_in")]
-pub async fn logged_in() -> Result<()> {
+pub async fn logged_in() -> Result<(), ServerFnError> {
     let headers = extract::<HeaderMap>().await?;
 
     // TODO: make this pattern simpler
@@ -130,11 +130,11 @@ pub async fn logged_in() -> Result<()> {
 
 #[component]
 pub fn LoginForm() -> impl IntoView {
-    let token_input_element = create_node_ref::<Input>();
+    let token_input_element = NodeRef::<Input>::new();
 
     // catch the login status
     // Option<Result<(), ServerFnError>>
-    let login_action = create_action(|token: &String| {
+    let login_action = Action::new(|token: &String| {
         let token = token.clone();
         async move { login(token, Some("/admin".to_string())).await }
     });
@@ -160,15 +160,14 @@ pub fn LoginForm() -> impl IntoView {
         </form>
 
         // Info if token is valid
-        {move || login_action.value().get().map_or(
-            ().into_view(),
+        {move || login_action.value().get().map_or(().into_any(),
             // there is Some result
             |res| match res {
                 Ok(()) => view! {
                     <p>"Logged in!"</p>
                 },
                 Err(_) => view! { <p>"Login failure. Please try again."</p> },
-            }.into_view())
+            }.into_any())
         }
 
         <a href="/admin">"Goto admin"</a>

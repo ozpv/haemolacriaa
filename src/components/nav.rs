@@ -1,11 +1,11 @@
 use crate::config::NAV_ITEMS;
 use icondata as ico;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 
 #[component]
 pub fn Nav() -> impl IntoView {
-    let activity = create_rw_signal(false);
+    let activity = RwSignal::new(false);
     let toggle_active = move |_| activity.update(|status| *status = !*status);
 
     let active_icon = Signal::derive(move || {
