@@ -12,14 +12,14 @@ pub fn Releases() -> impl IntoView {
     let song_info = Resource::new(move || name.get(), get_song_by_name);
 
     view! {
-        <div class="min-h-screen bg-gray-900" id="release-page">
-            <Transition fallback=move || view! { <p class="text-sm font-medium text-white">{"Loading..."}</p> }>
+        <div class="bg-base-dark min-h-screen" id="release-page">
+            <Transition fallback=move || view! { <p class="text-sm font-medium text-text-dark">{"Loading..."}</p> }>
                 {move || song_info.get().map(|song| match song {
                         Ok(song) => view!{
                             <StreamingList list_info=song/>
                         }.into_any(),
                         Err(_) => view! {
-                            <p class="text-sm font-medium text-white">{
+                            <p class="text-sm font-medium text-text-dark">{
                                 if name.get() == "" {
                                     "Error loading a release! Please supply a name in the URL.".to_owned()
                                 } else {

@@ -1,12 +1,15 @@
 use leptos::prelude::*;
 use leptos_meta::*;
-use leptos_router::{path, components::{Redirect, Route, Router, Routes}, nested_router::Outlet, SsrMode};
+use leptos_router::{
+    components::{ProtectedRoute, Route, Router, Routes},
+    path, SsrMode,
+};
 
-// use crate::components::forms::{logged_in, LoginForm};
-use crate::components::nav::Nav;
 use crate::components::footer::Footer;
-// use crate::error::{AppError, ErrorPage};
-// use crate::pages::admin::Admin;
+use crate::components::forms::{logged_in, LoginForm};
+use crate::components::nav::Nav;
+use crate::error::{AppError, ErrorPage};
+use crate::pages::admin::Admin;
 use crate::pages::home::Home;
 use crate::pages::shop::Shop;
 
@@ -32,7 +35,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
 pub fn App() -> impl IntoView {
     provide_meta_context();
 
-    // let logged_in = Action::new(|(): &()| async { logged_in().await });
+    let logged_in = Resource::new(move || (), |_| logged_in());
 
     //let fallback = || {
     //    let mut outside_errors = Errors::default();
@@ -40,7 +43,7 @@ pub fn App() -> impl IntoView {
     //    view! {
     //        <ErrorPage outside_errors/>
     //    }
-    //}; 
+    //};
 
     view! {
         <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>
@@ -49,38 +52,21 @@ pub fn App() -> impl IntoView {
         <Router>
             <Nav/>
             <main>
-                <Routes fallback=|| "Not Found".into_view()>
-                    <Route path=path!("/") view=Home ssr=SsrMode::InOrder/>
-                    <Route path=path!("/shop") view=Shop ssr=SsrMode::InOrder/>
-
-                    // login page
-                    //<Route path=path!("/login") view=move || view! {
-                    //    <Suspense>
-                    //        // if user is logged in, redirect to /admin
-                    //        { logged_in.dispatch(()); }
-                    //        <Show when=move || logged_in.value().get().is_some_and(|res| res.is_ok())>
-                    //            <Redirect path="/admin"/>
-                    //        </Show>
-                    //    </Suspense>
-                    //    // otherwise show the login panel
-                    //    <Outlet/>
-                    //}>
-                    //    <Route path="" view=LoginForm/>
-                    //</Route>
-
-                    //// admin panel
-                    //<Route path=path!("/admin") view=move || view! {
-                    //    <Suspense>
-                    //        // check if logged in, if not redirect to /login
-                    //        <Show when=move || logged_in.value().get().is_none_or(|res| res.is_err())>
-                    //            <Redirect path="/login"/>
-                    //        </Show>
-                    //    </Suspense>
-                    //    // else (if logged in) show the children
-                    //    <Outlet/>
-                    //}>
-                    //    <Route path=path!("") view=Admin/>
-                    //</Route>
+                <Routes fallback=move || view! { <ErrorPage /> }>
+                    <Route path=path!("/") view=Home />
+                    <Route path=path!("/shop") view=Shop />
+                    <ProtectedRoute
+                        path=path!("/login")
+                        view=LoginForm
+                        condition=move || Some(logged_in.get().is_none_or(|res| res.is_err()))
+                        redirect_path=|| "/admin"
+                    />
+                    <ProtectedRoute
+                        path=path!("/admin")
+                        view=Admin
+                        condition=move || Some(logged_in.get().is_some_and(|res| res.is_ok()))
+                        redirect_path=|| "/login"
+                    />
                 </Routes>
             </main>
             <Footer/>

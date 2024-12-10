@@ -1,5 +1,5 @@
-use leptos::{ev::SubmitEvent, html::Input, task::spawn_local, prelude::*}; 
 use crate::util::err;
+use leptos::{ev::SubmitEvent, html::Input, prelude::*, task::spawn_local};
 use server_fn::codec::{MultipartData, MultipartFormData};
 use wasm_bindgen::JsCast;
 use web_sys::{FormData, HtmlFormElement};
@@ -133,7 +133,6 @@ pub fn LoginForm() -> impl IntoView {
     let token_input_element = NodeRef::<Input>::new();
 
     // catch the login status
-    // Option<Result<(), ServerFnError>>
     let login_action = Action::new(|token: &String| {
         let token = token.clone();
         async move { login(token, Some("/admin".to_string())).await }
@@ -165,9 +164,9 @@ pub fn LoginForm() -> impl IntoView {
             |res| match res {
                 Ok(()) => view! {
                     <p>"Logged in!"</p>
-                },
-                Err(_) => view! { <p>"Login failure. Please try again."</p> },
-            }.into_any())
+                }.into_any(),
+                Err(_) => view! { <p class="text-red-dark">"Login failure. Please try again."</p> }.into_any(),
+            })
         }
 
         <a href="/admin">"Goto admin"</a>

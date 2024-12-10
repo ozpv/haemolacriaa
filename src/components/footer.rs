@@ -5,25 +5,22 @@ use leptos_icons::*;
 #[component]
 pub fn Footer() -> impl IntoView {
     view! {
-        <footer class="sticky top-full bg-gray-900 p-5">
-            <div class="bg-gray-900">
-                <hr class="border-gray-800 mx-auto w-full md:w-[90%]" />
-                <div class="flex items-center justify-center">
-                    <nav class="flex pt-[10px] gap-[8vw] my-[10px] text-sm text-white md:gap-[2vw]">
-                        {SOCIAL_MEDIA_ITEMS.iter().map(|item| {
-                            item.active.then(|| view! {
-                                <a class="p-2 rounded-sm transition-all ease-in duration-75 hover:bg-gray-800" href={item.url}>
-                                    <Icon icon={item.icon} width={"16"} height={"16"} />
-                                </a>
-                            }.into_any()).unwrap_or(().into_any())
-                        }).collect_view()}
-                    </nav>
-                </div>
-                <span class="block py-[8px] justify-center text-center text-xs text-gray-500 font-sans">{format!("Copyleft (ɔ) {}-{} ", YEARS_ACTIVE[0], YEARS_ACTIVE[1])}
-                    <a href={"/"} class="hover:underline hover:text-blue-900">{"haemolacriaa"}</a>
-                    {". All Wrongs Reserved."}
-                </span>
+        <footer class="sticky top-full bg-base-dark pt-2 pb-9">
+            <div class="flex items-center justify-center">
+                <nav class="flex pt-2.5 gap-[8vw] my-2.5 text-sm text-text-dark md:gap-[2vw]">
+                    {SOCIAL_MEDIA_ITEMS.iter().map(|item| {
+                        item.active.then(|| view! {
+                            <a class="p-2 rounded-sm transition-all ease-in duration-75 hover:bg-surface-dark-100" href={item.url}>
+                                <Icon icon=item.icon width="16" height="16" />
+                            </a>
+                        }.into_any()).unwrap_or(().into_any())
+                    }).collect_view()}
+                </nav>
             </div>
+            <span class="block py-1.5 justify-center text-center text-xs text-surface-dark-200 font-sans">{format!("Copyleft (ɔ) {}-{} ", YEARS_ACTIVE[0], YEARS_ACTIVE[1])}
+                <a href={"/"} class="hover:underline hover:text-sapphire-dark">{"haemolacriaa"}</a>
+                {". All Wrongs Reserved."}
+            </span>
         </footer>
     }
 }

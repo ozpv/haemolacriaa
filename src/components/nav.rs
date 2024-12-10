@@ -19,41 +19,23 @@ pub fn Nav() -> impl IntoView {
     let hidden_status = move || !activity.get();
 
     view! {
-        <nav class="bg-gray-900 border-gray-200">
-            <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                <span class="flex items-center text-xl text-white font-sans px-[20px]">{env!("CARGO_PKG_NAME")}</span>
-                <button
-                    on:click=toggle_active
-                    class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 md:hidden"
-                >
-                    <Icon
-                        icon=active_icon
-                        width="32px"
-                        height="32px"
-                    />
+        <nav class="bg-base-dark border-gray-200">
+            <div class="flex flex-wrap max-w-screen-xl items-center justify-between mx-auto p-4">
+                <span class="flex items-center text-xl text-text-dark font-sans px-5">{env!("CARGO_PKG_NAME")}</span>
+
+                <button on:click=toggle_active class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-overlay-dark-200 md:hidden">
+                    <Icon icon=active_icon width="32" height="32"/>
                 </button>
-                <div
-                    class="w-full md:block md:w-auto hidden"
-                    class:hidden=hidden_status
-                    id="navbar-default"
-                >
-                    <ul
-                        class="font-sans font-medium flex flex-col p-[16px] md:p-0 mt-4 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-gray-900"
-                    >
-                        {
-                            NAV_ITEMS.iter().map(|item| {
-                                view! {
-                                    <li class="p-[8px]">
-                                        <a
-                                            href=item.path
-                                            class="text-white py-[10px] px-[10px] hover:bg-gray-800 md:hover:text-blue-900 md:hover:bg-transparent"
-                                        >
-                                            {item.name}
-                                        </a>
-                                    </li>
-                                }
-                            }).collect_view()
-                        }
+
+                <div class="w-full md:block md:w-auto" class:hidden=hidden_status id="navbar-default">
+                    <ul class="font-sans font-medium flex flex-col p-[16px] md:p-0 mt-4 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-base-dark">
+                        {NAV_ITEMS.iter().map(|item| view! {
+                            <li class="p-2" on:click=toggle_active>
+                                <a href=item.path class="text-text-dark p-2.5 hover:bg-base-dark md:hover:text-sapphire-dark md:hover:bg-transparent">
+                                    {item.name}
+                                </a>
+                            </li>
+                        }).collect_view()}
                     </ul>
                 </div>
             </div>
