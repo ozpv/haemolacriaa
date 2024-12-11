@@ -31,7 +31,7 @@ pub mod util {
 cfg_if::cfg_if! {
     if #[cfg(feature = "ssr")] {
         pub mod jwt;
-        pub mod state;
+        pub mod pool;
 
         pub mod lazy {
             use once_cell::sync::Lazy;

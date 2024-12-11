@@ -12,7 +12,7 @@ cfg_if::cfg_if! {
         use leptos_axum::{extract, ResponseOptions};
         use http::{HeaderMap, HeaderValue, header};
         use time::Duration;
-        use cookie::Cookie;
+        use cookie::{SameSite, Cookie};
     }
 }
 
@@ -83,6 +83,7 @@ pub async fn login(token: String, redirect_url: Option<String>) -> Result<(), Se
         let cookie = Cookie::build(("tok", &token))
             .secure(true)
             .http_only(true)
+            .same_site(SameSite::None)
             .max_age(Duration::days(7))
             .build();
 
@@ -98,6 +99,7 @@ pub async fn login(token: String, redirect_url: Option<String>) -> Result<(), Se
         }
         Ok(())
     } else {
+        expect_context::<ResponseOptions>().set_status(StatusCode::UNAUTHORIZED);
         err!("Failed to login")
     }
 }
@@ -107,8 +109,10 @@ pub async fn login(token: String, redirect_url: Option<String>) -> Result<(), Se
 pub async fn logged_in() -> Result<(), ServerFnError> {
     let headers = extract::<HeaderMap>().await?;
 
+    println!("checking login cookie");
     // TODO: make this pattern simpler
     let Some(token) = headers.get_all(header::COOKIE).iter().find_map(|cookie| {
+        println!("parsing cookie");
         let cookie =
             Cookie::parse(cookie.to_str().expect("Cookie to parse")).expect("Cookie is broken");
 
@@ -118,6 +122,7 @@ pub async fn logged_in() -> Result<(), ServerFnError> {
             None
         }
     }) else {
+        println!("Failed to find cookie");
         return err!("Failed to find cookie in header");
     };
 

@@ -10,7 +10,7 @@ pub fn Home() -> impl IntoView {
 
     view! {
         <div class="bg-base-dark min-h-screen" id="home-page">
-            <StreamingList list_info=active_list.get()/>
+            <StreamingList list_info=active_list />
 
             <div class="border border-surface-dark rounded shadow mt-7 pb-9 xl:mx-60" id="previous-releases">
                 <span class="flex justify-center mt-9" id="Text">
@@ -29,7 +29,7 @@ pub fn Home() -> impl IntoView {
                                     on:click=move |_| active_list.set(song.clone())
                                     title=song.name.clone()
                                     image=song.image.clone()
-                                    class="ease-in duration-100 hover:scale-105 my-5"
+                                    class="md:ease-in md:duration-100 hover:scale-105 md:my-5"
                                 />
                             }
                         })

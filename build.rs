@@ -95,19 +95,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     // can be set to anything
     let opt = std::env::var_os("RM_HASH");
 
-    read_dir("./assets")
-        .expect("Dir should exist!")
-        .for_each(|entry| {
-            let entry = entry.expect("There to be a file").path();
-
-            if let Some(_) = opt {
-                remove_hash(&entry).expect("Failed to rename file!");
-            } else {
-                encode_as_webp(&entry).expect("Failed to encode as WebP");
-                // hash after encode
-                add_hash_to_filename(&entry).expect("Failed to rename file!");
-            }
-        });
+    for entry in read_dir("./assets")?.filter_map(|entry| Some(entry.ok()?.path())) {
+        if opt.is_some() {
+            remove_hash(&entry)?;
+        } else {
+            encode_as_webp(&entry)?;
+            // hash after encode
+            add_hash_to_filename(&entry)?;
+        }
+    }
 
     Ok(())
 }

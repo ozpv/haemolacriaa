@@ -16,7 +16,7 @@ pub fn Releases() -> impl IntoView {
             <Transition fallback=move || view! { <p class="text-sm font-medium text-text-dark">{"Loading..."}</p> }>
                 {move || song_info.get().map(|song| match song {
                         Ok(song) => view!{
-                            <StreamingList list_info=song/>
+                            <StreamingList list_info=RwSignal::new(song)/>
                         }.into_any(),
                         Err(_) => view! {
                             <p class="text-sm font-medium text-text-dark">{

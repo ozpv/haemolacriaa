@@ -1,12 +1,12 @@
 use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::{
-    components::{ProtectedRoute, Route, Router, Routes},
-    path, SsrMode,
+    components::{FlatRoutes, ProtectedRoute, Route, Router},
+    SsrMode, StaticSegment,
 };
 
 use crate::components::footer::Footer;
-use crate::components::forms::{logged_in, LoginForm};
+use crate::components::forms::{logged_in, Login, LoginForm};
 use crate::components::nav::Nav;
 use crate::error::{AppError, ErrorPage};
 use crate::pages::admin::Admin;
@@ -52,22 +52,23 @@ pub fn App() -> impl IntoView {
         <Router>
             <Nav/>
             <main>
-                <Routes fallback=move || view! { <ErrorPage /> }>
-                    <Route path=path!("/") view=Home />
-                    <Route path=path!("/shop") view=Shop />
+                <FlatRoutes fallback=move || view! { <p>"404 Error"</p> }>
+                    <Route path=StaticSegment("/") view=Home />
+                    <Route path=StaticSegment("/shop") view=Shop />
                     <ProtectedRoute
-                        path=path!("/login")
+                        path=StaticSegment("/login")
                         view=LoginForm
                         condition=move || Some(logged_in.get().is_none_or(|res| res.is_err()))
                         redirect_path=|| "/admin"
                     />
                     <ProtectedRoute
-                        path=path!("/admin")
+                        path=StaticSegment("/admin")
                         view=Admin
                         condition=move || Some(logged_in.get().is_some_and(|res| res.is_ok()))
                         redirect_path=|| "/login"
+                        ssr=SsrMode::InOrder
                     />
-                </Routes>
+                </FlatRoutes>
             </main>
             <Footer/>
         </Router>

@@ -4,14 +4,14 @@ use leptos::server;
 use sqlx::Row;
 
 #[cfg(feature = "ssr")]
-use crate::state::AppState;
+use crate::pool::pool;
 use crate::types::links::Song;
 
 use std::ops::Range;
 
 #[server(GetLatestRelease, "/api/song", "GetJson")]
 pub async fn get_latest_release() -> Result<Song> {
-    let pool = AppState::pool()?;
+    let pool = pool()?;
 
     let q = "SELECT * FROM 
             song 
@@ -36,7 +36,7 @@ pub async fn get_latest_release() -> Result<Song> {
 
 #[server(GetSongByName, "/api/song", "GetJson")]
 pub async fn get_song_by_name(name: String) -> Result<Song> {
-    let pool = AppState::pool()?;
+    let pool = pool()?;
 
     let q = "SELECT * FROM song WHERE name=$1";
 
@@ -58,7 +58,7 @@ pub async fn get_song_by_name(name: String) -> Result<Song> {
 
 #[server(GetRangeOfSongs, "/api/song", "GetJson")]
 pub async fn get_range_of_songs(range: Range<usize>) -> Result<Vec<Song>> {
-    let pool = AppState::pool()?;
+    let pool = pool()?;
 
     let q = "SELECT * FROM song LIMIT $1 OFFSET $2";
 
@@ -91,7 +91,7 @@ pub async fn get_range_of_songs(range: Range<usize>) -> Result<Vec<Song>> {
 
 #[server(AddSong, "/api/song", "Url")]
 pub async fn add_song(song: Song) -> Result<()> {
-    let pool = AppState::pool()?;
+    let pool = pool()?;
 
     let q = "SELECT * FROM song WHERE name=$1";
 
@@ -125,7 +125,7 @@ pub async fn add_song(song: Song) -> Result<()> {
 
 #[server(DeleteSongByName, "/api/song", "Url")]
 pub async fn delete_song_by_name(name: String) -> Result<()> {
-    let pool = AppState::pool()?;
+    let pool = pool()?;
 
     let q = "DELETE FROM song WHERE name=$1";
 
