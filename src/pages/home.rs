@@ -12,7 +12,7 @@ pub fn Home() -> impl IntoView {
         <div class="bg-base-dark min-h-screen" id="home-page">
             <StreamingList list_info=active_list />
 
-            <div class="border border-surface-dark rounded shadow mt-7 pb-9 xl:mx-60" id="previous-releases">
+            <div class="border border-surface-dark rounded shadow mt-9 pb-9 xl:mx-60" id="previous-releases">
                 <span class="flex justify-center mt-9" id="Text">
                     <span class="text-center text-3xl font-semibold font-sans text-transparent bg-clip-text bg-gradient-to-r from-text-dark via-yellow-dark to-lavender-dark">
                         "Previous Releases"

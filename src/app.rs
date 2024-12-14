@@ -8,7 +8,7 @@ use leptos_router::{
 use crate::components::footer::Footer;
 use crate::components::forms::{logged_in, Login, LoginForm};
 use crate::components::nav::Nav;
-use crate::error::{AppError, ErrorPage};
+use crate::error::ErrorPage;
 use crate::pages::admin::Admin;
 use crate::pages::home::Home;
 use crate::pages::shop::Shop;
@@ -37,14 +37,6 @@ pub fn App() -> impl IntoView {
 
     let logged_in = Resource::new(move || (), |_| logged_in());
 
-    //let fallback = || {
-    //    let mut outside_errors = Errors::default();
-    //    outside_errors.insert_with_default_key(AppError::NotFound);
-    //    view! {
-    //        <ErrorPage outside_errors/>
-    //    }
-    //};
-
     view! {
         <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>
         <Title text="haemolacriaa"/>
@@ -52,7 +44,7 @@ pub fn App() -> impl IntoView {
         <Router>
             <Nav/>
             <main>
-                <FlatRoutes fallback=move || view! { <p>"404 Error"</p> }>
+                <FlatRoutes fallback=move || view! { <ErrorPage /> }>
                     <Route path=StaticSegment("/") view=Home />
                     <Route path=StaticSegment("/shop") view=Shop />
                     <ProtectedRoute
