@@ -1,3 +1,4 @@
+/*
 use leptos::prelude::*;
 
 use crate::components::forms::FileUploadForm;
@@ -9,3 +10,4 @@ pub fn Admin() -> impl IntoView {
         <FileUploadForm/>
     }
 }
+*/

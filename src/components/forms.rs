@@ -1,3 +1,4 @@
+/*
 use crate::util::err;
 use leptos::{ev::SubmitEvent, html::Input, prelude::*, task::spawn_local};
 use server_fn::codec::{MultipartData, MultipartFormData};
@@ -177,3 +178,4 @@ pub fn LoginForm() -> impl IntoView {
         <a href="/admin">"Goto admin"</a>
     }
 }
+*/

@@ -6,10 +6,10 @@ use leptos_router::{
 };
 
 use crate::components::footer::Footer;
-use crate::components::forms::{logged_in, Login, LoginForm};
+//use crate::components::forms::{logged_in, Login, LoginForm};
 use crate::components::nav::Nav;
 use crate::error::ErrorPage;
-use crate::pages::admin::Admin;
+//use crate::pages::admin::Admin;
 use crate::pages::home::Home;
 use crate::pages::shop::Shop;
 
@@ -35,7 +35,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
 pub fn App() -> impl IntoView {
     provide_meta_context();
 
-    let logged_in = Resource::new(move || (), |_| logged_in());
+    //let logged_in = Resource::new(move || (), |_| logged_in());
 
     view! {
         <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>
@@ -44,9 +44,10 @@ pub fn App() -> impl IntoView {
         <Router>
             <Nav/>
             <main>
-                <FlatRoutes fallback=move || view! { <ErrorPage /> }>
+                <FlatRoutes fallback=ErrorPage>
                     <Route path=StaticSegment("/") view=Home />
                     <Route path=StaticSegment("/shop") view=Shop />
+    /*
                     <ProtectedRoute
                         path=StaticSegment("/login")
                         view=LoginForm
@@ -60,6 +61,7 @@ pub fn App() -> impl IntoView {
                         redirect_path=|| "/login"
                         ssr=SsrMode::InOrder
                     />
+    */
                 </FlatRoutes>
             </main>
             <Footer/>

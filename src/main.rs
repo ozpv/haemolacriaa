@@ -3,7 +3,7 @@ use haemolacriaa::app::*;
 use haemolacriaa::jwt;
 use leptos::{config::LeptosOptions, prelude::provide_context, IntoView};
 use leptos::{logging::log, prelude::get_configuration};
-use leptos_axum::{generate_route_list, LeptosRoutes};
+use leptos_axum::{file_and_error_handler, generate_route_list, LeptosRoutes};
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
 use std::time::Duration;
 
@@ -15,6 +15,7 @@ async fn main() {
     let routes = generate_route_list(App);
 
     // to build the postgres connection
+    /*
     let user = std::env::var("PG_USER").expect("Failed to get postgres user!");
     let password = std::env::var("PG_PASSWORD").expect("Failed to get postgres password!");
     let host = std::env::var("PG_HOST").expect("Failed to get postgres host!");
@@ -47,9 +48,10 @@ async fn main() {
         .run(&db_pool)
         .await
         .expect("Failed to run SQLx migrations!");
-
+    */
     // build our application with a route
     let app = Router::new()
+        /*
         .leptos_routes_with_context(
             &leptos_options,
             routes,
@@ -59,9 +61,12 @@ async fn main() {
                 move || shell(leptos_options.clone())
             },
         )
-        .fallback(leptos_axum::file_and_error_handler::<LeptosOptions, _>(
-            shell,
-        ))
+        */
+        .leptos_routes(&leptos_options, routes, {
+            let leptos_options = leptos_options.clone();
+            move || shell(leptos_options.clone())
+        })
+        .fallback(file_and_error_handler::<LeptosOptions, _>(shell))
         .with_state(leptos_options);
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
