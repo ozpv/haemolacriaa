@@ -1,5 +1,5 @@
 # haemolacriaa 
-My personal website written in rust with Leptos and Actix 
+music website written in rust with Leptos and Actix 
 
 # Deployment via VPS 
 
