@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use leptos_router::hooks::use_params_map;
 
-use crate::components::lists::StreamingList;
+use crate::components::{lists::StreamingList, nav};
 use crate::song_db::get_song_by_name;
 
 #[component]
@@ -12,6 +12,7 @@ pub fn Releases() -> impl IntoView {
     let song_info = Resource::new(move || name.get(), get_song_by_name);
 
     view! {
+        <nav::Nav />
         <div class="bg-base-dark min-h-screen" id="release-page">
             <Transition fallback=move || view! { <p class="text-sm font-medium text-text-dark">{"Loading..."}</p> }>
                 {move || song_info.get().map(|song| match song {

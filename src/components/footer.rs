@@ -1,6 +1,6 @@
 use crate::config::{SOCIAL_MEDIA_ITEMS, YEARS_ACTIVE};
 use leptos::prelude::*;
-use leptos_icons::*;
+use leptos_icons::Icon;
 
 #[component]
 pub fn Footer() -> impl IntoView {

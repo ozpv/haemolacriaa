@@ -1,6 +1,5 @@
 use axum::Router;
 use haemolacriaa::app::*;
-use haemolacriaa::jwt;
 use leptos::{config::LeptosOptions, prelude::provide_context, IntoView};
 use leptos::{logging::log, prelude::get_configuration};
 use leptos_axum::{file_and_error_handler, generate_route_list, LeptosRoutes};

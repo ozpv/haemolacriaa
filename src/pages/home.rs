@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 
-use crate::components::{card::SongCard, lists::StreamingList};
+use crate::components::{card::SongCard, lists::StreamingList, nav};
 use crate::config::{CURRENT_SONG, OTHER_SONGS};
 use crate::types::links::Song;
 
@@ -9,6 +9,7 @@ pub fn Home() -> impl IntoView {
     let active_list = RwSignal::new(Song::<String>::from(CURRENT_SONG));
 
     view! {
+        <nav::Nav/>
         <div class="bg-base-dark min-h-screen" id="home-page">
             <StreamingList list_info=active_list />
 

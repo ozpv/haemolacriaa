@@ -1,17 +1,18 @@
 use leptos::prelude::*;
-use leptos_meta::*;
+use leptos_icons::Icon;
+use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
 use leptos_router::{
     components::{FlatRoutes, ProtectedRoute, Route, Router},
-    SsrMode, StaticSegment,
+    path, SsrMode,
 };
 
 use crate::components::footer::Footer;
 //use crate::components::forms::{logged_in, Login, LoginForm};
-use crate::components::nav::Nav;
+use crate::components::nav;
 use crate::error::ErrorPage;
 //use crate::pages::admin::Admin;
-use crate::pages::home::Home;
-use crate::pages::shop::Shop;
+use crate::pages::home;
+//use crate::pages::shop::shop;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -42,11 +43,12 @@ pub fn App() -> impl IntoView {
         <Title text="haemolacriaa"/>
 
         <Router>
-            <Nav/>
             <main>
                 <FlatRoutes fallback=ErrorPage>
-                    <Route path=StaticSegment("/") view=Home />
-                    <Route path=StaticSegment("/shop") view=Shop />
+                        <Route path=path!("") view=home::Home />
+                        <Route path=path!("/shop") view=Todo/>
+                        //<Route path=path!("/shop") view=shop::Shop />
+                        //<Route path=path!("/shop/:name") view=shop::Product />
     /*
                     <ProtectedRoute
                         path=StaticSegment("/login")
@@ -69,13 +71,20 @@ pub fn App() -> impl IntoView {
     }
 }
 
-/// Todo
 #[component]
-fn Todo() -> impl IntoView {
+pub fn Todo() -> impl IntoView {
     view! {
-        <Nav/>
-        <div class="bg-gray-900 min-h-screen">
-            <h1 class="text-white">"Work in progress"</h1>
+        <nav::Nav />
+        <div class="bg-base-dark min-h-screen">
+            <h2 class="text-text-dark text-center pt-10 pb-7 text-2xl font-sans">"Coming soon"</h2>
+            <div class="flex justify-center">
+                <a href="/" class="flex justify-center bg-surface-dark rounded-full text-text-dark pr-6 pl-8 py-3 hover:bg-surface-dark-100 hover:text-blue-dark">
+                    <p class="text-center font-sans pr-3">
+                        "Return home"
+                    </p>
+                    <Icon icon={icondata::BsArrowRight} width="20" height="20" {..} class="translate-y-0.5" />
+                </a>
+            </div>
         </div>
     }
 }

@@ -6,6 +6,7 @@ use crate::types::{
     links::{SocialMediaInfo, Song, StreamingPlatform},
     routes::RouteInfo,
 };
+use PlatformId::{AppleMusic, Bandcamp, SoundCloud, Spotify, YouTube};
 
 /// Information section
 // Assumes you only have one, synchronized name.
@@ -50,7 +51,7 @@ pub const LEAVE_SONG: Song<&'static str> = Song {
     name: "leave",
     author: USERNAME,
     image: Image {
-        path: "assets/leave.webp",
+        path: "leave.webp",
         width: Some("400px"),
         height: Some("400px"),
     },
@@ -68,7 +69,7 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         name: "swarm",
         author: USERNAME,
         image: Image {
-            path: "assets/swarm.webp",
+            path: "swarm.webp",
             width: Some("400px"),
             height: Some("400px"),
         },
@@ -84,7 +85,7 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         name: "haemolacriaa",
         author: USERNAME,
         image: Image {
-            path: "assets/haemolacriaa.webp",
+            path: "haemolacriaa.webp",
             width: Some("400px"),
             height: Some("400px"),
         },
@@ -100,7 +101,7 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         name: "stay",
         author: USERNAME,
         image: Image {
-            path: "assets/stay.webp",
+            path: "stay.webp",
             width: Some("400px"),
             height: Some("400px"),
         },
@@ -126,7 +127,6 @@ pub enum PlatformId<T = &'static str> {
 
 impl<T> PlatformId<T> {
     pub fn unwrap_name(&self) -> &T {
-        use PlatformId::*;
         match self {
             Spotify(x, _)
             | YouTube(x, _)
@@ -136,7 +136,6 @@ impl<T> PlatformId<T> {
         }
     }
     pub fn unwrap_link(&self) -> &T {
-        use PlatformId::*;
         match self {
             Spotify(_, y)
             | YouTube(_, y)

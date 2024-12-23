@@ -1,4 +1,4 @@
-use crate::util::*;
+use crate::util::Result;
 use leptos::server;
 #[cfg(feature = "ssr")]
 use sqlx::Row;

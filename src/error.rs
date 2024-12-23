@@ -1,9 +1,11 @@
+use crate::components::nav;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 
 #[component]
 pub fn ErrorPage() -> impl IntoView {
     view! {
+        <nav::Nav/>
         <div class="bg-base-dark min-h-screen">
             <h2 class="text-text-dark text-center pt-10 pb-7 text-2xl font-sans">"Page Not Found"</h2>
             <div class="flex justify-center">

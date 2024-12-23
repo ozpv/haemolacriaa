@@ -1,6 +1,5 @@
 #![allow(unexpected_cfgs)]
 
-/*
 use crate::lazy::JWT_SECRET;
 use crate::util::*;
 use axum::{extract::Request, middleware::Next, response::Response};
@@ -55,7 +54,7 @@ pub async fn decode_jwt(token: String) -> Result<Claims> {
 }
 
 /// Pass in a token and get Ok(()) if valid
-#[server(VerifyJwt, "/api", "Url")]
+//#[server(VerifyJwt, "/api", "Url")]
 pub async fn verify_jwt(token: String) -> Result<(), StatusCode> {
     let claims = decode_jwt(token)
         .await
@@ -83,4 +82,3 @@ pub async fn protected_check(req: Request, next: Next) -> Result<Response, Statu
         Err(StatusCode::UNAUTHORIZED)
     }
 }
-*/

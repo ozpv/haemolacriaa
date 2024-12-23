@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use leptos_icons::*;
+use leptos_icons::Icon;
 
 use crate::components::buttons::LinkButton;
 use crate::types::links::{SocialMediaInfo, Song};

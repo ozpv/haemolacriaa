@@ -93,15 +93,23 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // pass the var RM_HASH to remove instead
     // can be set to anything
-    let opt = std::env::var_os("RM_HASH");
+    let opt_rm = std::env::var_os("RM_HASH");
+    let opt_encode = std::env::var_os("HASH");
+
+    if opt_rm.is_none() && opt_encode.is_none() {
+        return Ok(());
+    }
 
     for entry in read_dir("./assets")?.filter_map(|entry| Some(entry.ok()?.path())) {
-        if opt.is_some() {
-            remove_hash(&entry)?;
-        } else {
-            encode_as_webp(&entry)?;
-            // hash after encode
-            add_hash_to_filename(&entry)?;
+        match (opt_rm.clone(), opt_encode.clone()) {
+            (Some(_), None) => {
+                remove_hash(&entry)?;
+            }
+            (None, Some(_)) => {
+                encode_as_webp(&entry)?;
+                add_hash_to_filename(&entry)?;
+            }
+            _ => {}
         }
     }
 

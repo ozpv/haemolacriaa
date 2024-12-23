@@ -1,7 +1,7 @@
 use crate::config::NAV_ITEMS;
 use icondata as ico;
 use leptos::prelude::*;
-use leptos_icons::*;
+use leptos_icons::Icon;
 
 #[component]
 pub fn Nav() -> impl IntoView {
