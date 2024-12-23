@@ -46,7 +46,7 @@ pub fn App() -> impl IntoView {
             <main>
                 <FlatRoutes fallback=ErrorPage>
                         <Route path=path!("") view=home::Home />
-                        <Route path=path!("/shop") view=Todo/>
+                        <Route path=path!("/shop") view=Todo />
                         //<Route path=path!("/shop") view=shop::Shop />
                         //<Route path=path!("/shop/:name") view=shop::Product />
     /*
