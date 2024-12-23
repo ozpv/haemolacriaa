@@ -114,6 +114,9 @@ export default {
 		transparent: 'transparent',
       	current: 'currentColor',
     },
+    fontFamily: {
+      inter: ['Inter', 'sans-serif'],
+	},
   },
   plugins: [],
 }

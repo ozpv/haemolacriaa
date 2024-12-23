@@ -2,9 +2,7 @@ pub mod app;
 pub mod components;
 pub mod config;
 pub mod error;
-//pub mod jwt;
 pub mod pages;
-//pub mod song_db;
 pub mod types;
 
 pub mod util {
@@ -31,7 +29,7 @@ pub mod util {
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "ssr")] {
-        pub mod jwt;
+        //pub mod api;
         pub mod pool;
 
         pub mod lazy {

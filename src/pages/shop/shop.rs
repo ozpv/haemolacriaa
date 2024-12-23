@@ -1,18 +1,22 @@
+use super::item::List;
 use leptos::prelude::*;
 use leptos_router::{hooks::use_params, params::Params};
 
 #[component]
 pub fn Nav() -> impl IntoView {
     view! {
-        <p>"Shop nav"</p>
+        <p class="text-text-dark font-inter">"Shop nav"</p>
     }
 }
 
 #[component]
 pub fn Home() -> impl IntoView {
     view! {
-        <Nav/>
-        <p>"Welcome home"</p>
+        <main class="main">
+            <Nav/>
+            <h1 class="text-text-dark text-5xl text-center font-inter py-5">"shop"</h1>
+            <List />
+        </main>
     }
 }
 
@@ -34,8 +38,10 @@ pub fn Product() -> impl IntoView {
     };
 
     view! {
-        <Nav/>
-        <p>"This is a product page"</p>
-        <p>"Your ID is: "{id}</p>
+        <main class="main">
+            <Nav/>
+            <p>"This is a product page"</p>
+            <p>"Your ID is: "{id}</p>
+        </main>
     }
 }

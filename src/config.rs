@@ -32,11 +32,11 @@ const YOUTUBE_CHANNEL_ID: &str = "UCQDQqA9iaWtlNkwXiCQogYQ";
 // Each route displayed in the navbar.
 pub static NAV_ITEMS: [RouteInfo; 2] = [
     RouteInfo {
-        name: "Home",
+        name: "home",
         path: "/",
     },
     RouteInfo {
-        name: "Shop",
+        name: "shop",
         path: "/shop",
     },
 ];
@@ -149,34 +149,34 @@ impl<T> PlatformId<T> {
 pub static STREAMING_PLATFORMS: [StreamingPlatform; 5] = [
     StreamingPlatform {
         icon: ico::SiSpotify,
-        id: PlatformId::Spotify("Spotify", "https://open.spotify.com/"),
+        id: PlatformId::Spotify("spotify", "https://open.spotify.com/"),
     },
     StreamingPlatform {
         icon: ico::SiYoutube,
-        id: PlatformId::YouTube("YouTube", "https://www.youtube.com/"),
+        id: PlatformId::YouTube("youtube", "https://www.youtube.com/"),
     },
     StreamingPlatform {
         icon: ico::SiSoundcloud,
         id: PlatformId::SoundCloud(
-            "SoundCloud",
+            "soundcloud",
             formatcp!("https://soundcloud.com/{}/", USERNAME),
         ),
     },
     StreamingPlatform {
         icon: ico::SiApple,
         id: PlatformId::AppleMusic(
-            "Apple Music",
+            "apple music",
             formatcp!("https://music.apple.com/{}/album/", APPLE_MUSIC_REGION),
         ),
     },
     StreamingPlatform {
         icon: ico::SiBandcamp,
-        id: PlatformId::Bandcamp("Bandcamp", formatcp!("https://{}.bandcamp.com/", USERNAME)),
+        id: PlatformId::Bandcamp("bandcamp", formatcp!("https://{}.bandcamp.com/", USERNAME)),
     },
 ];
 
 /// Footer
-pub const YEARS_ACTIVE: [&str; 2] = ["2023", "2024"];
+pub const YEARS_ACTIVE: [&str; 2] = ["2023", "2025"];
 
 // Each item to be displayed on the footer.
 // From left to right.

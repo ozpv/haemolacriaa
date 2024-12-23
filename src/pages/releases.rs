@@ -13,7 +13,7 @@ pub fn Releases() -> impl IntoView {
 
     view! {
         <nav::Nav />
-        <div class="bg-base-dark min-h-screen" id="release-page">
+        <main class="main" id="release-page">
             <Transition fallback=move || view! { <p class="text-sm font-medium text-text-dark">{"Loading..."}</p> }>
                 {move || song_info.get().map(|song| match song {
                         Ok(song) => view!{
@@ -31,6 +31,6 @@ pub fn Releases() -> impl IntoView {
                     }
                 )}
             </Transition>
-        </div>
+        </main>
     }
 }

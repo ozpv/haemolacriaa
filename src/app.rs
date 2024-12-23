@@ -12,7 +12,7 @@ use crate::components::nav;
 use crate::error::ErrorPage;
 //use crate::pages::admin::Admin;
 use crate::pages::home;
-//use crate::pages::shop::shop;
+use crate::pages::shop::shop;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -43,29 +43,26 @@ pub fn App() -> impl IntoView {
         <Title text="haemolacriaa"/>
 
         <Router>
-            <main>
-                <FlatRoutes fallback=ErrorPage>
-                        <Route path=path!("") view=home::Home />
-                        <Route path=path!("/shop") view=Todo />
-                        //<Route path=path!("/shop") view=shop::Shop />
-                        //<Route path=path!("/shop/:name") view=shop::Product />
-    /*
-                    <ProtectedRoute
-                        path=StaticSegment("/login")
-                        view=LoginForm
-                        condition=move || Some(logged_in.get().is_none_or(|res| res.is_err()))
-                        redirect_path=|| "/admin"
-                    />
-                    <ProtectedRoute
-                        path=StaticSegment("/admin")
-                        view=Admin
-                        condition=move || Some(logged_in.get().is_some_and(|res| res.is_ok()))
-                        redirect_path=|| "/login"
-                        ssr=SsrMode::InOrder
-                    />
-    */
-                </FlatRoutes>
-            </main>
+            <FlatRoutes fallback=ErrorPage>
+                <Route path=path!("") view=home::Home />
+                <Route path=path!("/shop") view=shop::Home />
+                <Route path=path!("/shop/:name") view=shop::Product />
+/*
+                <ProtectedRoute
+                    path=StaticSegment("/login")
+                    view=LoginForm
+                    condition=move || Some(logged_in.get().is_none_or(|res| res.is_err()))
+                    redirect_path=|| "/admin"
+                />
+                <ProtectedRoute
+                    path=StaticSegment("/admin")
+                    view=Admin
+                    condition=move || Some(logged_in.get().is_some_and(|res| res.is_ok()))
+                    redirect_path=|| "/login"
+                    ssr=SsrMode::InOrder
+                />
+*/
+            </FlatRoutes>
             <Footer/>
         </Router>
     }
@@ -75,16 +72,16 @@ pub fn App() -> impl IntoView {
 pub fn Todo() -> impl IntoView {
     view! {
         <nav::Nav />
-        <div class="bg-base-dark min-h-screen">
-            <h2 class="text-text-dark text-center pt-10 pb-7 text-2xl font-sans">"Coming soon"</h2>
+        <main class="bg-base-dark min-h-screen">
+            <h2 class="text-text-dark text-center pt-10 pb-7 text-2xl font-inter">"Coming soon"</h2>
             <div class="flex justify-center">
                 <a href="/" class="flex justify-center bg-surface-dark rounded-full text-text-dark pr-6 pl-8 py-3 hover:bg-surface-dark-100 hover:text-blue-dark">
-                    <p class="text-center font-sans pr-3">
+                    <p class="text-center font-inter pr-3">
                         "Return home"
                     </p>
                     <Icon icon={icondata::BsArrowRight} width="20" height="20" {..} class="translate-y-0.5" />
                 </a>
             </div>
-        </div>
+        </main>
     }
 }

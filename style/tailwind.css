@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+	.main {
+		@apply bg-base-dark min-h-screen;
+	}
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  src: url('inter-v18-latin-regular.woff2') format('woff2');
+}

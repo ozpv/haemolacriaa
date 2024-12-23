@@ -1,29 +1,33 @@
 use axum::Router;
 use haemolacriaa::app::*;
-use leptos::{config::LeptosOptions, prelude::provide_context, IntoView};
-use leptos::{logging::log, prelude::get_configuration};
+use leptos::{
+    config::LeptosOptions,
+    prelude::{get_configuration, provide_context},
+};
 use leptos_axum::{file_and_error_handler, generate_route_list, LeptosRoutes};
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
 use std::time::Duration;
+use tower_http::trace::TraceLayer;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let conf = get_configuration(None).unwrap();
     let leptos_options = conf.leptos_options;
     let addr = leptos_options.site_addr;
     let routes = generate_route_list(App);
 
-    // to build the postgres connection
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO)
+        .init();
+
+    // build the postgres connection pool
     /*
-    let user = std::env::var("PG_USER").expect("Failed to get postgres user!");
-    let password = std::env::var("PG_PASSWORD").expect("Failed to get postgres password!");
-    let host = std::env::var("PG_HOST").expect("Failed to get postgres host!");
-    let port = std::env::var("PG_PORT")
-        .expect("Failed to get postgres port!")
-        .parse::<u16>()
-        .ok()
-        .expect("Failed to parse port as a u16!");
-    let db = std::env::var("PG_DATABASE").expect("Failed to get postgres database!");
+    let user = std::env::var("PG_USER")?;
+    let password = std::env::var("PG_PASSWORD")?;
+    let host = std::env::var("PG_HOST")?;
+    let port = std::env::var("PG_PORT")?
+        .parse::<u16>()?;
+    let db = std::env::var("PG_DATABASE")?;
 
     // setup postgres options
     let db_options = PgConnectOptions::new()
@@ -34,21 +38,23 @@ async fn main() {
         .database(&db)
         .ssl_mode(PgSslMode::Require);
 
+    tracing::info!("Connecting to DB");
+
     // setup postgres connection pool
     let db_pool = PgPoolOptions::new()
         .max_connections(5)
         .acquire_timeout(Duration::from_secs(3))
         .connect_with(db_options)
-        .await
-        .expect("Failed to connect to database");
+        .await?;
+
+    tracing::info!("Running migrations");
 
     // run migrations
     sqlx::migrate!()
         .run(&db_pool)
-        .await
-        .expect("Failed to run SQLx migrations!");
+        .await?;
     */
-    // build our application with a route
+
     let app = Router::new()
         /*
         .leptos_routes_with_context(
@@ -66,11 +72,14 @@ async fn main() {
             move || shell(leptos_options.clone())
         })
         .fallback(file_and_error_handler::<LeptosOptions, _>(shell))
+        .layer(TraceLayer::new_for_http())
         .with_state(leptos_options);
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-    log!("listening on http://{}", &addr);
+    tracing::info!("Listening on http://{}", &addr);
     axum::serve(listener, app.into_make_service())
         .await
         .unwrap();
+
+    Ok(())
 }
