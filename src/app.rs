@@ -39,33 +39,34 @@ pub fn App() -> impl IntoView {
     //let logged_in = Resource::new(move || (), |_| logged_in());
 
     view! {
-        <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>
-        <Title text="haemolacriaa"/>
+            <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>
+            <Title text="haemolacriaa"/>
 
-        <Router>
-            <FlatRoutes fallback=ErrorPage>
-                <Route path=path!("") view=home::Home />
-                <Route path=path!("/shop") view=shop::Home />
-                <Route path=path!("/shop/:name") view=shop::Product />
-/*
-                <ProtectedRoute
-                    path=StaticSegment("/login")
-                    view=LoginForm
-                    condition=move || Some(logged_in.get().is_none_or(|res| res.is_err()))
-                    redirect_path=|| "/admin"
-                />
-                <ProtectedRoute
-                    path=StaticSegment("/admin")
-                    view=Admin
-                    condition=move || Some(logged_in.get().is_some_and(|res| res.is_ok()))
-                    redirect_path=|| "/login"
-                    ssr=SsrMode::InOrder
-                />
-*/
-            </FlatRoutes>
-            <Footer/>
-        </Router>
-    }
+            <Router>
+                <FlatRoutes fallback=ErrorPage>
+                    <Route path=path!("") view=home::Home />
+                    <Route path=path!("/shop") view=shop::Home />
+                    <Route path=path!("/shop/:name") view=shop::Product />
+                    <Route path=path!("/bag") view=shop::Bag />
+    /*
+                    <ProtectedRoute
+                        path=StaticSegment("/login")
+                        view=LoginForm
+                        condition=move || Some(logged_in.get().is_none_or(|res| res.is_err()))
+                        redirect_path=|| "/admin"
+                    />
+                    <ProtectedRoute
+                        path=StaticSegment("/admin")
+                        view=Admin
+                        condition=move || Some(logged_in.get().is_some_and(|res| res.is_ok()))
+                        redirect_path=|| "/login"
+                        ssr=SsrMode::InOrder
+                    />
+    */
+                </FlatRoutes>
+                <Footer/>
+            </Router>
+        }
 }
 
 #[component]

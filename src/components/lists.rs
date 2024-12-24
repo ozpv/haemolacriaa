@@ -9,7 +9,7 @@ fn Appendix(social_media_info: Option<&'static SocialMediaInfo>) -> impl IntoVie
     view! {
         {social_media_info
             .map_or(
-                ().into_any(), 
+                ().into_any(),
                 |info| view! {
                     <div class="flex justify-center">
                         <nav id="social-media-links">
@@ -31,10 +31,10 @@ pub fn StreamingList(
 ) -> impl IntoView {
     view! {
         <div id=move || format!("{}-link-list", list_info.get().name)>
-            <img 
-                class="block text-text-dark mx-auto pt-4 shadow-2xl shadow-crust-dark" 
-                src=move || list_info.get().image.path.clone() 
-                width="400px" 
+            <img
+                class="block text-text-dark mx-auto pt-4 shadow-2xl shadow-crust-dark"
+                src=move || list_info.get().image.path.clone()
+                width="400px"
                 height="400px"
                 alt=move || list_info.get().name.clone()
             />
@@ -49,13 +49,13 @@ pub fn StreamingList(
                     {move || list_info.get()
                         .build_streaming_info()
                         .into_iter()
-                        .map(|item| 
+                        .map(|item|
                             item.song_id.map_or(
-                                ().into_any(), 
+                                ().into_any(),
                                 |(platform_name, song_url)| view! {
-                                    <LinkButton 
-                                        class="text-text-dark text-md font-inter py-6 w-80 hover:scale-105 hover:text-surface-dark" 
-                                        href=song_url 
+                                    <LinkButton
+                                        class="text-text-dark text-md font-inter py-6 w-80 hover:scale-105 hover:text-surface-dark"
+                                        href=song_url
                                         id=format!("{}-link-button", platform_name)
                                     >
                                         <Icon icon=item.platform_icon width="24" height="24" />
@@ -70,7 +70,7 @@ pub fn StreamingList(
             </div>
             {appendix_social
                 .map_or(
-                    ().into_any(), 
+                    ().into_any(),
                     |_| view! {
                         <Appendix social_media_info=appendix_social/>
                     }.into_any()

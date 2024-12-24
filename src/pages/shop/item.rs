@@ -7,9 +7,7 @@ fn Card(
     price: f64,
     #[prop(default = false)] in_stock: bool,
 ) -> impl IntoView {
-    let redirect = format!("/shop/{}", if in_stock {
-        &product_name
-    } else { "" });
+    let redirect = format!("/shop/{}", if in_stock { &product_name } else { "" });
 
     let price = format!("${price}");
 
@@ -30,8 +28,8 @@ pub fn List() -> impl IntoView {
         <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
             {(0..10)
                 .into_iter()
-                .map(|i| view! { 
-                    <Card image_path="stay.webp".to_string() product_name=i.to_string() price=100.0 + (i as f64) in_stock=true /> 
+                .map(|i| view! {
+                    <Card image_path="stay.webp".to_string() product_name=i.to_string() price=100.0 + (i as f64) in_stock=true />
                 })
                 .collect_view()
             }

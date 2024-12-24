@@ -1,21 +1,14 @@
-use crate::components::nav;
 use leptos::prelude::*;
-use leptos_icons::Icon;
+
+use crate::components::{buttons::ReturnButton, nav};
 
 #[component]
 pub fn ErrorPage() -> impl IntoView {
     view! {
         <nav::Nav/>
         <div class="bg-base-dark min-h-screen">
-            <h2 class="text-text-dark text-center pt-10 pb-7 text-2xl font-inter">"Page Not Found"</h2>
-            <div class="flex justify-center">
-                <a href="/" class="flex justify-center bg-surface-dark rounded-full text-text-dark pr-6 pl-8 py-3 hover:bg-surface-dark-100 hover:text-blue-dark">
-                    <p class="text-center font-inter pr-3">
-                        "Return home"
-                    </p>
-                    <Icon icon={icondata::BsArrowRight} width="20" height="20" {..} class="translate-y-0.5" />
-                </a>
-            </div>
+            <h2 class="text-text-dark text-center pt-10 pb-7 text-2xl font-sans">"page not found"</h2>
+            <ReturnButton body="return home" href="/" />
         </div>
     }
 }

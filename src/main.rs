@@ -1,5 +1,6 @@
 use axum::Router;
 use haemolacriaa::app::*;
+use http::{header, Method};
 use leptos::{
     config::LeptosOptions,
     prelude::{get_configuration, provide_context},
@@ -7,7 +8,7 @@ use leptos::{
 use leptos_axum::{file_and_error_handler, generate_route_list, LeptosRoutes};
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
 use std::time::Duration;
-use tower_http::trace::TraceLayer;
+use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLayer};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -72,8 +73,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             move || shell(leptos_options.clone())
         })
         .fallback(file_and_error_handler::<LeptosOptions, _>(shell))
+        .with_state(leptos_options)
         .layer(TraceLayer::new_for_http())
-        .with_state(leptos_options);
+        .layer(CompressionLayer::new().gzip(true))
+        .layer(
+            CorsLayer::new()
+                .allow_methods([Method::GET, Method::POST])
+                .allow_headers([header::AUTHORIZATION, header::CONTENT_TYPE]),
+        );
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     tracing::info!("Listening on http://{}", &addr);

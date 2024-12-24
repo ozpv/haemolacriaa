@@ -23,12 +23,12 @@ pub fn Nav() -> impl IntoView {
             <div class="flex flex-wrap max-w-screen-xl items-center justify-between mx-auto p-4">
                 <span class="flex items-center text-xl text-text-dark font-inter px-5">{env!("CARGO_PKG_NAME")}</span>
 
-                <button on:click=toggle_active class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-overlay-dark-200 md:hidden">
-                    <Icon icon=active_icon width="32" height="32"/>
+                <button on:click=toggle_active class="text-sm text-overlay-dark-200 mx-2 md:hidden">
+                    <Icon icon=active_icon width="24" height="24"/>
                 </button>
 
                 <div class="w-full md:block md:w-auto" class:hidden=hidden_status id="navbar-default">
-                    <ul class="font-inter font-medium flex flex-col p-[16px] md:p-0 mt-4 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-base-dark">
+                    <ul class="font-inter font-medium flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-base-dark">
                         {NAV_ITEMS
                             .iter()
                             .map(|item| view! {
