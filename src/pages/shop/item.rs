@@ -1,4 +1,29 @@
 use leptos::prelude::*;
+use serde::{Deserialize, Serialize};
+
+#[wasm_bindgen::prelude::wasm_bindgen]
+#[cfg_attr(not(feature = "ssr"), derive(Deserialize, Serialize))]
+#[derive(Clone)]
+pub struct Product {
+    name: String,
+    price: f64,
+}
+
+#[wasm_bindgen::prelude::wasm_bindgen]
+impl Product {
+    #[wasm_bindgen::prelude::wasm_bindgen(constructor)]
+    pub fn new(name: String, price: f64) -> Self {
+        Self { name, price }
+    }
+
+    pub fn get_price(&self) -> f64 {
+        self.price
+    }
+
+    pub fn get_name(self) -> String {
+        self.name
+    }
+}
 
 #[component]
 fn Card(
@@ -24,15 +49,37 @@ fn Card(
 
 #[component]
 pub fn List() -> impl IntoView {
+    let items = RwSignal::<Option<Vec<Product>>>::new(None);
+
+    #[cfg(not(feature = "ssr"))]
+    Effect::new(move || {
+        use super::storage::{get_storage, Bag};
+
+        let stored_items = Bag::try_get_bag_items(get_storage()).ok();
+        items.set(stored_items);
+    });
+
+    // TODO: Get Items from localstorage or try the server and not from the bag
     view! {
         <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-            {(0..10)
-                .into_iter()
-                .map(|i| view! {
-                    <Card image_path="stay.webp".to_string() product_name=i.to_string() price=100.0 + (i as f64) in_stock=true />
+            {move || {
+                items.get().map_or(().into_any(), |items| {
+                    items
+                        .iter()
+                        .map(|item| {
+                            view! {
+                                <Card
+                                    image_path="stay.webp".to_string()
+                                    product_name=item.clone().get_name()
+                                    price=item.get_price()
+                                    in_stock=true
+                                />
+                            }
+                        })
+                        .collect_view()
+                        .into_any()
                 })
-                .collect_view()
-            }
+            }}
         </div>
     }
 }

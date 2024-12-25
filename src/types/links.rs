@@ -4,7 +4,11 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use std::borrow::ToOwned;
 
-use crate::config::{PlatformId, PlatformId::*, STREAMING_PLATFORMS};
+use crate::config::{
+    PlatformId,
+    PlatformId::{AppleMusic, Bandcamp, SoundCloud, Spotify, YouTube},
+    STREAMING_PLATFORMS,
+};
 use crate::types::images::Image;
 
 // Social media info section

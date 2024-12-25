@@ -8,7 +8,9 @@ use leptos::{
 use leptos_axum::{file_and_error_handler, generate_route_list, LeptosRoutes};
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
 use std::time::Duration;
-use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLayer};
+use tower_http::{
+    compression::CompressionLayer, cors::CorsLayer, timeout::TimeoutLayer, trace::TraceLayer,
+};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -76,6 +78,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_state(leptos_options)
         .layer(TraceLayer::new_for_http())
         .layer(CompressionLayer::new().gzip(true))
+        .layer(TimeoutLayer::new(Duration::from_secs(30)))
         .layer(
             CorsLayer::new()
                 .allow_methods([Method::GET, Method::POST])
