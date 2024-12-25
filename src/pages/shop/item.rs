@@ -1,22 +1,22 @@
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
-#[wasm_bindgen::prelude::wasm_bindgen]
 #[cfg_attr(not(feature = "ssr"), derive(Deserialize, Serialize))]
-#[derive(Clone)]
+#[derive(Hash, PartialEq, Eq, Clone)]
 pub struct Product {
     name: String,
-    price: f64,
+    price: i64,
 }
 
-#[wasm_bindgen::prelude::wasm_bindgen]
 impl Product {
-    #[wasm_bindgen::prelude::wasm_bindgen(constructor)]
-    pub fn new(name: String, price: f64) -> Self {
+    /// `name` the name of the product
+    /// `price`: the price of the product in cents
+    pub fn new(name: String, price: i64) -> Self {
         Self { name, price }
     }
 
-    pub fn get_price(&self) -> f64 {
+    pub fn get_price(&self) -> i64 {
         self.price
     }
 
@@ -29,7 +29,7 @@ impl Product {
 fn Card(
     image_path: String,
     product_name: String,
-    price: f64,
+    price: i64,
     #[prop(default = false)] in_stock: bool,
 ) -> impl IntoView {
     let redirect = format!("/shop/{}", if in_stock { &product_name } else { "" });
@@ -49,14 +49,14 @@ fn Card(
 
 #[component]
 pub fn List() -> impl IntoView {
-    let items = RwSignal::<Option<Vec<Product>>>::new(None);
+    let items = RwSignal::<Option<HashMap<Product, usize>>>::new(None);
 
     #[cfg(not(feature = "ssr"))]
     Effect::new(move || {
         use super::storage::{get_storage, Bag};
 
-        let stored_items = Bag::try_get_bag_items(get_storage()).ok();
-        items.set(stored_items);
+        //let stored_items = Bag::try_get_bag_items(get_storage()).ok();
+        //items.set(stored_items);
     });
 
     // TODO: Get Items from localstorage or try the server and not from the bag
@@ -70,8 +70,8 @@ pub fn List() -> impl IntoView {
                             view! {
                                 <Card
                                     image_path="stay.webp".to_string()
-                                    product_name=item.clone().get_name()
-                                    price=item.get_price()
+                                    product_name=item.0.clone().get_name()
+                                    price=item.0.get_price()
                                     in_stock=true
                                 />
                             }

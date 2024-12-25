@@ -10,6 +10,7 @@ pkgs.mkShell {
     binaryen
     postgresql
     sqlx-cli
+    twiggy
 	wasm-bindgen-cli
   ];
 }

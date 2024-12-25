@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use leptos_router::{hooks::use_params, params::Params};
 
-use super::{item::List, nav::Nav};
+use super::{item, nav::Nav};
 use crate::components::buttons::ReturnButton;
 
 #[component]
@@ -11,7 +11,7 @@ pub fn Home() -> impl IntoView {
         use super::storage::{get_storage, Bag};
 
         #[cfg(not(feature = "ssr"))]
-        let product = super::item::Product::new("another product".to_string(), 32.0);
+        let product = item::Product::new("another product".to_string(), 32);
 
         #[cfg(not(feature = "ssr"))]
         let _ = Bag::try_add_bag_item(get_storage(), product);
@@ -24,7 +24,7 @@ pub fn Home() -> impl IntoView {
         </button>
         <main class="main">
             <h1 class="text-text-dark text-5xl text-center font-sans py-5">"shop"</h1>
-            <List />
+            <item::List />
         </main>
     }
 }
