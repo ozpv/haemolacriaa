@@ -21,13 +21,8 @@ pub fn try_dispatch_storage_event() -> Result<(), JsValue> {
 }
 
 #[inline]
-fn js_exception(s: &'static str) -> JsValue {
+fn js_exception<'a>(s: &'a str) -> JsValue {
     Error::new(s).into()
-}
-
-#[inline]
-fn js_move_exception(s: String) -> JsValue {
-    Error::new(&s).into()
 }
 
 pub struct Items;
@@ -54,16 +49,6 @@ impl Items {
 pub struct Bag;
 
 impl Bag {
-    /// Totals the bag as cents
-    /// Returns an error on failure
-    pub fn try_total_bag(storage: Option<&Storage>) -> Result<i64, JsValue> {
-        let bag = Self::try_get_bag(storage)?;
-
-        Ok(bag.iter().fold(0, |c, (product, count)| {
-            c + (product.get_price() * (*count as i64))
-        }))
-    }
-
     /// Gets the value of `bag_count` from `storage`
     /// Deletes the invalid value and returns an error if `bag_count` doesn't exist
     pub fn try_get_bag_count(storage: Option<&Storage>) -> Result<usize, JsValue> {
@@ -86,20 +71,38 @@ impl Bag {
         Self::try_get_bag_count(storage).unwrap_or(0)
     }
 
+    /// "syncs" `bag_count` by setting it to the sum of values in each `bag` from `storage`
+    /// Returns an error if `bag_count` doesn't exist, or dispatch_event fails
+    pub fn try_to_sync_bag_count(storage: Option<&Storage>) -> Result<usize, JsValue> {
+        let bag = Self::try_get_bag(storage)?;
+
+        let count = bag.iter().fold(0, |c, (_, count)| c + count);
+
+        let storage = storage.ok_or_else(|| js_exception("Invalid Storage object"))?;
+
+        storage.set_item("bag_count", &count.to_string())?;
+
+        try_dispatch_storage_event()?;
+
+        Ok(count)
+    }
+
+    /// Totals the bag as cents
+    /// Returns an error on failure
+    pub fn try_to_total_bag(storage: Option<&Storage>) -> Result<i64, JsValue> {
+        let bag = Self::try_get_bag(storage)?;
+
+        Ok(bag.iter().fold(0, |c, (product, count)| {
+            c + (product.get_price() * (*count as i64))
+        }))
+    }
+
     /// Attempts to increment `bag_count` by `value`
     /// Returns an error on failure
-    pub fn try_incr_bag_count(storage: Option<&Storage>, value: usize) -> Result<(), JsValue> {
-        let storage = storage.ok_or_else(|| js_exception("Invalid storage object"))?;
+    pub fn try_to_incr_bag_count(storage: Option<&Storage>, value: usize) -> Result<(), JsValue> {
+        let existing_count = Self::try_get_bag_count(storage)?;
 
-        let existing_count = storage
-            .get_item("bag_count")?
-            .as_deref()
-            .map(<str>::parse::<usize>)
-            .ok_or_else(|| js_exception("Failed to find bag_count"))?
-            .map_err(|_| {
-                let _ = storage.delete("bag_count");
-                js_exception("Failed to parse bag_count, deleted invalid value")
-            })?;
+        let storage = storage.ok_or_else(|| js_exception("Invalid Storage object"))?;
 
         storage.set_item("bag_count", &(existing_count + value).to_string())?;
 
@@ -127,22 +130,23 @@ impl Bag {
     pub fn try_add_to_bag(storage: Option<Storage>, product: Product) -> Result<(), JsValue> {
         let storage = storage.ok_or_else(|| js_exception("Invalid Storage object"))?;
 
-        if let Ok(mut items) = storage.get_item("bag")?.as_deref().map_or_else(
-            || Ok(HashMap::new()),
-            serde_json::from_str::<HashMap<Product, usize>>,
-        ) {
-            *items.entry(product).or_insert(0) += 1;
+        let mut items = storage
+            .get_item("bag")?
+            .as_deref()
+            .map_or_else(
+                || Ok(HashMap::new()),
+                serde_json::from_str::<HashMap<Product, usize>>,
+            )
+            .map_err(|_| js_exception("Failed to parse bag"))?;
 
-            let items =
-                serde_json::to_string(&items).map_err(|e| js_move_exception(format!("{e}")))?;
+        *items.entry(product).or_insert(0) += 1;
 
-            storage.set_item("bag", &items)?;
+        let items = serde_json::to_string(&items).map_err(|e| js_exception(&format!("{e}")))?;
 
-            Self::try_incr_bag_count(Some(storage.as_ref()), 1)?;
+        storage.set_item("bag", &items)?;
 
-            Ok(())
-        } else {
-            Err(js_exception("Failed to parse items in Bag"))
-        }
+        Self::try_to_incr_bag_count(Some(storage.as_ref()), 1)?;
+
+        Ok(())
     }
 }

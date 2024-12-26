@@ -1,7 +1,7 @@
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 
-pub mod api;
+//pub mod api;
 pub mod app;
 pub mod components;
 pub mod config;

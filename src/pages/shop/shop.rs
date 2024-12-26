@@ -25,11 +25,18 @@ pub fn Home() -> impl IntoView {
         #[cfg(feature = "hydrate")]
         use web_sys::HtmlButtonElement;
         #[cfg(feature = "hydrate")]
-        let total = Bag::try_total_bag(get_storage().as_ref()).unwrap();
+        let total = Bag::try_to_total_bag(get_storage().as_ref()).unwrap();
         #[cfg(feature = "hydrate")]
         let total_element: HtmlButtonElement = total_element.get().unwrap();
         #[cfg(feature = "hydrate")]
         Dom::set_inner_html(&total_element, &format!("Bag total: {total}"))
+    };
+
+    let sync_bag = move |_| {
+        #[cfg(feature = "hydrate")]
+        use super::storage::{get_storage, Bag};
+        #[cfg(feature = "hydrate")]
+        Bag::try_to_sync_bag_count(get_storage().as_ref()).unwrap();
     };
 
     view! {
@@ -39,6 +46,9 @@ pub fn Home() -> impl IntoView {
         </button>
         <button on:click=total_bag node_ref=total_element>
             "Bag total: 0"
+        </button>
+        <button on:click=sync_bag>
+            "Sync bag count"
         </button>
         <main class="main">
             <h1 class="text-text-dark text-5xl text-center font-sans py-5">"shop"</h1>
