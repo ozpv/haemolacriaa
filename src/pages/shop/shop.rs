@@ -3,24 +3,42 @@ use leptos_router::{hooks::use_params, params::Params};
 
 use super::{item, nav::Nav};
 use crate::components::buttons::ReturnButton;
+#[cfg(feature = "hydrate")]
+use crate::types::product;
 
 #[component]
 pub fn Home() -> impl IntoView {
-    let on_click = move |_| {
-        #[cfg(not(feature = "ssr"))]
+    let add_item = move |_| {
+        #[cfg(feature = "hydrate")]
         use super::storage::{get_storage, Bag};
+        #[cfg(feature = "hydrate")]
+        let product = product::Product::new("another product".to_string(), 32);
+        #[cfg(feature = "hydrate")]
+        Bag::try_add_to_bag(get_storage(), product).unwrap();
+    };
 
-        #[cfg(not(feature = "ssr"))]
-        let product = item::Product::new("another product".to_string(), 32);
+    let total_element = NodeRef::new();
 
-        #[cfg(not(feature = "ssr"))]
-        let _ = Bag::try_add_bag_item(get_storage(), product);
+    let total_bag = move |_| {
+        #[cfg(feature = "hydrate")]
+        use super::storage::{get_storage, Bag};
+        #[cfg(feature = "hydrate")]
+        use web_sys::HtmlButtonElement;
+        #[cfg(feature = "hydrate")]
+        let total = Bag::try_total_bag(get_storage().as_ref()).unwrap();
+        #[cfg(feature = "hydrate")]
+        let total_element: HtmlButtonElement = total_element.get().unwrap();
+        #[cfg(feature = "hydrate")]
+        Dom::set_inner_html(&total_element, &format!("Bag total: {total}"))
     };
 
     view! {
         <Nav/>
-        <button on:click=on_click>
+        <button on:click=add_item>
             "Add item"
+        </button>
+        <button on:click=total_bag node_ref=total_element>
+            "Bag total: 0"
         </button>
         <main class="main">
             <h1 class="text-text-dark text-5xl text-center font-sans py-5">"shop"</h1>

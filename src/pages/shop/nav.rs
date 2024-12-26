@@ -3,9 +3,6 @@ use leptos_icons::Icon;
 
 use crate::config::NAV_ITEMS;
 
-#[cfg(not(feature = "ssr"))]
-use super::storage::{get_storage, Bag};
-
 #[component]
 pub fn Nav() -> impl IntoView {
     let activity = RwSignal::new(false);
@@ -21,13 +18,17 @@ pub fn Nav() -> impl IntoView {
 
     let hidden_status = move || !activity.get();
 
-    let cart_amount = RwSignal::new(None::<usize>);
+    let shop_count = NodeRef::new();
 
     cfg_if::cfg_if! {
-        if #[cfg(not(feature = "ssr"))] {
+        if #[cfg(feature = "hydrate")] {
+            use web_sys::HtmlParagraphElement;
+            use super::storage::{get_storage, Bag};
+
             let update_count = move || {
-                let count = Bag::get_item_count_from_storage_or_default(get_storage());
-                cart_amount.set(Some(count));
+                let count = Bag::get_bag_count_or_default(get_storage().as_ref());
+                let count_element: HtmlParagraphElement = shop_count.get().expect("Shop count element to exist");
+                Dom::set_inner_html(&count_element, &count.to_string());
             };
 
             Effect::new(update_count);
@@ -62,7 +63,7 @@ pub fn Nav() -> impl IntoView {
 
                 <a href="/bag" class="flex flew-row text-text-dark text-sm mx-2">
                     <Icon icon={icondata::BsBag} width="16px" height="16px" {..} class="translate-y-px"/>
-                    <p class="text-text-dark font-inter bg-base-dark mx-3 -translate-y-px">{move || cart_amount.get()}</p>
+                    <p class="text-text-dark font-inter bg-base-dark mx-3 -translate-y-px" node_ref=shop_count>"0"</p>
                 </a>
 
                 <button on:click=toggle_active class="text-sm text-overlay-dark-200 mx-2 md:hidden">

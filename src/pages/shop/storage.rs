@@ -4,8 +4,9 @@ use std::collections::HashMap;
 use wasm_bindgen::JsValue;
 use web_sys::Storage;
 
-use super::item::Product;
+use crate::types::product::Product;
 
+#[inline]
 pub fn get_storage() -> Option<Storage> {
     helpers::window().local_storage().ok()?
 }
@@ -19,58 +20,129 @@ pub fn try_dispatch_storage_event() -> Result<(), JsValue> {
     Ok(())
 }
 
+#[inline]
+fn js_exception(s: &'static str) -> JsValue {
+    Error::new(s).into()
+}
+
+#[inline]
+fn js_move_exception(s: String) -> JsValue {
+    Error::new(&s).into()
+}
+
+pub struct Items;
+
+impl Items {
+    pub fn get_items_from_storage_or_api(
+        storage: Option<&Storage>,
+    ) -> Result<Vec<Product>, JsValue> {
+        Self::try_get_items_from_storage(storage).map_err(|_| js_exception("Not yet implemented"))
+    }
+
+    pub fn try_get_items_from_storage(storage: Option<&Storage>) -> Result<Vec<Product>, JsValue> {
+        let storage = storage.ok_or_else(|| js_exception("Invalid storage object"))?;
+
+        storage
+            .get_item("items")?
+            .as_deref()
+            .map(serde_json::from_str)
+            .ok_or_else(|| js_exception("Failed to find items"))?
+            .map_err(|_| js_exception("Failed to parse items"))
+    }
+}
+
 pub struct Bag;
 
 impl Bag {
-    pub fn try_get_item_count_from_storage(storage: Option<Storage>) -> Result<usize, JsValue> {
-        let storage =
-            storage.ok_or_else(|| Into::<JsValue>::into(Error::new("Invalid storage object")))?;
-        storage.get_item("bag_count")?.map_or(Ok(0), |v| {
-            v.parse::<usize>().map_err(|_| {
+    /// Totals the bag as cents
+    /// Returns an error on failure
+    pub fn try_total_bag(storage: Option<&Storage>) -> Result<i64, JsValue> {
+        let bag = Self::try_get_bag(storage)?;
+
+        Ok(bag.iter().fold(0, |c, (product, count)| {
+            c + (product.get_price() * (*count as i64))
+        }))
+    }
+
+    /// Gets the value of `bag_count` from `storage`
+    /// Deletes the invalid value and returns an error if `bag_count` doesn't exist
+    pub fn try_get_bag_count(storage: Option<&Storage>) -> Result<usize, JsValue> {
+        let storage = storage.ok_or_else(|| js_exception("Invalid storage object"))?;
+
+        storage
+            .get_item("bag_count")?
+            .as_deref()
+            .map(<str>::parse::<usize>)
+            .ok_or_else(|| js_exception("Failed to find bag_count"))?
+            .map_err(|_| {
                 let _ = storage.delete("bag_count");
-                JsValue::null()
+                js_exception("Failed to parse bag_count, deleted invalid value")
             })
-        })
     }
 
-    pub fn get_item_count_from_storage_or_default(storage: Option<Storage>) -> usize {
-        Self::try_get_item_count_from_storage(storage).unwrap_or(0)
+    /// Gets the value of `bag_count` from `storage`
+    /// If the `bag_count` doesn't exist, return 0
+    pub fn get_bag_count_or_default(storage: Option<&Storage>) -> usize {
+        Self::try_get_bag_count(storage).unwrap_or(0)
     }
 
-    /*
-    pub fn try_get_bag_items(storage: Option<Storage>) -> Result<HashMap<Product, usize>, JsValue> {
-        let storage = storage.ok_or_else(|| JsValue::from("Invalid Storage object"))?;
+    /// Attempts to increment `bag_count` by `value`
+    /// Returns an error on failure
+    pub fn try_incr_bag_count(storage: Option<&Storage>, value: usize) -> Result<(), JsValue> {
+        let storage = storage.ok_or_else(|| js_exception("Invalid storage object"))?;
 
-        let items: HashMap<Product, usize> = storage
+        let existing_count = storage
+            .get_item("bag_count")?
+            .as_deref()
+            .map(<str>::parse::<usize>)
+            .ok_or_else(|| js_exception("Failed to find bag_count"))?
+            .map_err(|_| {
+                let _ = storage.delete("bag_count");
+                js_exception("Failed to parse bag_count, deleted invalid value")
+            })?;
+
+        storage.set_item("bag_count", &(existing_count + value).to_string())?;
+
+        try_dispatch_storage_event()?;
+
+        Ok(())
+    }
+
+    /// Get the value of `bag` from `storage`
+    /// Returns an error if `bag` doesn't exist
+    pub fn try_get_bag(storage: Option<&Storage>) -> Result<HashMap<Product, usize>, JsValue> {
+        let storage = storage.ok_or_else(|| js_exception("Invalid Storage object"))?;
+
+        storage
             .get_item("bag")?
             .as_deref()
             .map(serde_json::from_str)
-            .ok_or_else(|| JsValue::from("`items` doesn't exist in storage"))?
-            .map_err(|_| JsValue::from("Failed to parse items"))?;
+            .ok_or_else(|| js_exception("Failed to find items"))?
+            .map_err(|_| js_exception("Failed to parse items"))
+    }
 
-        Ok(items)
-    }*/
-
-    pub fn try_add_bag_item(storage: Option<Storage>, product: Product) -> Result<(), JsValue> {
-        let storage =
-            storage.ok_or_else(|| Into::<JsValue>::into(Error::new("Invalid Storage object")))?;
+    /// Get the value of `bag` from `storage`
+    /// Returns an error if `bag` doesn't exist, if it failed to parse
+    /// or if an `storage` event failed to send
+    pub fn try_add_to_bag(storage: Option<Storage>, product: Product) -> Result<(), JsValue> {
+        let storage = storage.ok_or_else(|| js_exception("Invalid Storage object"))?;
 
         if let Ok(mut items) = storage.get_item("bag")?.as_deref().map_or_else(
             || Ok(HashMap::new()),
             serde_json::from_str::<HashMap<Product, usize>>,
         ) {
-            *items.entry(product).or_insert(0) += 0;
+            *items.entry(product).or_insert(0) += 1;
 
-            let items = serde_json::to_string(&items)
-                .map_err(|_| JsValue::from("Failed to convert `items` to JSON string"))?;
+            let items =
+                serde_json::to_string(&items).map_err(|e| js_move_exception(format!("{e}")))?;
 
             storage.set_item("bag", &items)?;
 
-            try_dispatch_storage_event()?;
+            Self::try_incr_bag_count(Some(storage.as_ref()), 1)?;
 
             Ok(())
         } else {
-            Err(JsValue::from("Failed to parse items in Bag"))
+            Err(js_exception("Failed to parse items in Bag"))
         }
     }
 }

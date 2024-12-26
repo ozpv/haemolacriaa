@@ -1,29 +1,7 @@
 use leptos::prelude::*;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[cfg_attr(not(feature = "ssr"), derive(Deserialize, Serialize))]
-#[derive(Hash, PartialEq, Eq, Clone)]
-pub struct Product {
-    name: String,
-    price: i64,
-}
-
-impl Product {
-    /// `name` the name of the product
-    /// `price`: the price of the product in cents
-    pub fn new(name: String, price: i64) -> Self {
-        Self { name, price }
-    }
-
-    pub fn get_price(&self) -> i64 {
-        self.price
-    }
-
-    pub fn get_name(self) -> String {
-        self.name
-    }
-}
+use crate::types::product::Product;
 
 #[component]
 fn Card(
@@ -51,15 +29,15 @@ fn Card(
 pub fn List() -> impl IntoView {
     let items = RwSignal::<Option<HashMap<Product, usize>>>::new(None);
 
-    #[cfg(not(feature = "ssr"))]
+    #[cfg(feature = "hydrate")]
     Effect::new(move || {
         use super::storage::{get_storage, Bag};
 
-        //let stored_items = Bag::try_get_bag_items(get_storage()).ok();
-        //items.set(stored_items);
+        let stored_items = Bag::try_get_bag(get_storage().as_ref()).ok();
+        items.set(stored_items);
     });
 
-    // TODO: Get Items from localstorage or try the server and not from the bag
+    // TODO: Get Items from localstorage or api and not the bag
     view! {
         <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
             {move || {

@@ -1,13 +1,18 @@
 #![allow(unexpected_cfgs)]
 
+#[cfg(feature = "ssr")]
 use crate::lazy::JWT_SECRET;
 use crate::util::*;
+#[cfg(feature = "ssr")]
 use axum::{extract::Request, middleware::Next, response::Response};
+#[cfg(feature = "ssr")]
 use chrono::Utc;
+#[cfg(feature = "ssr")]
 use headers::{Cookie, HeaderMapExt};
+#[cfg(feature = "ssr")]
 use http::StatusCode;
+#[cfg(feature = "ssr")]
 use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
-#[allow(unused_imports)]
 use leptos::server;
 use serde::{Deserialize, Serialize};
 
@@ -55,6 +60,7 @@ pub async fn decode_jwt(token: String) -> Result<Claims> {
 
 /// Pass in a token and get Ok(()) if valid
 //#[server(VerifyJwt, "/api", "Url")]
+#[cfg(feature = "ssr")]
 pub async fn verify_jwt(token: String) -> Result<(), StatusCode> {
     let claims = decode_jwt(token)
         .await
@@ -67,6 +73,7 @@ pub async fn verify_jwt(token: String) -> Result<(), StatusCode> {
     }
 }
 
+#[cfg(feature = "ssr")]
 pub async fn protected_check(req: Request, next: Next) -> Result<Response, StatusCode> {
     let Some(cookie) = req.headers().typed_get::<Cookie>() else {
         return Err(StatusCode::UNAUTHORIZED);

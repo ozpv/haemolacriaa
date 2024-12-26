@@ -1,5 +1,5 @@
 pub mod item;
 pub mod nav;
 pub mod shop;
-#[cfg(not(feature = "ssr"))]
+#[cfg(feature = "hydrate")]
 pub mod storage;

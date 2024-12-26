@@ -1,3 +1,5 @@
+#[cfg(feature = "ssr")]
+use crate::util::err;
 use crate::util::Result;
 use leptos::server;
 #[cfg(feature = "ssr")]
