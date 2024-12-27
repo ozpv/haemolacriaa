@@ -12,9 +12,9 @@ pub fn Home() -> impl IntoView {
         #[cfg(feature = "hydrate")]
         use super::storage::{get_storage, Bag};
         #[cfg(feature = "hydrate")]
-        let product = product::Product::new("another product".to_string(), 32);
+        let product = product::Product::new("another product", 32);
         #[cfg(feature = "hydrate")]
-        Bag::try_add_to_bag(get_storage(), product).unwrap();
+        Bag::try_add_to_bag(get_storage().as_ref(), product).unwrap();
     };
 
     let total_element = NodeRef::new();
@@ -25,7 +25,7 @@ pub fn Home() -> impl IntoView {
         #[cfg(feature = "hydrate")]
         use web_sys::HtmlButtonElement;
         #[cfg(feature = "hydrate")]
-        let total = Bag::try_to_total_bag(get_storage().as_ref()).unwrap();
+        let total = Bag::try_total_bag(get_storage().as_ref()).unwrap();
         #[cfg(feature = "hydrate")]
         let total_element: HtmlButtonElement = total_element.get().unwrap();
         #[cfg(feature = "hydrate")]
@@ -36,7 +36,7 @@ pub fn Home() -> impl IntoView {
         #[cfg(feature = "hydrate")]
         use super::storage::{get_storage, Bag};
         #[cfg(feature = "hydrate")]
-        Bag::try_to_sync_bag_count(get_storage().as_ref()).unwrap();
+        Bag::try_sync_bag_count(get_storage().as_ref()).unwrap();
     };
 
     view! {

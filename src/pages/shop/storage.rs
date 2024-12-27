@@ -28,12 +28,35 @@ fn js_exception<'a>(s: &'a str) -> JsValue {
 pub struct Items;
 
 impl Items {
-    pub fn get_items_from_storage_or_api(
+    fn try_set_items_in_storage(
         storage: Option<&Storage>,
-    ) -> Result<Vec<Product>, JsValue> {
-        Self::try_get_items_from_storage(storage).map_err(|_| js_exception("Not yet implemented"))
+        items: &Vec<Product>,
+    ) -> Result<(), JsValue> {
+        let storage = storage.ok_or_else(|| js_exception("Invalid storage object"))?;
+
+        let items = serde_json::to_string(items)
+            .map_err(|_| js_exception("Failed to convert items to JSON string"))?;
+
+        storage.set_item("items", &items)?;
+
+        Ok(())
     }
 
+    /// Attemps to get items from `storage`
+    /// or fetch them from the server
+    pub fn get_items_from_storage_or_server(
+        storage: Option<&Storage>,
+    ) -> Result<Vec<Product>, JsValue> {
+        let items = Self::try_get_items_from_storage(storage)
+            // TODO: make a request to the server to get items
+            .unwrap_or(vec![Product::new("10000 Cents", 10000)]);
+
+        Self::try_set_items_in_storage(storage, &items)?;
+
+        Ok(items)
+    }
+
+    /// Attemps to get items from `storage`
     pub fn try_get_items_from_storage(storage: Option<&Storage>) -> Result<Vec<Product>, JsValue> {
         let storage = storage.ok_or_else(|| js_exception("Invalid storage object"))?;
 
@@ -73,7 +96,7 @@ impl Bag {
 
     /// "syncs" `bag_count` by setting it to the sum of values in each `bag` from `storage`
     /// Returns an error if `bag_count` doesn't exist, or dispatch_event fails
-    pub fn try_to_sync_bag_count(storage: Option<&Storage>) -> Result<usize, JsValue> {
+    pub fn try_sync_bag_count(storage: Option<&Storage>) -> Result<usize, JsValue> {
         let bag = Self::try_get_bag(storage)?;
 
         let count = bag.iter().fold(0, |c, (_, count)| c + count);
@@ -89,7 +112,7 @@ impl Bag {
 
     /// Totals the bag as cents
     /// Returns an error on failure
-    pub fn try_to_total_bag(storage: Option<&Storage>) -> Result<i64, JsValue> {
+    pub fn try_total_bag(storage: Option<&Storage>) -> Result<i64, JsValue> {
         let bag = Self::try_get_bag(storage)?;
 
         Ok(bag.iter().fold(0, |c, (product, count)| {
@@ -99,8 +122,8 @@ impl Bag {
 
     /// Attempts to increment `bag_count` by `value`
     /// Returns an error on failure
-    pub fn try_to_incr_bag_count(storage: Option<&Storage>, value: usize) -> Result<(), JsValue> {
-        let existing_count = Self::try_get_bag_count(storage)?;
+    pub fn try_incr_bag_count(storage: Option<&Storage>, value: usize) -> Result<(), JsValue> {
+        let existing_count = Self::try_get_bag_count(storage).unwrap_or(0);
 
         let storage = storage.ok_or_else(|| js_exception("Invalid Storage object"))?;
 
@@ -120,17 +143,17 @@ impl Bag {
             .get_item("bag")?
             .as_deref()
             .map(serde_json::from_str)
-            .ok_or_else(|| js_exception("Failed to find items"))?
-            .map_err(|_| js_exception("Failed to parse items"))
+            .ok_or_else(|| js_exception("Failed to find bag"))?
+            .map_err(|_| js_exception("Failed to parse bag"))
     }
 
     /// Get the value of `bag` from `storage`
     /// Returns an error if `bag` doesn't exist, if it failed to parse
     /// or if an `storage` event failed to send
-    pub fn try_add_to_bag(storage: Option<Storage>, product: Product) -> Result<(), JsValue> {
+    pub fn try_add_to_bag(storage: Option<&Storage>, product: Product) -> Result<(), JsValue> {
         let storage = storage.ok_or_else(|| js_exception("Invalid Storage object"))?;
 
-        let mut items = storage
+        let mut bag = storage
             .get_item("bag")?
             .as_deref()
             .map_or_else(
@@ -139,13 +162,14 @@ impl Bag {
             )
             .map_err(|_| js_exception("Failed to parse bag"))?;
 
-        *items.entry(product).or_insert(0) += 1;
+        *bag.entry(product).or_insert(0) += 1;
 
-        let items = serde_json::to_string(&items).map_err(|e| js_exception(&format!("{e}")))?;
+        let bag = serde_json::to_string(&bag)
+            .map_err(|_| js_exception("Failed to convert bag to JSON string"))?;
 
-        storage.set_item("bag", &items)?;
+        storage.set_item("bag", &bag)?;
 
-        Self::try_to_incr_bag_count(Some(storage.as_ref()), 1)?;
+        Self::try_incr_bag_count(Some(storage), 1)?;
 
         Ok(())
     }

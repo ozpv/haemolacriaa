@@ -36,8 +36,11 @@ impl<'de> Deserialize<'de> for Product {
 impl Product {
     /// `name`: the name of the product
     /// `price`: the price of the product in cents
-    pub fn new(name: String, price: i64) -> Self {
-        Self { name, price }
+    pub fn new(name: &str, price: i64) -> Self {
+        Self {
+            name: name.to_string(),
+            price,
+        }
     }
 
     pub fn get_price(&self) -> i64 {

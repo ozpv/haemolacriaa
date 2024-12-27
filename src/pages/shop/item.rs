@@ -1,5 +1,4 @@
 use leptos::prelude::*;
-use std::collections::HashMap;
 
 use crate::types::product::Product;
 
@@ -27,13 +26,13 @@ fn Card(
 
 #[component]
 pub fn List() -> impl IntoView {
-    let items = RwSignal::<Option<HashMap<Product, usize>>>::new(None);
+    let items = RwSignal::<Option<Vec<Product>>>::new(None);
 
     #[cfg(feature = "hydrate")]
     Effect::new(move || {
-        use super::storage::{get_storage, Bag};
+        use super::storage::{get_storage, Items};
 
-        let stored_items = Bag::try_get_bag(get_storage().as_ref()).ok();
+        let stored_items = Items::get_items_from_storage_or_server(get_storage().as_ref()).ok();
         items.set(stored_items);
     });
 
@@ -48,8 +47,8 @@ pub fn List() -> impl IntoView {
                             view! {
                                 <Card
                                     image_path="stay.webp".to_string()
-                                    product_name=item.0.clone().get_name()
-                                    price=item.0.get_price()
+                                    product_name=item.clone().get_name()
+                                    price=item.get_price()
                                     in_stock=true
                                 />
                             }
