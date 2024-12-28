@@ -1,11 +1,8 @@
 use axum::Router;
 use haemolacriaa::app::*;
 use http::{header, Method};
-use leptos::{
-    config::LeptosOptions,
-    prelude::{get_configuration, provide_context},
-};
-use leptos_axum::{file_and_error_handler, generate_route_list, LeptosRoutes};
+use leptos::prelude::{get_configuration, provide_context};
+use leptos_axum::{file_and_error_handler, generate_route_list_with_ssg, LeptosRoutes};
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
 use std::time::Duration;
 use tower_http::{
@@ -17,7 +14,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let conf = get_configuration(None).unwrap();
     let leptos_options = conf.leptos_options;
     let addr = leptos_options.site_addr;
-    let routes = generate_route_list(App);
+    let (routes, static_routes) = generate_route_list_with_ssg({
+        let leptos_options = leptos_options.clone();
+        move || shell(leptos_options.clone())
+    });
 
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::INFO)
@@ -58,6 +58,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await?;
     */
 
+    static_routes.generate(&leptos_options).await;
+
     let app = Router::new()
         /*
         .leptos_routes_with_context(
@@ -74,7 +76,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let leptos_options = leptos_options.clone();
             move || shell(leptos_options.clone())
         })
-        .fallback(file_and_error_handler::<LeptosOptions, _>(shell))
+        .fallback(file_and_error_handler(shell))
         .with_state(leptos_options)
         .layer(TraceLayer::new_for_http())
         .layer(CompressionLayer::new().gzip(true))

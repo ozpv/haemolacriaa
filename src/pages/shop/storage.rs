@@ -25,50 +25,6 @@ fn js_exception<'a>(s: &'a str) -> JsValue {
     Error::new(s).into()
 }
 
-pub struct Items;
-
-impl Items {
-    fn try_set_items_in_storage(
-        storage: Option<&Storage>,
-        items: &Vec<Product>,
-    ) -> Result<(), JsValue> {
-        let storage = storage.ok_or_else(|| js_exception("Invalid storage object"))?;
-
-        let items = serde_json::to_string(items)
-            .map_err(|_| js_exception("Failed to convert items to JSON string"))?;
-
-        storage.set_item("items", &items)?;
-
-        Ok(())
-    }
-
-    /// Attemps to get items from `storage`
-    /// or fetch them from the server
-    pub fn get_items_from_storage_or_server(
-        storage: Option<&Storage>,
-    ) -> Result<Vec<Product>, JsValue> {
-        let items = Self::try_get_items_from_storage(storage)
-            // TODO: make a request to the server to get items
-            .unwrap_or(vec![Product::new("10000 Cents", 10000)]);
-
-        Self::try_set_items_in_storage(storage, &items)?;
-
-        Ok(items)
-    }
-
-    /// Attemps to get items from `storage`
-    pub fn try_get_items_from_storage(storage: Option<&Storage>) -> Result<Vec<Product>, JsValue> {
-        let storage = storage.ok_or_else(|| js_exception("Invalid storage object"))?;
-
-        storage
-            .get_item("items")?
-            .as_deref()
-            .map(serde_json::from_str)
-            .ok_or_else(|| js_exception("Failed to find items"))?
-            .map_err(|_| js_exception("Failed to parse items"))
-    }
-}
-
 pub struct Bag;
 
 impl Bag {

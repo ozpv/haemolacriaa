@@ -1,9 +1,12 @@
+use futures::{channel::mpsc, Stream};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
 use leptos_router::{
     components::{FlatRoutes, ProtectedRoute, Route, Router},
-    path, SsrMode,
+    path,
+    static_routes::StaticRoute,
+    SsrMode,
 };
 
 use crate::components::footer::Footer;
@@ -32,11 +35,30 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
     }
 }
 
+fn watch_value() -> impl Stream<Item = ()> {
+    #[allow(unused)]
+    let (mut tx, rx) = mpsc::channel(0);
+
+    #[cfg(feature = "ssr")]
+    {
+        use crate::lazy::UPDATE_ITEMS;
+
+        tokio::spawn(async move {
+            loop {
+                if UPDATE_ITEMS.1.lock().await.changed().await.is_ok() {
+                    let _ = tx.try_send(());
+                    tracing::info!("Received update from `UPDATE_ITEMS`, regenerating /shop");
+                }
+            }
+        });
+    }
+
+    rx
+}
+
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
-
-    //let logged_in = Resource::new(move || (), |_| logged_in());
 
     view! {
             <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>
@@ -45,7 +67,13 @@ pub fn App() -> impl IntoView {
             <Router>
                 <FlatRoutes fallback=ErrorPage>
                     <Route path=path!("") view=home::Home />
-                    <Route path=path!("/shop") view=shop::Home />
+                    <Route
+                        path=path!("/shop")
+                        view=shop::Home
+                        ssr=SsrMode::Static(
+                            StaticRoute::new().regenerate(|_| watch_value())
+                        )
+                    />
                     <Route path=path!("/shop/:name") view=shop::Product />
                     <Route path=path!("/bag") view=shop::Bag />
     /*

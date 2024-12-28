@@ -1,9 +1,9 @@
 use leptos::prelude::*;
 use leptos_router::{hooks::use_params, params::Params};
 
-use super::{item, nav::Nav};
+use super::nav::Nav;
 use crate::components::buttons::ReturnButton;
-#[cfg(feature = "hydrate")]
+use crate::pages::shop::item::Card;
 use crate::types::product;
 
 #[component]
@@ -39,20 +39,57 @@ pub fn Home() -> impl IntoView {
         Bag::try_sync_bag_count(get_storage().as_ref()).unwrap();
     };
 
+    let items_resource =
+        OnceResource::new_blocking(
+            async move { crate::api::stripe::get_items_from_stripe().await },
+        );
+
+    let items_view = move || {
+        Suspend::new(async move {
+            items_resource.await.map(|items| {
+                items
+                    .iter()
+                    .map(|item| {
+                        view! {
+                            <Card
+                                image="stay.webp".to_string()
+                                name=item.clone().get_name()
+                                price=item.get_price()
+                                in_stock=true
+                            />
+                        }
+                    })
+                    .collect_view()
+            })
+        })
+    };
+
     view! {
         <Nav/>
-        <button on:click=add_item>
-            "Add item"
-        </button>
-        <button on:click=total_bag node_ref=total_element>
-            "Bag total: 0"
-        </button>
-        <button on:click=sync_bag>
-            "Sync bag count"
-        </button>
         <main class="main">
+            <button on:click=add_item>
+                "Add item"
+            </button>
+
+            <button on:click=total_bag node_ref=total_element>
+                "Bag total: 0"
+            </button>
+
+            <button on:click=sync_bag>
+                "Sync bag count"
+            </button>
+
             <h1 class="text-text-dark text-5xl text-center font-sans py-5">"shop"</h1>
-            <item::List />
+
+            <Suspense
+                fallback=move || view! {
+                    <p class="text-text-dark text-center font-inter">"Loading products..."</p>
+                }
+            >
+                <ErrorBoundary fallback=move |_| view! { <p class="text-text-dark text-center font-inter">"Failed to fetch products from stripe"</p> }>
+                    {items_view}
+                </ErrorBoundary>
+            </Suspense>
         </main>
     }
 }
