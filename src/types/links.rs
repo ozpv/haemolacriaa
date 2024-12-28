@@ -1,7 +1,6 @@
 use icondata::Icon;
 use serde::{Deserialize, Serialize};
 use std::borrow::ToOwned;
-use std::cell::Cell;
 
 use crate::config::USERNAME;
 use crate::types::images::Image;
@@ -143,48 +142,48 @@ impl<T: std::fmt::Display> Song<T> {
     }
 
     pub fn build_streaming_info(self) -> Vec<StreamingInfo> {
-        let mut res = Cell::new(Vec::with_capacity(5));
+        let mut res = Vec::with_capacity(5);
 
-        let () = self.spotify_id.map_or((), |p| {
-            res.get_mut().push(StreamingInfo {
+        if let Some(p) = self.spotify_id {
+            res.push(StreamingInfo {
                 platform_icon: p.icon(),
                 platform_name: p.name(),
                 song_url: p.build_url(self.is_album),
             });
-        });
+        }
 
-        let () = self.youtube_id.map_or((), |p| {
-            res.get_mut().push(StreamingInfo {
+        if let Some(p) = self.youtube_id {
+            res.push(StreamingInfo {
                 platform_icon: p.icon(),
                 platform_name: p.name(),
                 song_url: p.build_url(self.is_album),
             });
-        });
+        }
 
-        let () = self.soundcloud_id.map_or((), |p| {
-            res.get_mut().push(StreamingInfo {
+        if let Some(p) = self.soundcloud_id {
+            res.push(StreamingInfo {
                 platform_icon: p.icon(),
                 platform_name: p.name(),
                 song_url: p.build_url(self.is_album),
             });
-        });
+        }
 
-        let () = self.apple_music_id.map_or((), |p| {
-            res.get_mut().push(StreamingInfo {
+        if let Some(p) = self.apple_music_id {
+            res.push(StreamingInfo {
                 platform_icon: p.icon(),
                 platform_name: p.name(),
                 song_url: p.build_url(self.is_album),
             });
-        });
+        }
 
-        let () = self.bandcamp_id.map_or((), |p| {
-            res.get_mut().push(StreamingInfo {
+        if let Some(p) = self.bandcamp_id {
+            res.push(StreamingInfo {
                 platform_icon: p.icon(),
                 platform_name: p.name(),
                 song_url: p.build_url(self.is_album),
             });
-        });
+        }
 
-        res.into_inner()
+        res
     }
 }
