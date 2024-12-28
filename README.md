@@ -1,5 +1,5 @@
 # haemolacriaa 
-music website written in rust with Leptos and Actix 
+music website written in rust with Leptos and Axum
 
 # Deployment via VPS 
 
