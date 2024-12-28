@@ -26,23 +26,23 @@ fn Appendix(social_media_info: Option<&'static SocialMediaInfo>) -> impl IntoVie
 
 #[component]
 pub fn StreamingList(
-    list_info: RwSignal<Song>,
+    list_info: RwSignal<Song<&'static str>>,
     #[prop(optional)] appendix_social: Option<&'static SocialMediaInfo>,
 ) -> impl IntoView {
     view! {
         <div id=move || format!("{}-link-list", list_info.get().name)>
             <img
                 class="block text-text-dark mx-auto pt-4 shadow-2xl shadow-crust-dark"
-                src=move || list_info.get().image.path.clone()
+                src=move || list_info.get().image.path
                 width="400px"
                 height="400px"
-                alt=move || list_info.get().name.clone()
+                alt=move || list_info.get().name
             />
             <h1 class="block text-text-dark text-center text-3xl font-bold font-sans pt-9">
-                    {move || list_info.get().name.clone()}
+                    {move || list_info.get().name}
             </h1>
             <h2 class="block text-subtext-dark text-center text-lg font-medium font-inter pt-4 pb-2.5">
-                    {move || list_info.get().author.clone()}
+                    {move || list_info.get().author}
             </h2>
             <div class="flex justify-center">
                 <nav id="streaming-links">

@@ -44,12 +44,12 @@ pub fn Home() -> impl IntoView {
         Suspend::new(async move {
             items_resource.await.map(|items| {
                 items
-                    .iter()
+                    .into_iter()
                     .map(|item| {
                         view! {
                             <Card
                                 image="stay.webp".to_string()
-                                name=item.clone().get_name()
+                                name=item.get_name()
                                 price=item.get_price()
                                 in_stock=true
                             />

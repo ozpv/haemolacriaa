@@ -2,11 +2,10 @@ use leptos::prelude::*;
 
 use crate::components::{card::SongCard, lists::StreamingList, nav};
 use crate::config::{CURRENT_SONG, OTHER_SONGS};
-use crate::types::links::Song;
 
 #[component]
 pub fn Home() -> impl IntoView {
-    let active_list = RwSignal::new(Song::<String>::from(CURRENT_SONG));
+    let active_list = RwSignal::new(CURRENT_SONG);
 
     view! {
         <nav::Nav/>
@@ -27,9 +26,9 @@ pub fn Home() -> impl IntoView {
                             view! {
                                 <li>
                                     <SongCard
-                                        on:click=move |_| active_list.set((*song).into())
-                                        title=song.name.to_string()
-                                        image=song.image.into()
+                                        on:click=move |_| active_list.set(*song)
+                                        title=song.name
+                                        image=song.image
                                         class="my-5 ease-in duration-100 md:hover:scale-105"
                                     />
                                 </li>

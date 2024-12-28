@@ -120,30 +120,26 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
 /// (x, y) x: the name of the platform, y: the base link to a song
 /// Used T to save myself from writing &'static str and your eyes
 pub enum PlatformId<T = &'static str> {
-    Spotify(T, T),
-    YouTube(T, T),
-    SoundCloud(T, T),
-    AppleMusic(T, T),
-    Bandcamp(T, T),
+    Spotify(T),
+    YouTube(T),
+    SoundCloud(T),
+    AppleMusic(T),
+    Bandcamp(T),
 }
 
 impl<T> PlatformId<T> {
-    pub fn unwrap_name(&self) -> &T {
+    pub fn name(&self) -> &'static str {
         match self {
-            Spotify(x, _)
-            | YouTube(x, _)
-            | SoundCloud(x, _)
-            | AppleMusic(x, _)
-            | Bandcamp(x, _) => x,
+            Spotify(_) => "spotify",
+            YouTube(_) => "youtube",
+            SoundCloud(_) => "soundcloud",
+            AppleMusic(_) => "apple music",
+            Bandcamp(_) => "bandcamp",
         }
     }
-    pub fn unwrap_link(&self) -> &T {
+    pub fn unwrap(&self) -> &T {
         match self {
-            Spotify(_, y)
-            | YouTube(_, y)
-            | SoundCloud(_, y)
-            | AppleMusic(_, y)
-            | Bandcamp(_, y) => y,
+            Spotify(y) | YouTube(y) | SoundCloud(y) | AppleMusic(y) | Bandcamp(y) => y,
         }
     }
 }
@@ -151,29 +147,26 @@ impl<T> PlatformId<T> {
 pub static STREAMING_PLATFORMS: [StreamingPlatform; 5] = [
     StreamingPlatform {
         icon: ico::SiSpotify,
-        id: PlatformId::Spotify("spotify", "https://open.spotify.com/"),
+        id: PlatformId::Spotify("https://open.spotify.com/"),
     },
     StreamingPlatform {
         icon: ico::SiYoutube,
-        id: PlatformId::YouTube("youtube", "https://www.youtube.com/"),
+        id: PlatformId::YouTube("https://www.youtube.com/"),
     },
     StreamingPlatform {
         icon: ico::SiSoundcloud,
-        id: PlatformId::SoundCloud(
-            "soundcloud",
-            formatcp!("https://soundcloud.com/{}/", USERNAME),
-        ),
+        id: PlatformId::SoundCloud(formatcp!("https://soundcloud.com/{}/", USERNAME)),
     },
     StreamingPlatform {
         icon: ico::SiApple,
-        id: PlatformId::AppleMusic(
-            "apple music",
-            formatcp!("https://music.apple.com/{}/album/", APPLE_MUSIC_REGION),
-        ),
+        id: PlatformId::AppleMusic(formatcp!(
+            "https://music.apple.com/{}/album/",
+            APPLE_MUSIC_REGION
+        )),
     },
     StreamingPlatform {
         icon: ico::SiBandcamp,
-        id: PlatformId::Bandcamp("bandcamp", formatcp!("https://{}.bandcamp.com/", USERNAME)),
+        id: PlatformId::Bandcamp(formatcp!("https://{}.bandcamp.com/", USERNAME)),
     },
 ];
 

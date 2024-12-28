@@ -1,7 +1,5 @@
 use icondata::Icon;
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "ssr")]
-use sqlx::FromRow;
 use std::borrow::ToOwned;
 
 use crate::config::{
@@ -28,14 +26,24 @@ pub struct StreamingPlatform {
 }
 
 impl StreamingPlatform {
-    fn create_url<'a, T>(&self, id: &T, is_album: bool, main: &'a str, alt: &'a str) -> String
+    fn create_url<'a, T>(
+        &self,
+        id: &T,
+        is_album: bool,
+        main: Option<&'a str>,
+        alt: Option<&'a str>,
+    ) -> String
     where
         T: std::fmt::Display,
     {
         format!(
             "{}{}{}",
-            &self.id.unwrap_link(),
-            if is_album { &main } else { &alt },
+            &self.id.unwrap(),
+            if is_album {
+                main.unwrap_or("")
+            } else {
+                alt.unwrap_or("")
+            },
             &id
         )
     }
@@ -49,8 +57,8 @@ pub struct StreamingInfo {
 // Song info section
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
-#[cfg_attr(feature = "ssr", derive(FromRow))]
-pub struct Song<T = String> {
+#[cfg_attr(feature = "ssr", derive(sqlx::FromRow))]
+pub struct Song<T = &'static str> {
     pub name: T,
     pub author: T,
     pub image: Image<T>,
@@ -66,9 +74,9 @@ pub struct Song<T = String> {
 impl<'a> From<Song<&'a str>> for Song<String> {
     fn from(s: Song<&'a str>) -> Song<String> {
         Song {
-            name: s.name.to_owned(),
-            author: s.author.to_owned(),
-            image: Image::from(s.image),
+            name: s.name.to_string(),
+            author: s.author.to_string(),
+            image: s.image.into(),
             is_album: s.is_album,
             spotify_id: s.spotify_id.map(ToOwned::to_owned),
             youtube_id: s.youtube_id.map(ToOwned::to_owned),
@@ -95,30 +103,39 @@ impl<T: std::fmt::Display> Song<T> {
             .map(|platform| StreamingInfo {
                 platform_icon: platform.icon,
                 song_id: match platform.id {
-                    Spotify(x, _) => self.spotify_id.as_ref().map(|id| {
+                    Spotify(_) => self.spotify_id.as_ref().map(|id| {
                         (
-                            x,
-                            platform.create_url(id, self.is_album, "album/", "track/"),
+                            platform.id.name(),
+                            platform.create_url(id, self.is_album, Some("album/"), Some("track/")),
                         )
                     }),
-                    YouTube(x, _) => self.youtube_id.as_ref().map(|id| {
+                    YouTube(_) => self.youtube_id.as_ref().map(|id| {
                         (
-                            x,
-                            platform.create_url(id, self.is_album, "playlist?list=", "watch?v="),
+                            platform.id.name(),
+                            platform.create_url(
+                                id,
+                                self.is_album,
+                                Some("playlist?list="),
+                                Some("watch?v="),
+                            ),
                         )
                     }),
-                    SoundCloud(x, _) => self
-                        .soundcloud_id
-                        .as_ref()
-                        .map(|id| (x, platform.create_url(id, self.is_album, "sets/", ""))),
-                    AppleMusic(x, _) => self
-                        .apple_music_id
-                        .as_ref()
-                        .map(|id| (x, platform.create_url(id, true, "", ""))),
-                    Bandcamp(x, _) => self.bandcamp_id.as_ref().map(|id| {
+                    SoundCloud(_) => self.soundcloud_id.as_ref().map(|id| {
                         (
-                            x,
-                            platform.create_url(id, self.is_album, "album/", "track/"),
+                            platform.id.name(),
+                            platform.create_url(id, self.is_album, Some("sets/"), None),
+                        )
+                    }),
+                    AppleMusic(_) => self.apple_music_id.as_ref().map(|id| {
+                        (
+                            platform.id.name(),
+                            platform.create_url(id, false, None, None),
+                        )
+                    }),
+                    Bandcamp(_) => self.bandcamp_id.as_ref().map(|id| {
+                        (
+                            platform.id.name(),
+                            platform.create_url(id, self.is_album, Some("album/"), Some("track/")),
                         )
                     }),
                 },
