@@ -10,33 +10,32 @@ use crate::types::product;
 pub fn Home() -> impl IntoView {
     let add_item = move |_| {
         #[cfg(feature = "hydrate")]
-        use super::storage::{get_storage, Bag};
-        #[cfg(feature = "hydrate")]
-        let product = product::Product::new("another product", 32);
-        #[cfg(feature = "hydrate")]
-        Bag::try_add_to_bag(get_storage().as_ref(), product).unwrap();
+        {
+            use super::storage::{get_storage, Bag};
+            let product = product::Product::new("another product", 32);
+            Bag::try_add_to_bag(get_storage().as_ref(), product).unwrap();
+        }
     };
 
     let total_element = NodeRef::new();
 
     let total_bag = move |_| {
         #[cfg(feature = "hydrate")]
-        use super::storage::{get_storage, Bag};
-        #[cfg(feature = "hydrate")]
-        use web_sys::HtmlButtonElement;
-        #[cfg(feature = "hydrate")]
-        let total = Bag::try_total_bag(get_storage().as_ref()).unwrap();
-        #[cfg(feature = "hydrate")]
-        let total_element: HtmlButtonElement = total_element.get().unwrap();
-        #[cfg(feature = "hydrate")]
-        Dom::set_inner_html(&total_element, &format!("Bag total: {total}"))
+        {
+            use super::storage::{get_storage, Bag};
+            use web_sys::HtmlButtonElement;
+            let total = Bag::try_total_bag(get_storage().as_ref()).unwrap();
+            let total_element: HtmlButtonElement = total_element.get().unwrap();
+            Dom::set_inner_html(&total_element, &format!("Bag total: {total}"))
+        }
     };
 
     let sync_bag = move |_| {
         #[cfg(feature = "hydrate")]
-        use super::storage::{get_storage, Bag};
-        #[cfg(feature = "hydrate")]
-        Bag::try_sync_bag_count(get_storage().as_ref()).unwrap();
+        {
+            use super::storage::{get_storage, Bag};
+            Bag::try_sync_bag_count(get_storage().as_ref()).unwrap();
+        }
     };
 
     let items_resource =

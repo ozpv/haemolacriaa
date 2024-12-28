@@ -1,6 +1,6 @@
 use crate::config::NAV_ITEMS;
 use icondata as ico;
-use leptos::prelude::*;
+use leptos::{html, prelude::*};
 use leptos_icons::Icon;
 
 #[component]
@@ -33,9 +33,12 @@ pub fn Nav() -> impl IntoView {
                             .iter()
                             .map(|item| view! {
                                 <li class="p-2" on:click=toggle_active>
-                                    <a href=item.path class="text-text-dark font-inter p-2.5 hover:bg-base-dark md:hover:text-sapphire-dark md:hover:bg-transparent">
-                                        {item.name}
-                                    </a>
+                                    {html::a()
+                                        .attr("href", item.path)
+                                        .class("text-text-dark font-inter p-2.5 hover:bg-base-dark md:hover:text-sapphire-dark md:hover:bg-transparent")
+                                        .rel(item.external.then_some("external"))
+                                        .inner_html(item.name)
+                                    }
                                 </li>
                             })
                             .collect_view()

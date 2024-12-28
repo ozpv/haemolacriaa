@@ -34,10 +34,12 @@ pub static NAV_ITEMS: [RouteInfo; 2] = [
     RouteInfo {
         name: "home",
         path: "/",
+        external: false,
     },
     RouteInfo {
         name: "shop",
         path: "/shop",
+        external: true,
     },
 ];
 
