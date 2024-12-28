@@ -49,21 +49,18 @@ pub fn StreamingList(
                     {move || list_info.get()
                         .build_streaming_info()
                         .into_iter()
-                        .map(|item|
-                            item.song_id.map_or(
-                                ().into_any(),
-                                |(platform_name, song_url)| view! {
-                                    <LinkButton
-                                        class="text-text-dark text-md font-inter py-6 w-80 hover:scale-105 hover:text-surface-dark"
-                                        href=song_url
-                                        id=format!("{}-link-button", platform_name)
-                                    >
-                                        <Icon icon=item.platform_icon width="24" height="24" />
-                                        <p class="pl-5">{platform_name}</p>
-                                    </LinkButton>
-                                }.into_any()
-                            )
-                        )
+                        .map(|info| {
+                            view! {
+                                <LinkButton
+                                    class="text-text-dark text-md font-inter py-6 w-80 hover:scale-105 hover:text-surface-dark"
+                                    href=info.song_url
+                                    id=format!("{}-link-button", info.platform_name)
+                                >
+                                    <Icon icon=info.platform_icon width="24" height="24" />
+                                    <p class="pl-5">{info.platform_name}</p>
+                                </LinkButton>
+                            }
+                        })
                         .collect_view()
                     }
                 </nav>

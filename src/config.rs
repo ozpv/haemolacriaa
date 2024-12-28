@@ -1,16 +1,19 @@
 use const_format::formatcp;
-use icondata as ico;
 
 use crate::types::{
     images::Image,
-    links::{SocialMediaInfo, Song, StreamingPlatform},
+    links::{
+        Platform::{AppleMusic, Bandcamp, SoundCloud, Spotify, YouTube},
+        SocialMediaInfo, Song,
+    },
     routes::RouteInfo,
 };
-use PlatformId::{AppleMusic, Bandcamp, SoundCloud, Spotify, YouTube};
+
+pub const YEARS_ACTIVE: [&str; 2] = ["2023", "2025"];
 
 /// Information section
 // Assumes you only have one, synchronized name.
-const USERNAME: &str = "haemolacriaa";
+pub const USERNAME: &str = "haemolacriaa";
 
 // Add other users here
 const TIKTOK_USERNAME: &str = "haemolacriaamusic";
@@ -58,10 +61,10 @@ pub const LEAVE_SONG: Song<&'static str> = Song {
         height: Some("400px"),
     },
     is_album: false,
-    spotify_id: Some("5lcsNMrZi4BgbBdMCL1Esl"),
-    youtube_id: Some("b23ieCaa_fs"),
-    soundcloud_id: Some("leave"),
-    apple_music_id: Some("1765816897"),
+    spotify_id: Some(Spotify("5lcsNMrZi4BgbBdMCL1Esl")),
+    youtube_id: Some(YouTube("b23ieCaa_fs")),
+    soundcloud_id: Some(SoundCloud("leave")),
+    apple_music_id: Some(AppleMusic("1765816897")),
     bandcamp_id: None,
     publish_date: chrono::NaiveDate::from_ymd_opt(2024, 9, 13),
 };
@@ -76,10 +79,10 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
             height: Some("400px"),
         },
         is_album: false,
-        spotify_id: Some("7aLZxnXz0ZTkOJOlVmeqZQ"),
-        youtube_id: Some("dbLlehkojoI"),
-        soundcloud_id: Some("swarm"),
-        apple_music_id: Some("1756360277"),
+        spotify_id: Some(Spotify("7aLZxnXz0ZTkOJOlVmeqZQ")),
+        youtube_id: Some(YouTube("dbLlehkojoI")),
+        soundcloud_id: Some(SoundCloud("swarm")),
+        apple_music_id: Some(AppleMusic("1756360277")),
         bandcamp_id: None,
         publish_date: chrono::NaiveDate::from_ymd_opt(2024, 7, 19),
     },
@@ -92,11 +95,11 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
             height: Some("400px"),
         },
         is_album: true,
-        spotify_id: Some("5TmWqQ0YoJ9t8PHPSqhZLp"),
-        youtube_id: Some("OLAK5uy_k5kigsMsg7pFfb3_J566qnxftni1ba7jw"),
-        soundcloud_id: Some("haemolacriaa"),
-        apple_music_id: Some("1739982491"),
-        bandcamp_id: Some("haemolacriaa"),
+        spotify_id: Some(Spotify("5TmWqQ0YoJ9t8PHPSqhZLp")),
+        youtube_id: Some(YouTube("OLAK5uy_k5kigsMsg7pFfb3_J566qnxftni1ba7jw")),
+        soundcloud_id: Some(SoundCloud("haemolacriaa")),
+        apple_music_id: Some(AppleMusic("1739982491")),
+        bandcamp_id: Some(Bandcamp("haemolacriaa")),
         publish_date: chrono::NaiveDate::from_ymd_opt(2024, 4, 19),
     },
     Song {
@@ -108,116 +111,56 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
             height: Some("400px"),
         },
         is_album: false,
-        spotify_id: Some("3rzuDN6mPujdByy2QfCArW"),
-        youtube_id: Some("b_IEnLvLn3Y"),
-        soundcloud_id: Some("stay"),
-        apple_music_id: Some("1681486735"),
+        spotify_id: Some(Spotify("3rzuDN6mPujdByy2QfCArW")),
+        youtube_id: Some(YouTube("b_IEnLvLn3Y")),
+        soundcloud_id: Some(SoundCloud("stay")),
+        apple_music_id: Some(AppleMusic("1681486735")),
         bandcamp_id: None,
         publish_date: chrono::NaiveDate::from_ymd_opt(2023, 4, 14),
     },
 ];
 
-/// (x, y) x: the name of the platform, y: the base link to a song
-/// Used T to save myself from writing &'static str and your eyes
-pub enum PlatformId<T = &'static str> {
-    Spotify(T),
-    YouTube(T),
-    SoundCloud(T),
-    AppleMusic(T),
-    Bandcamp(T),
-}
-
-impl<T> PlatformId<T> {
-    pub fn name(&self) -> &'static str {
-        match self {
-            Spotify(_) => "spotify",
-            YouTube(_) => "youtube",
-            SoundCloud(_) => "soundcloud",
-            AppleMusic(_) => "apple music",
-            Bandcamp(_) => "bandcamp",
-        }
-    }
-    pub fn unwrap(&self) -> &T {
-        match self {
-            Spotify(y) | YouTube(y) | SoundCloud(y) | AppleMusic(y) | Bandcamp(y) => y,
-        }
-    }
-}
-
-pub static STREAMING_PLATFORMS: [StreamingPlatform; 5] = [
-    StreamingPlatform {
-        icon: ico::SiSpotify,
-        id: PlatformId::Spotify("https://open.spotify.com/"),
-    },
-    StreamingPlatform {
-        icon: ico::SiYoutube,
-        id: PlatformId::YouTube("https://www.youtube.com/"),
-    },
-    StreamingPlatform {
-        icon: ico::SiSoundcloud,
-        id: PlatformId::SoundCloud(formatcp!("https://soundcloud.com/{}/", USERNAME)),
-    },
-    StreamingPlatform {
-        icon: ico::SiApple,
-        id: PlatformId::AppleMusic(formatcp!(
-            "https://music.apple.com/{}/album/",
-            APPLE_MUSIC_REGION
-        )),
-    },
-    StreamingPlatform {
-        icon: ico::SiBandcamp,
-        id: PlatformId::Bandcamp(formatcp!("https://{}.bandcamp.com/", USERNAME)),
-    },
-];
-
-/// Footer
-pub const YEARS_ACTIVE: [&str; 2] = ["2023", "2025"];
-
 // Each item to be displayed on the footer.
 // From left to right.
 pub static SOCIAL_MEDIA_ITEMS: [SocialMediaInfo; 8] = [
     SocialMediaInfo {
-        icon: ico::SiGithub,
-        url: formatcp!("https://github.com/{}", GITHUB_USERNAME),
+        icon: icondata::SiGithub,
+        url: formatcp!("https://github.com/{GITHUB_USERNAME}"),
         active: true,
     },
     SocialMediaInfo {
-        icon: ico::SiTiktok,
-        url: formatcp!("https://tiktok.com/@{}", TIKTOK_USERNAME),
+        icon: icondata::SiTiktok,
+        url: formatcp!("https://tiktok.com/@{TIKTOK_USERNAME}"),
         active: true,
     },
     SocialMediaInfo {
-        icon: ico::SiYoutube,
-        url: formatcp!("https://youtube.com/channel/{}", YOUTUBE_CHANNEL_ID),
+        icon: icondata::SiYoutube,
+        url: formatcp!("https://youtube.com/channel/{YOUTUBE_CHANNEL_ID}"),
         active: true,
     },
     SocialMediaInfo {
-        icon: ico::SiInstagram,
-        url: formatcp!("https://instagram.com/{}", USERNAME),
+        icon: icondata::SiInstagram,
+        url: formatcp!("https://instagram.com/{USERNAME}"),
         active: true,
     },
     SocialMediaInfo {
-        icon: ico::SiApple,
-        url: formatcp!(
-            "https://music.apple.com/{}/artist/{}",
-            APPLE_MUSIC_REGION,
-            APPLE_MUSIC_ID
-        ),
+        icon: icondata::SiApple,
+        url: formatcp!("https://music.apple.com/{APPLE_MUSIC_REGION}/artist/{APPLE_MUSIC_ID}",),
         active: false,
     },
     SocialMediaInfo {
-        icon: ico::SiSoundcloud,
-        url: formatcp!("https://soundcloud.com/{}", USERNAME),
+        icon: icondata::SiSoundcloud,
+        url: formatcp!("https://soundcloud.com/{USERNAME}"),
         active: false,
     },
     SocialMediaInfo {
-        icon: ico::SiSpotify,
-        url: formatcp!("https://open.spotify.com/artist/{}", SPOTIFY_ARTIST_ID),
+        icon: icondata::SiSpotify,
+        url: formatcp!("https://open.spotify.com/artist/{SPOTIFY_ARTIST_ID}"),
         active: false,
     },
     SocialMediaInfo {
-        icon: ico::SiBandcamp,
-        url: formatcp!("https://{}.bandcamp.com/", USERNAME),
+        icon: icondata::SiBandcamp,
+        url: formatcp!("https://{USERNAME}.bandcamp.com/"),
         active: false,
     },
 ];

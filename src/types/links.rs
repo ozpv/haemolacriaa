@@ -1,13 +1,12 @@
 use icondata::Icon;
 use serde::{Deserialize, Serialize};
 use std::borrow::ToOwned;
+use std::cell::Cell;
 
-use crate::config::{
-    PlatformId,
-    PlatformId::{AppleMusic, Bandcamp, SoundCloud, Spotify, YouTube},
-    STREAMING_PLATFORMS,
-};
+use crate::config::USERNAME;
 use crate::types::images::Image;
+
+use Platform::{AppleMusic, Bandcamp, SoundCloud, Spotify, YouTube};
 
 // Social media info section
 
@@ -22,39 +21,83 @@ pub struct SocialMediaInfo {
 
 pub struct StreamingPlatform {
     pub icon: Icon,
-    pub id: PlatformId<&'static str>,
-}
-
-impl StreamingPlatform {
-    fn create_url<'a, T>(
-        &self,
-        id: &T,
-        is_album: bool,
-        main: Option<&'a str>,
-        alt: Option<&'a str>,
-    ) -> String
-    where
-        T: std::fmt::Display,
-    {
-        format!(
-            "{}{}{}",
-            &self.id.unwrap(),
-            if is_album {
-                main.unwrap_or("")
-            } else {
-                alt.unwrap_or("")
-            },
-            &id
-        )
-    }
+    pub id: Platform<&'static str>,
 }
 
 pub struct StreamingInfo {
-    pub song_id: Option<(&'static str, String)>,
+    pub platform_name: &'static str,
+    pub song_url: String,
     pub platform_icon: Icon,
 }
 
 // Song info section
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+pub enum Platform<T = &'static str> {
+    Spotify(T),
+    YouTube(T),
+    SoundCloud(T),
+    AppleMusic(T),
+    Bandcamp(T),
+}
+
+impl<T> Platform<T> {
+    /// Extracts the name of the platform in lowercase
+    pub fn name(&self) -> &'static str {
+        match self {
+            Spotify(_) => "spotify",
+            YouTube(_) => "youtube",
+            SoundCloud(_) => "soundcloud",
+            AppleMusic(_) => "apple music",
+            Bandcamp(_) => "bandcamp",
+        }
+    }
+
+    pub fn icon(&self) -> icondata::Icon {
+        match self {
+            Spotify(_) => icondata::SiSpotify,
+            YouTube(_) => icondata::SiYoutube,
+            SoundCloud(_) => icondata::SiSoundcloud,
+            AppleMusic(_) => icondata::SiApple,
+            Bandcamp(_) => icondata::SiBandcamp,
+        }
+    }
+
+    pub fn build_url(&self, is_album: bool) -> String
+    where
+        T: std::fmt::Display,
+    {
+        match self {
+            Spotify(x) => format!(
+                "https://open.spotify.com/{}/{x}",
+                if is_album { "album" } else { "track" }
+            ),
+            YouTube(x) => format!(
+                "https://www.youtube.com/{}{x}",
+                if is_album {
+                    "playlist?list="
+                } else {
+                    "watch?v="
+                }
+            ),
+            SoundCloud(x) => format!(
+                "https://soundcloud.com/{USERNAME}/{}{x}",
+                if is_album { "sets/" } else { "" }
+            ),
+            AppleMusic(x) => format!("https://music.apple.com/album/{x}"),
+            Bandcamp(x) => format!(
+                "https://{USERNAME}.bandcamp.com/{}/{x}",
+                if is_album { "album/" } else { "track/" }
+            ),
+        }
+    }
+
+    pub fn unwrap(&self) -> &T {
+        match self {
+            Spotify(x) | YouTube(x) | SoundCloud(x) | AppleMusic(x) | Bandcamp(x) => x,
+        }
+    }
+}
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(sqlx::FromRow))]
@@ -63,14 +106,15 @@ pub struct Song<T = &'static str> {
     pub author: T,
     pub image: Image<T>,
     pub is_album: bool,
-    pub spotify_id: Option<T>,
-    pub youtube_id: Option<T>,
-    pub soundcloud_id: Option<T>,
-    pub apple_music_id: Option<T>,
-    pub bandcamp_id: Option<T>,
+    pub spotify_id: Option<Platform<T>>,
+    pub youtube_id: Option<Platform<T>>,
+    pub soundcloud_id: Option<Platform<T>>,
+    pub apple_music_id: Option<Platform<T>>,
+    pub bandcamp_id: Option<Platform<T>>,
     pub publish_date: Option<chrono::NaiveDate>,
 }
 
+/*
 impl<'a> From<Song<&'a str>> for Song<String> {
     fn from(s: Song<&'a str>) -> Song<String> {
         Song {
@@ -87,6 +131,7 @@ impl<'a> From<Song<&'a str>> for Song<String> {
         }
     }
 }
+*/
 
 impl<T: std::fmt::Display> Song<T> {
     pub fn get_key(&self) -> String {
@@ -98,48 +143,48 @@ impl<T: std::fmt::Display> Song<T> {
     }
 
     pub fn build_streaming_info(self) -> Vec<StreamingInfo> {
-        STREAMING_PLATFORMS
-            .iter()
-            .map(|platform| StreamingInfo {
-                platform_icon: platform.icon,
-                song_id: match platform.id {
-                    Spotify(_) => self.spotify_id.as_ref().map(|id| {
-                        (
-                            platform.id.name(),
-                            platform.create_url(id, self.is_album, Some("album/"), Some("track/")),
-                        )
-                    }),
-                    YouTube(_) => self.youtube_id.as_ref().map(|id| {
-                        (
-                            platform.id.name(),
-                            platform.create_url(
-                                id,
-                                self.is_album,
-                                Some("playlist?list="),
-                                Some("watch?v="),
-                            ),
-                        )
-                    }),
-                    SoundCloud(_) => self.soundcloud_id.as_ref().map(|id| {
-                        (
-                            platform.id.name(),
-                            platform.create_url(id, self.is_album, Some("sets/"), None),
-                        )
-                    }),
-                    AppleMusic(_) => self.apple_music_id.as_ref().map(|id| {
-                        (
-                            platform.id.name(),
-                            platform.create_url(id, false, None, None),
-                        )
-                    }),
-                    Bandcamp(_) => self.bandcamp_id.as_ref().map(|id| {
-                        (
-                            platform.id.name(),
-                            platform.create_url(id, self.is_album, Some("album/"), Some("track/")),
-                        )
-                    }),
-                },
-            })
-            .collect()
+        let mut res = Cell::new(Vec::with_capacity(5));
+
+        let () = self.spotify_id.map_or((), |p| {
+            res.get_mut().push(StreamingInfo {
+                platform_icon: p.icon(),
+                platform_name: p.name(),
+                song_url: p.build_url(self.is_album),
+            });
+        });
+
+        let () = self.youtube_id.map_or((), |p| {
+            res.get_mut().push(StreamingInfo {
+                platform_icon: p.icon(),
+                platform_name: p.name(),
+                song_url: p.build_url(self.is_album),
+            });
+        });
+
+        let () = self.soundcloud_id.map_or((), |p| {
+            res.get_mut().push(StreamingInfo {
+                platform_icon: p.icon(),
+                platform_name: p.name(),
+                song_url: p.build_url(self.is_album),
+            });
+        });
+
+        let () = self.apple_music_id.map_or((), |p| {
+            res.get_mut().push(StreamingInfo {
+                platform_icon: p.icon(),
+                platform_name: p.name(),
+                song_url: p.build_url(self.is_album),
+            });
+        });
+
+        let () = self.bandcamp_id.map_or((), |p| {
+            res.get_mut().push(StreamingInfo {
+                platform_icon: p.icon(),
+                platform_name: p.name(),
+                song_url: p.build_url(self.is_album),
+            });
+        });
+
+        res.into_inner()
     }
 }
