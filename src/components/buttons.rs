@@ -1,4 +1,4 @@
-use leptos::prelude::*;
+use leptos::{html, prelude::*};
 use leptos_icons::Icon;
 
 #[component]
@@ -23,13 +23,27 @@ pub fn LinkButton(
 }
 
 #[component]
-pub fn ReturnButton(body: &'static str, href: &'static str) -> impl IntoView {
+pub fn ReturnButton(
+    body: &'static str,
+    href: &'static str,
+    #[prop(default = false)] external: bool,
+) -> impl IntoView {
+    let button = html::a()
+        .href(href)
+        .class("flex justify-center bg-surface-dark rounded-full text-text-dark pr-6 pl-8 py-3 hover:bg-surface-dark-100 hover:text-blue-dark")
+        .rel(external.then_some("external"))
+        .child((html::p()
+                .class("text-center font-inter pr-3")
+                .inner_html(body),
+            view! {
+                // Would use builder syntax but it's more of a headache 
+                <Icon icon={icondata::BsArrowRight} width="20" height="20" {..} class="translate-y-0.5" />
+            },
+        ));
+
     view! {
         <div class="flex justify-center">
-            <a href=href class="flex justify-center bg-surface-dark rounded-full text-text-dark pr-6 pl-8 py-3 hover:bg-surface-dark-100 hover:text-blue-dark">
-                <p class="text-center font-inter pr-3">{body}</p>
-                <Icon icon={icondata::BsArrowRight} width="20" height="20" {..} class="translate-y-0.5" />
-            </a>
+            {button}
         </div>
     }
 }

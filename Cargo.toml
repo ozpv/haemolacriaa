@@ -30,7 +30,6 @@ js-sys = { version = "0.3.76", optional = true }
 
 # compile time
 const_format = "0.2.32"
-cfg-if = "1.0.0"
 
 # server only
 http = { version = "1", optional = true }

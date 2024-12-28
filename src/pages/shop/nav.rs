@@ -1,4 +1,4 @@
-use leptos::prelude::*;
+use leptos::{html, prelude::*};
 use leptos_icons::Icon;
 
 use crate::config::NAV_ITEMS;
@@ -20,24 +20,23 @@ pub fn Nav() -> impl IntoView {
 
     let shop_count = NodeRef::new();
 
-    cfg_if::cfg_if! {
-        if #[cfg(feature = "hydrate")] {
-            use web_sys::HtmlParagraphElement;
-            use super::storage::{get_storage, Bag};
+    #[cfg(feature = "hydrate")]
+    {
+        use super::storage::{get_storage, Bag};
+        use web_sys::HtmlParagraphElement;
 
-            let update_count = move || {
-                let count = Bag::get_bag_count_or_default(get_storage().as_ref());
-                let count_element: HtmlParagraphElement = shop_count.get().expect("Shop count element to exist");
-                Dom::set_inner_html(&count_element, &count.to_string());
-            };
+        let update_count = move || {
+            let count = Bag::get_bag_count_or_default(get_storage().as_ref());
+            let count_element: HtmlParagraphElement =
+                shop_count.get().expect("Shop count element to exist");
+            Dom::set_inner_html(&count_element, &count.to_string());
+        };
 
-            Effect::new(update_count);
+        Effect::new(update_count);
 
-            let storage_handle =
-                window_event_listener(leptos::ev::storage, move |_| update_count());
+        let storage_handle = window_event_listener(leptos::ev::storage, move |_| update_count());
 
-            on_cleanup(move || storage_handle.remove());
-        }
+        on_cleanup(move || storage_handle.remove());
     }
 
     view! {
@@ -51,9 +50,12 @@ pub fn Nav() -> impl IntoView {
                             .iter()
                             .map(|item| view! {
                                 <li class="p-2" on:click=toggle_active>
-                                    <a href=item.path class="text-text-dark font-inter p-2.5 hover:bg-base-dark md:hover:text-sapphire-dark md:hover:bg-transparent">
-                                        {item.name}
-                                    </a>
+                                    {html::a()
+                                        .href(item.path)
+                                        .class("text-text-dark font-inter p-2.5 hover:bg-base-dark md:hover:text-sapphire-dark md:hover:bg-transparent")
+                                        .rel(item.external.then_some("external"))
+                                        .inner_html(item.name)
+                                    }
                                 </li>
                             })
                             .collect_view()

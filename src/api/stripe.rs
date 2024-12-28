@@ -26,7 +26,7 @@ pub async fn regen_items_page() -> Result<()> {
     })
 }
 
-pub async fn get_items_from_stripe() -> Result<Vec<Product>> {
+pub async fn get_products() -> Result<Vec<Product>> {
     #[cfg(feature = "ssr")]
     tracing::info!("Fetching items from stripe");
     let items = ITEMS

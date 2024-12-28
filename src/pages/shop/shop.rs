@@ -3,7 +3,7 @@ use leptos_router::{hooks::use_params, params::Params};
 
 use super::nav::Nav;
 use crate::components::buttons::ReturnButton;
-use crate::pages::shop::item::Card;
+use crate::pages::shop::product::Card;
 use crate::types::product;
 
 #[component]
@@ -38,10 +38,7 @@ pub fn Home() -> impl IntoView {
         }
     };
 
-    let items_resource =
-        OnceResource::new_blocking(
-            async move { crate::api::stripe::get_items_from_stripe().await },
-        );
+    let items_resource = OnceResource::new_blocking(crate::api::stripe::get_products());
 
     let items_view = move || {
         Suspend::new(async move {
@@ -80,12 +77,12 @@ pub fn Home() -> impl IntoView {
 
             <h1 class="text-text-dark text-5xl text-center font-sans py-5">"shop"</h1>
 
-            <Suspense
-                fallback=move || view! {
-                    <p class="text-text-dark text-center font-inter">"Loading products..."</p>
-                }
-            >
-                <ErrorBoundary fallback=move |_| view! { <p class="text-text-dark text-center font-inter">"Failed to fetch products from stripe"</p> }>
+            <Suspense fallback=move || view! {
+                <p class="text-text-dark text-center font-inter">"Loading products..."</p>
+            }>
+                <ErrorBoundary fallback=move |_| view! {
+                    <p class="text-text-dark text-center font-inter">"No products found"</p>
+                }>
                     {items_view}
                 </ErrorBoundary>
             </Suspense>
@@ -99,7 +96,7 @@ pub fn Bag() -> impl IntoView {
         <Nav />
         <main class="main">
             <h1 class="text-text-dark text-center pt-10 pb-7 text-2xl font-sans">"your bag is empty"</h1>
-            <ReturnButton body="continue shopping" href="/shop" />
+            <ReturnButton body="continue shopping" href="/shop" external=true />
         </main>
     }
 }

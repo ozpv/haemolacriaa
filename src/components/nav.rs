@@ -34,7 +34,7 @@ pub fn Nav() -> impl IntoView {
                             .map(|item| view! {
                                 <li class="p-2" on:click=toggle_active>
                                     {html::a()
-                                        .attr("href", item.path)
+                                        .href(item.path)
                                         .class("text-text-dark font-inter p-2.5 hover:bg-base-dark md:hover:text-sapphire-dark md:hover:bg-transparent")
                                         .rel(item.external.then_some("external"))
                                         .inner_html(item.name)
