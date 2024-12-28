@@ -9,7 +9,7 @@ CI/CD or another automated deployment process would be extremely overkill for th
 Once I'm finished implementing what I need, I likely won't need to deploy it very often (I already don't).
 There's only one branch, `main`, and I usually push breaking code to it anyway. 
 No need for PRs or a stable branch if all this is, is a decorated static website anyway (not really but...).
-Some of the features (redis, postgres, etc) could be considered over-engineered for the purpose of this project, but I consider it to be a valuable learning experience.
+Some of the features (postgres, etc) could be considered over-engineered for the purpose of this project, but I consider it to be a valuable learning experience.
 
 ## Setup the webserver
 
