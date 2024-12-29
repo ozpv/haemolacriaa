@@ -1,5 +1,6 @@
-use axum::Router;
+use axum::{routing::get, Router};
 use haemolacriaa::app::*;
+use haemolacriaa::cdn::handle_webp_image;
 use http::{header, Method};
 use leptos::prelude::{get_configuration, provide_context};
 use leptos_axum::{file_and_error_handler, generate_route_list_with_ssg, LeptosRoutes};
@@ -20,7 +21,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::INFO)
+        .with_max_level(tracing::Level::DEBUG)
+        //.with_max_level(tracing::Level::INFO)
         .init();
 
     // build the postgres connection pool
@@ -76,6 +78,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let leptos_options = leptos_options.clone();
             move || shell(leptos_options.clone())
         })
+        .route("/assets/:file_name", get(handle_webp_image))
         .fallback(file_and_error_handler(shell))
         .with_state(leptos_options)
         .layer(TraceLayer::new_for_http())

@@ -12,7 +12,7 @@ pub fn Home() -> impl IntoView {
         #[cfg(feature = "hydrate")]
         {
             use super::storage::{get_storage, Bag};
-            let product = product::Product::new("another product", 32);
+            let product = product::Product::new("another product", 32, product::Size::XS);
             Bag::try_add_to_bag(get_storage().as_ref(), product).unwrap();
         }
     };
@@ -119,6 +119,7 @@ pub fn Product() -> impl IntoView {
     };
 
     view! {
+        <product::SizeChartModal />
         <Nav/>
         <main class="main">
             <p>"This is a product page"</p>

@@ -3,12 +3,13 @@ use std::borrow::ToOwned;
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(sqlx::Type))]
-/// Any valid CSS units (em, px, in...)
-/// Defaults to what makes sense (Usually 400px)
+/// Dimensions default to what makes sense (Usually 400px)
 pub struct Image<T = &'static str> {
     /// This is the path in the URI, not a path on the server
     pub path: T,
+    /// width in px
     pub width: Option<T>,
+    /// height in px
     pub height: Option<T>,
 }
 

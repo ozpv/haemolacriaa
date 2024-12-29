@@ -4,11 +4,11 @@ use std::sync::{LazyLock, RwLock};
 #[cfg(feature = "ssr")]
 use crate::util::err;
 
-use crate::types::product::Product;
+use crate::types::product::{Product, Size};
 use crate::util::Result;
 
 static ITEMS: LazyLock<RwLock<Vec<Product>>> =
-    LazyLock::new(|| RwLock::new(vec![Product::new("some product", 10000)]));
+    LazyLock::new(|| RwLock::new(vec![Product::new("some product", 10000, Size::XS)]));
 
 #[server(RegenItemsPage, "/api", "Url", endpoint = "regen_items_page")]
 pub async fn regen_items_page() -> Result<()> {
@@ -18,7 +18,7 @@ pub async fn regen_items_page() -> Result<()> {
     ITEMS
         .write()
         .unwrap()
-        .push(Product::new("another product", 10000));
+        .push(Product::new("another product", 10000, Size::XS));
 
     UPDATE_ITEMS.0.lock().await.send(()).map_err(|e| {
         tracing::info!("Failed to regen /shop: {e}");

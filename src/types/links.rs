@@ -41,8 +41,7 @@ pub enum Platform<T = &'static str> {
 }
 
 impl<T> Platform<T> {
-    /// Extracts the name of the platform in lowercase
-    pub fn name(&self) -> &'static str {
+    pub fn display(&self) -> &'static str {
         match self {
             Spotify(_) => "spotify",
             YouTube(_) => "youtube",
@@ -144,10 +143,11 @@ impl<T: std::fmt::Display> Song<T> {
     pub fn build_streaming_info(self) -> Vec<StreamingInfo> {
         let mut res = Vec::with_capacity(5);
 
+        // order these by significance
         if let Some(p) = self.spotify_id {
             res.push(StreamingInfo {
                 platform_icon: p.icon(),
-                platform_name: p.name(),
+                platform_name: p.display(),
                 song_url: p.build_url(self.is_album),
             });
         }
@@ -155,7 +155,7 @@ impl<T: std::fmt::Display> Song<T> {
         if let Some(p) = self.youtube_id {
             res.push(StreamingInfo {
                 platform_icon: p.icon(),
-                platform_name: p.name(),
+                platform_name: p.display(),
                 song_url: p.build_url(self.is_album),
             });
         }
@@ -163,7 +163,7 @@ impl<T: std::fmt::Display> Song<T> {
         if let Some(p) = self.soundcloud_id {
             res.push(StreamingInfo {
                 platform_icon: p.icon(),
-                platform_name: p.name(),
+                platform_name: p.display(),
                 song_url: p.build_url(self.is_album),
             });
         }
@@ -171,7 +171,7 @@ impl<T: std::fmt::Display> Song<T> {
         if let Some(p) = self.apple_music_id {
             res.push(StreamingInfo {
                 platform_icon: p.icon(),
-                platform_name: p.name(),
+                platform_name: p.display(),
                 song_url: p.build_url(self.is_album),
             });
         }
@@ -179,7 +179,7 @@ impl<T: std::fmt::Display> Song<T> {
         if let Some(p) = self.bandcamp_id {
             res.push(StreamingInfo {
                 platform_icon: p.icon(),
-                platform_name: p.name(),
+                platform_name: p.display(),
                 song_url: p.build_url(self.is_album),
             });
         }

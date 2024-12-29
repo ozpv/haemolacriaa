@@ -33,6 +33,8 @@ pub mod util {
 }
 
 #[cfg(feature = "ssr")]
+pub mod cdn;
+#[cfg(feature = "ssr")]
 pub mod pool;
 #[cfg(feature = "ssr")]
 pub mod lazy {

@@ -57,8 +57,8 @@ pub const LEAVE_SONG: Song<&'static str> = Song {
     author: USERNAME,
     image: Image {
         path: "leave.webp",
-        width: Some("400px"),
-        height: Some("400px"),
+        width: Some("400"),
+        height: Some("400"),
     },
     is_album: false,
     spotify_id: Some(Spotify("5lcsNMrZi4BgbBdMCL1Esl")),
@@ -75,8 +75,8 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         author: USERNAME,
         image: Image {
             path: "swarm.webp",
-            width: Some("400px"),
-            height: Some("400px"),
+            width: Some("400"),
+            height: Some("400"),
         },
         is_album: false,
         spotify_id: Some(Spotify("7aLZxnXz0ZTkOJOlVmeqZQ")),
@@ -91,8 +91,8 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         author: USERNAME,
         image: Image {
             path: "haemolacriaa.webp",
-            width: Some("400px"),
-            height: Some("400px"),
+            width: Some("400"),
+            height: Some("400"),
         },
         is_album: true,
         spotify_id: Some(Spotify("5TmWqQ0YoJ9t8PHPSqhZLp")),
@@ -107,8 +107,8 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         author: USERNAME,
         image: Image {
             path: "stay.webp",
-            width: Some("400px"),
-            height: Some("400px"),
+            width: Some("400"),
+            height: Some("400"),
         },
         is_album: false,
         spotify_id: Some(Spotify("3rzuDN6mPujdByy2QfCArW")),
