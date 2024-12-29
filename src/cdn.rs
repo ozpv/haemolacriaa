@@ -120,9 +120,24 @@ pub struct Dimensions {
     height: u32,
 }
 
+impl Dimensions {
+    fn supported(&self) -> bool {
+        match (self.width, self.height) {
+            (1000, 1000) => true,
+            (900, 900) => true,
+            (800, 800) => true,
+            (700, 700) => true,
+            (600, 600) => true,
+            (500, 500) => true,
+            (400, 400) => true,
+            _ => false,
+        }
+    }
+}
+
 #[derive(Error, Debug)]
 pub enum CdnError {
-    #[error("Dimensions must be multiples of 10")]
+    #[error("Unsupported dimensions")]
     BadDimensions,
     #[error("The requested resource must be a WebP image")]
     IncorrectFormat,
@@ -161,7 +176,7 @@ pub async fn handle_webp_image(
     dimensions: Query<Dimensions>,
     State(leptos_options): State<LeptosOptions>,
 ) -> Result<impl IntoResponse, CdnError> {
-    if dimensions.width % 10 != 0 || dimensions.height % 10 != 0 {
+    if !dimensions.supported() {
         return Err(CdnError::BadDimensions);
     }
 
@@ -182,6 +197,7 @@ pub async fn handle_webp_image(
 
     tracing::info!("Checking if {} exists", img_path.display());
 
+    #[allow(unused_mut)]
     let (mut res, len) = if img_path.exists() {
         tracing::info!(
             "Found the requested file on server: {file_name} ({}px, {}px)",
@@ -245,7 +261,6 @@ pub async fn handle_webp_image(
     };
 
     // set up response
-
     res.headers_mut().insert(
         header::CONTENT_TYPE,
         "image/webp".parse().map_err(|_| CdnError::ResponseError)?,
