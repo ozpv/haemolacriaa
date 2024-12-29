@@ -41,36 +41,40 @@ pub fn Nav() -> impl IntoView {
 
     view! {
         <nav class="bg-base-dark border-gray-200">
-            <div class="flex flex-wrap max-w-screen-xl items-center justify-between mx-auto p-4">
+            <div class="flex flex-wrap items-center justify-between max-w-screen-xl mx-auto p-4">
                 <span class="text-center text-xl text-text-dark font-inter px-5">{env!("CARGO_PKG_NAME")}</span>
 
-                <div class="w-full md:block md:w-auto" class:hidden=hidden_status id="navbar-default">
-                    <ul class="flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-base-dark">
-                        {NAV_ITEMS
-                            .iter()
-                            .map(|item| view! {
-                                <li class="p-2" on:click=toggle_active>
-                                    {html::a()
-                                        .href(item.path)
-                                        .class("text-text-dark font-inter p-2.5 hover:bg-base-dark md:hover:text-sapphire-dark md:hover:bg-transparent")
-                                        .rel(item.external.then_some("external"))
-                                        .inner_html(item.name)
-                                    }
-                                </li>
-                            })
-                            .collect_view()
-                        }
-                    </ul>
+                <div class="flex items-center">
+                    <div class="hidden w-full md:flex md:w-auto md:order-2" class:hidden=hidden_status>
+                        <ul class="flex flex-col bg-base-dark font-inter mt-6 md:flex-row md:mt-0">
+                            {NAV_ITEMS
+                                .iter()
+                                .map(|item| view! {
+                                    <li class="p-2" on:click=toggle_active>
+                                        {html::a()
+                                            .href(item.path)
+                                            .class("text-text-dark font-inter p-2.5 md:hover:text-sapphire-dark")
+                                            .rel(item.external.then_some("external"))
+                                            .inner_html(item.name)
+                                        }
+                                    </li>
+                                })
+                                .collect_view()
+                            }
+                        </ul>
+                    </div>
+
+                    <div class="flex md:order-1">
+                        <a href="/bag" class="flex flew-row items-center text-text-dark text-sm mx-2 hover:text-sapphire-dark">
+                            <Icon icon={icondata::BsBag} width="16px" height="16px" />
+                            <p class="font-inter mx-3" node_ref=shop_count>"0"</p>
+                        </a>
+
+                        <button on:click=toggle_active class="text-sm text-overlay-dark-200 mx-2 md:hidden">
+                            <Icon icon=active_icon width="24px" height="24px"/>
+                        </button>
+                    </div>
                 </div>
-
-                <a href="/bag" class="flex flew-row text-text-dark text-sm mx-2">
-                    <Icon icon={icondata::BsBag} width="16px" height="16px" {..} class="translate-y-px"/>
-                    <p class="text-text-dark font-inter bg-base-dark mx-3 -translate-y-px" node_ref=shop_count>"0"</p>
-                </a>
-
-                <button on:click=toggle_active class="text-sm text-overlay-dark-200 mx-2 md:hidden">
-                    <Icon icon=active_icon width="24px" height="24px"/>
-                </button>
             </div>
         </nav>
     }

@@ -195,16 +195,8 @@ pub async fn handle_webp_image(
         dimensions.height
     ));
 
-    tracing::info!("Checking if {} exists", img_path.display());
-
     #[allow(unused_mut)]
     let (mut res, len) = if img_path.exists() {
-        tracing::info!(
-            "Found the requested file on server: {file_name} ({}px, {}px)",
-            dimensions.width,
-            dimensions.height
-        );
-
         let res = task::spawn_blocking(move || {
             let file = File::open(img_path).map_err(|_| CdnError::FileOpenError)?;
             let mut buf_reader = BufReader::new(file);

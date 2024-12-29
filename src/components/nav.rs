@@ -28,14 +28,14 @@ pub fn Nav() -> impl IntoView {
                 </button>
 
                 <div class="w-full md:block md:w-auto" class:hidden=hidden_status id="navbar-default">
-                    <ul class="font-inter font-medium flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-base-dark">
+                    <ul class="flex flex-col bg-base-dark font-inter mt-8 md:flex-row md:mt-0">
                         {NAV_ITEMS
                             .iter()
                             .map(|item| view! {
                                 <li class="p-2" on:click=toggle_active>
                                     {html::a()
                                         .href(item.path)
-                                        .class("text-text-dark font-inter p-2.5 hover:bg-base-dark md:hover:text-sapphire-dark md:hover:bg-transparent")
+                                        .class("text-text-dark font-inter p-2.5 hover:text-sapphire-dark")
                                         .rel(item.external.then_some("external"))
                                         .inner_html(item.name)
                                     }

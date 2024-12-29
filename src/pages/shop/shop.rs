@@ -2,6 +2,7 @@ use leptos::prelude::*;
 use leptos_router::{hooks::use_params, params::Params};
 
 use super::nav::Nav;
+use super::product::SizeChartModal;
 use crate::components::buttons::ReturnButton;
 use crate::pages::shop::product::Card;
 use crate::types::product;
@@ -83,7 +84,9 @@ pub fn Home() -> impl IntoView {
                 <ErrorBoundary fallback=move |_| view! {
                     <p class="text-text-dark text-center font-inter">"No products found"</p>
                 }>
-                    {items_view}
+                    <div class="grid grid-cols-2 gap-5 p-4 md:grid-cols-4">
+                        {items_view}
+                    </div>
                 </ErrorBoundary>
             </Suspense>
         </main>
@@ -119,7 +122,6 @@ pub fn Product() -> impl IntoView {
     };
 
     view! {
-        <product::SizeChartModal />
         <Nav/>
         <main class="main">
             <p>"This is a product page"</p>
