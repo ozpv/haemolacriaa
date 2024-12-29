@@ -33,14 +33,7 @@ pub fn StreamingList(
         <div id=move || format!("{}-link-list", list_info.get().name)>
             <img
                 class="block text-text-dark mx-auto pt-4 shadow-2xl shadow-crust-dark"
-                src=move || {
-                    let image = list_info.get().image;
-                    format!("/assets/{}?width={}&height={}",
-                        image.path,
-                        image.width.unwrap_or("400"),
-                        image.height.unwrap_or("400")
-                    )
-                }
+                src=move || list_info.get().image.cdn_path()
                 width=move || list_info.get().image.width
                 height=move || list_info.get().image.height
                 alt=move || list_info.get().name

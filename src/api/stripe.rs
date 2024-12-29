@@ -7,8 +7,7 @@ use crate::util::err;
 use crate::types::product::{Product, Size};
 use crate::util::Result;
 
-static ITEMS: LazyLock<RwLock<Vec<Product>>> =
-    LazyLock::new(|| RwLock::new(vec![Product::new("some product", 10000, Size::XS)]));
+static ITEMS: LazyLock<RwLock<Vec<Product>>> = LazyLock::new(|| RwLock::new(vec![]));
 
 #[server(RegenItemsPage, "/api", "Url", endpoint = "regen_items_page")]
 pub async fn regen_items_page() -> Result<()> {

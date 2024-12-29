@@ -56,7 +56,7 @@ pub const LEAVE_SONG: Song<&'static str> = Song {
     name: "leave",
     author: USERNAME,
     image: Image {
-        path: "leave.webp",
+        name: "leave.webp",
         width: Some("400"),
         height: Some("400"),
     },
@@ -74,7 +74,7 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         name: "swarm",
         author: USERNAME,
         image: Image {
-            path: "swarm.webp",
+            name: "swarm.webp",
             width: Some("400"),
             height: Some("400"),
         },
@@ -90,7 +90,7 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         name: "haemolacriaa",
         author: USERNAME,
         image: Image {
-            path: "haemolacriaa.webp",
+            name: "haemolacriaa.webp",
             width: Some("400"),
             height: Some("400"),
         },
@@ -106,7 +106,7 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
         name: "stay",
         author: USERNAME,
         image: Image {
-            path: "stay.webp",
+            name: "stay.webp",
             width: Some("400"),
             height: Some("400"),
         },
