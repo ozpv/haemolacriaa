@@ -3,8 +3,8 @@ use axum::{
     extract::{
         path::ErrorKind, rejection::PathRejection, FromRequestParts, Path as AxumPath, Query, State,
     },
-    http::{request::Parts, StatusCode},
-    response::IntoResponse,
+    http::{header, request::Parts, StatusCode},
+    response::{IntoResponse, Response},
     Json,
 };
 use image::{imageops::FilterType, ImageFormat, ImageReader};
@@ -15,6 +15,8 @@ use std::{
     io::{BufReader, Cursor, Read},
     path::Path as FilePath,
 };
+use thiserror::Error;
+use tokio::task;
 
 #[derive(Serialize)]
 pub struct ImageFileError {
@@ -118,21 +120,53 @@ pub struct Dimensions {
     height: u32,
 }
 
+#[derive(Error, Debug)]
+pub enum CdnError {
+    #[error("Dimensions must be multiples of 10")]
+    BadDimensions,
+    #[error("The requested resource must be a WebP image")]
+    IncorrectFormat,
+    #[error("Failed to open the requested file on the server")]
+    FileOpenError,
+    #[error("Failed to decode the requested file")]
+    DecodeError,
+    #[error("Located the requested resource on the server but failed to read it")]
+    ReadError,
+    #[error("The requested resource was not found on the server")]
+    NotFound,
+    #[error("Failed to execute spawn_blocking")]
+    SpawnBlockingError,
+    #[error("Failed to write DynamicImage to the response buffer")]
+    BufWriteError,
+    #[error("Failed to set the CONTENT_TYPE header")]
+    ResponseError,
+}
+
+impl IntoResponse for CdnError {
+    fn into_response(self) -> Response {
+        let status = match self {
+            Self::BadDimensions => StatusCode::BAD_REQUEST,
+            Self::IncorrectFormat => StatusCode::BAD_REQUEST,
+            Self::NotFound => StatusCode::BAD_REQUEST,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
+        };
+
+        (status, format!("{}", self)).into_response()
+    }
+}
+
 // TODO: make a generic to handle all types of images
 pub async fn handle_webp_image(
     ImageFile(file_name): ImageFile<String>,
     dimensions: Query<Dimensions>,
     State(leptos_options): State<LeptosOptions>,
-) -> Result<impl IntoResponse, impl IntoResponse> {
+) -> Result<impl IntoResponse, CdnError> {
     if dimensions.width % 10 != 0 || dimensions.height % 10 != 0 {
-        return Err((
-            StatusCode::BAD_REQUEST,
-            "Dimensions must be multiples of 10",
-        ));
+        return Err(CdnError::BadDimensions);
     }
 
-    if !file_name.contains(".webp") {
-        return Err((StatusCode::BAD_REQUEST, "Requested file must be a .webp"));
+    if file_name.strip_suffix(".webp").is_none() {
+        return Err(CdnError::IncorrectFormat);
     }
 
     let site_root = leptos_options.site_root;
@@ -148,67 +182,89 @@ pub async fn handle_webp_image(
 
     tracing::info!("Checking if {} exists", img_path.display());
 
-    if img_path.exists() {
-        let file = File::open(img_path).map_err(|_| {
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to open requested file on server",
-            )
-        })?;
-        let mut buf_reader = BufReader::new(file);
-
-        let mut image = Vec::with_capacity(100000);
-
-        buf_reader.read_to_end(&mut image).map_err(|_| {
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Located the requested file on the server but failed to read it",
-            )
-        })?;
-
+    let (mut res, len) = if img_path.exists() {
         tracing::info!(
-            "Got file: {file_name} ({}px, {}px)",
+            "Found the requested file on server: {file_name} ({}px, {}px)",
             dimensions.width,
             dimensions.height
         );
 
-        Ok((StatusCode::OK, image))
+        let res = task::spawn_blocking(move || {
+            let file = File::open(img_path).map_err(|_| CdnError::FileOpenError)?;
+            let mut buf_reader = BufReader::new(file);
+
+            // ~200000 bytes is around the size of a 400x400 webp
+            let mut image = Vec::with_capacity(200000);
+
+            buf_reader
+                .read_to_end(&mut image)
+                .map_err(|_| CdnError::ReadError)?;
+
+            let len = image.len();
+            let mut res = (StatusCode::OK, image).into_response();
+
+            Ok((res, len))
+        })
+        .await
+        .map_err(|_| CdnError::SpawnBlockingError)?;
+
+        res?
     } else if plain_path.exists() {
         tracing::info!(
-            "Requested file {} doesn't exist resizing it",
+            "Requested file {} doesn't exist; resizing it",
             plain_path.display()
         );
 
-        let dyn_image = ImageReader::open(plain_path)
-            .map_err(|_| (StatusCode::BAD_REQUEST, "File not found on the server"))?
-            .decode()
-            .map_err(|_| {
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "Failed to decode the request file",
-                )
-            })?
-            .resize_exact(dimensions.width, dimensions.height, FilterType::Lanczos3);
+        let res = task::spawn_blocking(move || {
+            let dyn_image = ImageReader::open(plain_path)
+                .map_err(|_| CdnError::FileOpenError)?
+                .decode()
+                .map_err(|_| CdnError::DecodeError)?
+                .resize_exact(dimensions.width, dimensions.height, FilterType::Lanczos3);
 
-        let mut image = Vec::with_capacity(100000);
+            let mut image = Vec::with_capacity(200000);
 
-        dyn_image
-            .write_to(&mut Cursor::new(&mut image), ImageFormat::WebP)
-            .map_err(|_| {
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "Failed to write DynamicImage to the image buffer",
-                )
-            })?;
+            dyn_image
+                .write_to(&mut Cursor::new(&mut image), ImageFormat::WebP)
+                .map_err(|_| CdnError::BufWriteError)?;
 
-        // write the image on the server for caching
-        let _ = write(img_path, image.clone());
+            // write the image on the server for caching
+            let _ = write(img_path, image.clone());
 
-        Ok((StatusCode::OK, image))
+            let len = image.len();
+            let mut res = (StatusCode::OK, image).into_response();
+
+            Ok((res, len))
+        })
+        .await
+        .map_err(|_| CdnError::SpawnBlockingError)?;
+
+        res?
     } else {
-        Err((
-            StatusCode::BAD_REQUEST,
-            "Requested file not found on the server",
-        ))
-    }
+        return Err(CdnError::NotFound);
+    };
+
+    // set up response
+
+    res.headers_mut().insert(
+        header::CONTENT_TYPE,
+        "image/webp".parse().map_err(|_| CdnError::ResponseError)?,
+    );
+
+    res.headers_mut().insert(header::CONTENT_LENGTH, len.into());
+
+    res.headers_mut().insert(
+        header::ACCEPT_RANGES,
+        "bytes".parse().map_err(|_| CdnError::ResponseError)?,
+    );
+
+    // cache this image for up to 6 months
+    res.headers_mut().insert(
+        header::CACHE_CONTROL,
+        "public, max-age=15552000"
+            .parse()
+            .map_err(|_| CdnError::ResponseError)?,
+    );
+
+    Ok(res)
 }
