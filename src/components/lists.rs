@@ -52,7 +52,7 @@ pub fn StreamingList(
                         .map(|info| {
                             view! {
                                 <LinkButton
-                                    class="text-text-dark text-md font-inter py-6 w-80 hover:scale-105 hover:text-surface-dark"
+                                    class="text-text-dark text-md font-inter py-6 w-80 hover:scale-105 hover:text-base-dark"
                                     href=info.song_url
                                     id=format!("{}-link-button", info.platform_name)
                                 >
