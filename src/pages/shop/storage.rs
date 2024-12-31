@@ -1,10 +1,7 @@
-use js_sys::Error;
 use leptos::{leptos_dom::helpers, tachys::html::event::Event};
-use std::collections::HashMap;
 use wasm_bindgen::JsValue;
 use web_sys::Storage;
-
-use crate::types::product::Product;
+use js_sys::Error;
 
 #[inline]
 pub fn get_storage() -> Option<Storage> {
@@ -25,9 +22,13 @@ fn js_exception<'a>(s: &'a str) -> JsValue {
     Error::new(s).into()
 }
 
-pub struct Bag;
+pub mod bag {
+    use std::collections::HashMap;
+    use wasm_bindgen::JsValue;
+    use web_sys::Storage;
+    use super::{try_dispatch_storage_event, js_exception};
+    use crate::types::product::Product;
 
-impl Bag {
     /// Gets the value of `bag_count` from `storage`
     /// Deletes the invalid value and returns an error if `bag_count` doesn't exist
     pub fn try_get_bag_count(storage: Option<&Storage>) -> Result<usize, JsValue> {
@@ -47,13 +48,13 @@ impl Bag {
     /// Gets the value of `bag_count` from `storage`
     /// If the `bag_count` doesn't exist, return 0
     pub fn get_bag_count_or_default(storage: Option<&Storage>) -> usize {
-        Self::try_get_bag_count(storage).unwrap_or(0)
+        try_get_bag_count(storage).unwrap_or(0)
     }
 
     /// "syncs" `bag_count` by setting it to the sum of values in each `bag` from `storage`
     /// Returns an error if `bag_count` doesn't exist, or dispatch_event fails
     pub fn try_sync_bag_count(storage: Option<&Storage>) -> Result<usize, JsValue> {
-        let bag = Self::try_get_bag(storage)?;
+        let bag = try_get_bag(storage)?;
 
         let count = bag.iter().fold(0, |c, (_, count)| c + count);
 
@@ -69,7 +70,7 @@ impl Bag {
     /// Totals the bag as cents
     /// Returns an error on failure
     pub fn try_total_bag(storage: Option<&Storage>) -> Result<i64, JsValue> {
-        let bag = Self::try_get_bag(storage)?;
+        let bag = try_get_bag(storage)?;
 
         Ok(bag.iter().fold(0, |c, (product, count)| {
             c + (product.get_price() * (*count as i64))
@@ -79,7 +80,7 @@ impl Bag {
     /// Attempts to increment `bag_count` by `value`
     /// Returns an error on failure
     pub fn try_incr_bag_count(storage: Option<&Storage>, value: usize) -> Result<(), JsValue> {
-        let existing_count = Self::try_get_bag_count(storage).unwrap_or(0);
+        let existing_count = try_get_bag_count(storage).unwrap_or(0);
 
         let storage = storage.ok_or_else(|| js_exception("Invalid Storage object"))?;
 
@@ -125,7 +126,7 @@ impl Bag {
 
         storage.set_item("bag", &bag)?;
 
-        Self::try_incr_bag_count(Some(storage), 1)?;
+        try_incr_bag_count(Some(storage), 1)?;
 
         Ok(())
     }

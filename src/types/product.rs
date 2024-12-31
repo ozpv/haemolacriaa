@@ -115,4 +115,3 @@ impl Product {
         &self.size
     }
 }
-

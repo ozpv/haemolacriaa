@@ -1,20 +1,26 @@
-use leptos::prelude::*;
-use leptos_router::{hooks::use_params, params::Params};
-
 use super::nav::Nav;
-use super::product::SizeChartModal;
+use super::product::{Card, Product};
 use crate::components::buttons::ReturnButton;
-use crate::pages::shop::product::Card;
-use crate::types::product;
+#[allow(unused)]
+use crate::types;
+use leptos::prelude::*;
+
+#[component]
+fn OutOfStock() -> impl IntoView {
+    view! {
+        <p class="text-text-dark">"No items found"</p>
+    }
+}
 
 #[component]
 pub fn Home() -> impl IntoView {
     let add_item = move |_| {
         #[cfg(feature = "hydrate")]
         {
-            use super::storage::{get_storage, Bag};
-            let product = product::Product::new("another product", 32, product::Size::XS);
-            Bag::try_add_to_bag(get_storage().as_ref(), product).unwrap();
+            use super::storage::{get_storage, bag};
+            let product =
+                types::product::Product::new("another-product", 32, types::product::Size::XS);
+            bag::try_add_to_bag(get_storage().as_ref(), product).unwrap();
         }
     };
 
@@ -23,9 +29,9 @@ pub fn Home() -> impl IntoView {
     let total_bag = move |_| {
         #[cfg(feature = "hydrate")]
         {
-            use super::storage::{get_storage, Bag};
+            use super::storage::{get_storage, bag};
             use web_sys::HtmlButtonElement;
-            let total = Bag::try_total_bag(get_storage().as_ref()).unwrap();
+            let total = bag::try_total_bag(get_storage().as_ref()).unwrap();
             let total_element: HtmlButtonElement = total_element.get().unwrap();
             Dom::set_inner_html(&total_element, &format!("Bag total: {total}"))
         }
@@ -34,8 +40,8 @@ pub fn Home() -> impl IntoView {
     let sync_bag = move |_| {
         #[cfg(feature = "hydrate")]
         {
-            use super::storage::{get_storage, Bag};
-            Bag::try_sync_bag_count(get_storage().as_ref()).unwrap();
+            use super::storage::{get_storage, bag};
+            bag::try_sync_bag_count(get_storage().as_ref()).unwrap();
         }
     };
 
@@ -45,18 +51,21 @@ pub fn Home() -> impl IntoView {
         Suspend::new(async move {
             items_resource.await.map(|items| {
                 items
-                    .into_iter()
-                    .map(|item| {
-                        view! {
-                            <Card
-                                image="stay.webp".to_string()
-                                name=item.get_name()
-                                price=item.get_price()
-                                in_stock=true
-                            />
-                        }
-                    })
-                    .collect_view()
+                    .map_or(OutOfStock.into_any(), |products| products
+                        .into_iter()
+                        .map(|product| {
+                            view! {
+                                <Card
+                                    image="stay.webp".to_string()
+                                    name=product.get_name()
+                                    price=product.get_price()
+                                    in_stock=true
+                                />
+                            }
+                        })
+                        .collect_view()
+                        .into_any()
+                    )
             })
         })
     };
@@ -100,32 +109,6 @@ pub fn Bag() -> impl IntoView {
         <main class="main">
             <h1 class="text-text-dark text-center pt-10 pb-7 text-2xl font-sans">"your bag is empty"</h1>
             <ReturnButton body="continue shopping" href="/shop" external=true />
-        </main>
-    }
-}
-
-#[derive(Params, PartialEq)]
-struct ProductParams {
-    name: Option<String>,
-}
-
-#[component]
-pub fn Product() -> impl IntoView {
-    let params = use_params::<ProductParams>();
-    let id = move || {
-        params
-            .read()
-            .as_ref()
-            .ok()
-            .and_then(|p| p.name.clone())
-            .unwrap_or("Invalid ID".to_string())
-    };
-
-    view! {
-        <Nav/>
-        <main class="main">
-            <p>"This is a product page"</p>
-            <p>"Your ID is: "{id}</p>
         </main>
     }
 }

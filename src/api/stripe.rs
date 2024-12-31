@@ -19,18 +19,20 @@ pub async fn regen_items_page() -> Result<()> {
         .unwrap()
         .push(Product::new("another product", 10000, Size::XS));
 
-    UPDATE_ITEMS.0.lock().await.send(()).map_err(|e| {
-        tracing::info!("Failed to regen /shop: {e}");
-        ServerFnError::new("Failed to regen /shop")
-    })
+    UPDATE_ITEMS
+        .0
+        .lock()
+        .await
+        .send(())
+        .map_err(|_| ServerFnError::new("Failed to regen /shop"))
 }
 
-pub async fn get_products() -> Result<Vec<Product>> {
+pub async fn get_products() -> Result<Option<Vec<Product>>> {
     #[cfg(feature = "ssr")]
     tracing::info!("Fetching items from stripe");
     let items = ITEMS
         .read()
         .map_err(|_| ServerFnError::new("Failed to read from RwLock"))?
         .clone();
-    Ok(items)
+    Ok(Some(items))
 }

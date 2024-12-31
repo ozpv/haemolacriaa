@@ -3,7 +3,6 @@ use leptos_icons::Icon;
 
 #[component]
 pub fn LinkButton(
-    class: &'static str,
     href: String,
     id: String,
     children: Children,
@@ -11,10 +10,7 @@ pub fn LinkButton(
     view! {
         <a class="flex items-center justify-center p-px mt-4 shadow-lg shadow-mantle-dark rounded-lg group bg-gradient-to-br from-yellow-dark to-blue-dark" href=href id=id>
             <span
-                class=format!(
-                    "flex justify-center transition-all ease-in duration-75 bg-base-dark rounded-md group-hover:bg-opacity-0 {}",
-                    class
-                )
+                class="flex justify-center transition-all ease-in duration-75 bg-base-dark rounded-md group-hover:bg-opacity-0 text-text-dark text-md font-inter py-6 w-80 hover:scale-105 hover:text-base-dark"
             >
                 { children() }
             </span>

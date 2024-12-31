@@ -22,11 +22,11 @@ pub fn Nav() -> impl IntoView {
 
     #[cfg(feature = "hydrate")]
     {
-        use super::storage::{get_storage, Bag};
+        use super::storage::{get_storage, bag};
         use web_sys::HtmlParagraphElement;
 
         let update_count = move || {
-            let count = Bag::get_bag_count_or_default(get_storage().as_ref());
+            let count = bag::get_bag_count_or_default(get_storage().as_ref());
             let count_element: HtmlParagraphElement =
                 shop_count.get().expect("Shop count element to exist");
             Dom::set_inner_html(&count_element, &count.to_string());

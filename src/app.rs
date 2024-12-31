@@ -9,7 +9,7 @@ use leptos_router::{
     SsrMode,
 };
 
-use crate::components::footer::Footer;
+use crate::{components::footer::Footer, pages::shop::product};
 //use crate::components::forms::{logged_in, Login, LoginForm};
 use crate::components::nav;
 use crate::error::ErrorPage;
@@ -74,7 +74,7 @@ pub fn App() -> impl IntoView {
                             StaticRoute::new().regenerate(|_| watch_value())
                         )
                     />
-                    <Route path=path!("/shop/:name") view=shop::Product />
+                    <Route path=path!("/shop/:name") view=product::Product />
                     <Route path=path!("/bag") view=shop::Bag />
     /*
                     <ProtectedRoute

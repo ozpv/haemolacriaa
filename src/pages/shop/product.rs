@@ -1,5 +1,8 @@
 use leptos::prelude::*;
 use leptos_icons::Icon;
+use leptos_router::{hooks::use_params, params::Params};
+
+use super::nav::Nav;
 
 #[component]
 pub fn Card(
@@ -8,7 +11,11 @@ pub fn Card(
     price: i64,
     #[prop(default = false)] in_stock: bool,
 ) -> impl IntoView {
-    let redirect = format!("/shop/{}", if in_stock { &name } else { "" });
+    let redirect = if in_stock {
+        Some(format!("/shop/{}", name.replace(' ', "-")))
+    } else {
+        None
+    };
 
     let price = format!("${price}");
 
@@ -24,7 +31,7 @@ pub fn Card(
 }
 
 #[component]
-pub fn SizeChartModal() -> impl IntoView {
+fn SizeChartModal() -> impl IntoView {
     view! {
         <div tabindex="-1" class="fixed bg-crust-dark bg-opacity-80 max-h-full w-full h-full top-0 left-0 z-10 overflow-x-hidden overflow-y-auto p-4 md:inset-0" id="size-chart">
             <div class="relative w-full max-w-lg max-h-full">
@@ -49,5 +56,50 @@ pub fn SizeChartModal() -> impl IntoView {
             </div>
         </div>
 
+    }
+}
+
+#[component]
+fn AddToBagButton() -> impl IntoView {
+    view! {
+        
+    }
+}
+
+#[derive(Params, PartialEq)]
+struct ProductParams {
+    name: Option<String>,
+}
+
+#[component]
+pub fn Product() -> impl IntoView {
+    let params = use_params::<ProductParams>();
+    let id = move || {
+        params
+            .read()
+            .as_ref()
+            .ok()
+            .and_then(|p| p.name.clone())
+            .unwrap_or("Invalid ID".to_string())
+    };
+
+    let add_to_bag = view! {
+        <button class="flex items-center justify-center p-0.5 mt-4 shadow-lg shadow-mantle-dark rounded-lg group bg-gradient-to-br from-yellow-dark to-blue-dark">
+            <span 
+                class="text-text-dark text-md text-center font-inter py-6 w-80 transition-all ease-in duration-75 bg-base-dark rounded-md hover:bg-opacity-0 hover:scale-105 hover:text-base-dark"
+            >
+                "add to bag"
+            </span>
+        </button>
+
+    };
+
+    view! {
+        //<SizeChartModal />
+        <Nav/>
+        <main class="main">
+            {add_to_bag}
+            <p class="text-text-dark">"Product ID is: "{id}</p>
+        </main>
     }
 }
