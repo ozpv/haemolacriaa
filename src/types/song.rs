@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::images::Image;
-use super::links::{StreamingInfo, Platform};
+use super::links::{Platform, StreamingInfo};
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(sqlx::FromRow))]

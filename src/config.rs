@@ -2,12 +2,12 @@ use const_format::formatcp;
 
 use crate::types::{
     images::Image,
-    song::Song,
     links::{
         Platform::{AppleMusic, Bandcamp, SoundCloud, Spotify, YouTube},
         SocialMediaInfo,
     },
     routes::RouteInfo,
+    song::Song,
 };
 
 pub const YEARS_ACTIVE: [&str; 2] = ["2023", "2025"];

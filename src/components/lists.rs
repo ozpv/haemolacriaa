@@ -2,10 +2,7 @@ use leptos::prelude::*;
 use leptos_icons::Icon;
 
 use crate::components::buttons::LinkButton;
-use crate::types::{
-    links::SocialMediaInfo,
-    song::Song,
-};
+use crate::types::{links::SocialMediaInfo, song::Song};
 
 #[component]
 fn Appendix(social_media_info: Option<&'static SocialMediaInfo>) -> impl IntoView {

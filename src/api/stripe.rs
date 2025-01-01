@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use std::sync::{LazyLock, RwLock};
+use std::sync::{OnceLock, RwLock};
 
 #[cfg(feature = "ssr")]
 use crate::util::err;
@@ -7,18 +7,18 @@ use crate::util::err;
 use crate::types::product::{Product, Size};
 use crate::util::Result;
 
-static ITEMS: LazyLock<RwLock<Vec<Product>>> =
-    LazyLock::new(|| RwLock::new(vec![Product::new("some product", 10000, Size::S)]));
+static PRODUCTS: OnceLock<RwLock<Vec<Product>>> = OnceLock::new();
 
 #[server(RegenItemsPage, "/api", "Url", endpoint = "regen_items_page")]
 pub async fn regen_items_page() -> Result<()> {
     use crate::lazy::UPDATE_ITEMS;
 
     // Test
-    ITEMS
+    PRODUCTS
+        .get_or_init(|| RwLock::new(vec![Product::new("some product", 10000, Size::S)]))
         .write()
-        .unwrap()
-        .push(Product::new("another product", 10000, Size::XS));
+        .map_err(|_| ServerFnError::new("Failed to write to products"))?
+        .push(Product::new("Hello, World!", 10000, Size::XS));
 
     UPDATE_ITEMS
         .0
@@ -31,9 +31,12 @@ pub async fn regen_items_page() -> Result<()> {
 pub async fn get_products() -> Result<Option<Vec<Product>>> {
     #[cfg(feature = "ssr")]
     tracing::info!("Fetching items from stripe");
-    let items = ITEMS
+
+    let products = PRODUCTS
+        .get_or_init(|| RwLock::new(vec![Product::new("some product", 10000, Size::S)]))
         .read()
-        .map_err(|_| ServerFnError::new("Failed to read from RwLock"))?
+        .map_err(|_| ServerFnError::new("Failed to read products"))?
         .clone();
-    Ok(Some(items))
+
+    Ok(Some(products))
 }
