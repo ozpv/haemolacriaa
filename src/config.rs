@@ -2,9 +2,10 @@ use const_format::formatcp;
 
 use crate::types::{
     images::Image,
+    song::Song,
     links::{
         Platform::{AppleMusic, Bandcamp, SoundCloud, Spotify, YouTube},
-        SocialMediaInfo, Song,
+        SocialMediaInfo,
     },
     routes::RouteInfo,
 };

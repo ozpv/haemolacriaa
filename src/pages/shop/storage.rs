@@ -1,7 +1,7 @@
+use js_sys::Error;
 use leptos::{leptos_dom::helpers, tachys::html::event::Event};
 use wasm_bindgen::JsValue;
 use web_sys::Storage;
-use js_sys::Error;
 
 #[inline]
 pub fn get_storage() -> Option<Storage> {
@@ -23,11 +23,11 @@ fn js_exception<'a>(s: &'a str) -> JsValue {
 }
 
 pub mod bag {
+    use super::{js_exception, try_dispatch_storage_event};
+    use crate::types::product::Product;
     use std::collections::HashMap;
     use wasm_bindgen::JsValue;
     use web_sys::Storage;
-    use super::{try_dispatch_storage_event, js_exception};
-    use crate::types::product::Product;
 
     /// Gets the value of `bag_count` from `storage`
     /// Deletes the invalid value and returns an error if `bag_count` doesn't exist

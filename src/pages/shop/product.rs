@@ -59,13 +59,6 @@ fn SizeChartModal() -> impl IntoView {
     }
 }
 
-#[component]
-fn AddToBagButton() -> impl IntoView {
-    view! {
-        
-    }
-}
-
 #[derive(Params, PartialEq)]
 struct ProductParams {
     name: Option<String>,
@@ -85,7 +78,7 @@ pub fn Product() -> impl IntoView {
 
     let add_to_bag = view! {
         <button class="flex items-center justify-center p-0.5 mt-4 shadow-lg shadow-mantle-dark rounded-lg group bg-gradient-to-br from-yellow-dark to-blue-dark">
-            <span 
+            <span
                 class="text-text-dark text-md text-center font-inter py-6 w-80 transition-all ease-in duration-75 bg-base-dark rounded-md hover:bg-opacity-0 hover:scale-105 hover:text-base-dark"
             >
                 "add to bag"

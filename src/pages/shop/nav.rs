@@ -22,7 +22,7 @@ pub fn Nav() -> impl IntoView {
 
     #[cfg(feature = "hydrate")]
     {
-        use super::storage::{get_storage, bag};
+        use super::storage::{bag, get_storage};
         use web_sys::HtmlParagraphElement;
 
         let update_count = move || {

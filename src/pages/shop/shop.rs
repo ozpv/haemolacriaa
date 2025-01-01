@@ -8,7 +8,7 @@ use leptos::prelude::*;
 #[component]
 fn OutOfStock() -> impl IntoView {
     view! {
-        <p class="text-text-dark">"No items found"</p>
+        <p class="text-text-dark text-center font-inter">"No items found"</p>
     }
 }
 
@@ -17,7 +17,7 @@ pub fn Home() -> impl IntoView {
     let add_item = move |_| {
         #[cfg(feature = "hydrate")]
         {
-            use super::storage::{get_storage, bag};
+            use super::storage::{bag, get_storage};
             let product =
                 types::product::Product::new("another-product", 32, types::product::Size::XS);
             bag::try_add_to_bag(get_storage().as_ref(), product).unwrap();
@@ -29,7 +29,7 @@ pub fn Home() -> impl IntoView {
     let total_bag = move |_| {
         #[cfg(feature = "hydrate")]
         {
-            use super::storage::{get_storage, bag};
+            use super::storage::{bag, get_storage};
             use web_sys::HtmlButtonElement;
             let total = bag::try_total_bag(get_storage().as_ref()).unwrap();
             let total_element: HtmlButtonElement = total_element.get().unwrap();
@@ -40,7 +40,7 @@ pub fn Home() -> impl IntoView {
     let sync_bag = move |_| {
         #[cfg(feature = "hydrate")]
         {
-            use super::storage::{get_storage, bag};
+            use super::storage::{bag, get_storage};
             bag::try_sync_bag_count(get_storage().as_ref()).unwrap();
         }
     };
@@ -50,8 +50,8 @@ pub fn Home() -> impl IntoView {
     let items_view = move || {
         Suspend::new(async move {
             items_resource.await.map(|items| {
-                items
-                    .map_or(OutOfStock.into_any(), |products| products
+                items.map_or(OutOfStock.into_any(), |products| {
+                    products
                         .into_iter()
                         .map(|product| {
                             view! {
@@ -65,7 +65,7 @@ pub fn Home() -> impl IntoView {
                         })
                         .collect_view()
                         .into_any()
-                    )
+                })
             })
         })
     };
@@ -90,9 +90,7 @@ pub fn Home() -> impl IntoView {
             <Suspense fallback=move || view! {
                 <p class="text-text-dark text-center font-inter">"Loading products..."</p>
             }>
-                <ErrorBoundary fallback=move |_| view! {
-                    <p class="text-text-dark text-center font-inter">"No products found"</p>
-                }>
+                <ErrorBoundary fallback=move |_| OutOfStock>
                     <div class="grid grid-cols-2 gap-5 p-4 md:grid-cols-4">
                         {items_view}
                     </div>

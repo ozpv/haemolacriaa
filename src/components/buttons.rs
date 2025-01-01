@@ -2,11 +2,7 @@ use leptos::{html, prelude::*};
 use leptos_icons::Icon;
 
 #[component]
-pub fn LinkButton(
-    href: String,
-    id: String,
-    children: Children,
-) -> impl IntoView {
+pub fn LinkButton(href: String, id: String, children: Children) -> impl IntoView {
     view! {
         <a class="flex items-center justify-center p-px mt-4 shadow-lg shadow-mantle-dark rounded-lg group bg-gradient-to-br from-yellow-dark to-blue-dark" href=href id=id>
             <span

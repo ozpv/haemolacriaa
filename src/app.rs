@@ -74,7 +74,11 @@ pub fn App() -> impl IntoView {
                             StaticRoute::new().regenerate(|_| watch_value())
                         )
                     />
-                    <Route path=path!("/shop/:name") view=product::Product />
+                    <Route
+                        path=path!("/shop/:name")
+                        view=product::Product
+                        ssr=SsrMode::Static(StaticRoute::new())
+                    />
                     <Route path=path!("/bag") view=shop::Bag />
     /*
                     <ProtectedRoute
