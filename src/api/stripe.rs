@@ -28,15 +28,22 @@ pub async fn regen_items_page() -> Result<()> {
         .map_err(|_| ServerFnError::new("Failed to regen /shop"))
 }
 
+#[server]
 pub async fn get_products() -> Result<Option<Vec<Product>>> {
     #[cfg(feature = "ssr")]
     tracing::info!("Fetching items from stripe");
 
     let products = PRODUCTS
-        .get_or_init(|| RwLock::new(vec![Product::new("some product", 10000, Size::S)]))
-        .read()
-        .map_err(|_| ServerFnError::new("Failed to read products"))?
-        .clone();
+        .get()
+        .map(|inner| inner.read());
 
-    Ok(Some(products))
+    if let Some(res) = products {
+        let res = res
+            .map_err(|_| ServerFnError::new("Failed to read products"))?
+            .clone();
+
+        Ok(Some(res))
+    } else {
+        Ok(None)
+    }
 }

@@ -1,6 +1,7 @@
-use leptos::prelude::*;
+use leptos::{ev::MouseEvent, prelude::*};
 use leptos_icons::Icon;
 use leptos_router::{hooks::use_params, params::Params};
+use std::sync::Arc;
 
 use super::nav::Nav;
 
@@ -31,16 +32,24 @@ pub fn Card(
 }
 
 #[component]
-fn SizeChartModal() -> impl IntoView {
+fn SizeChartModal(
+    toggle_status: Arc<impl FnMut(MouseEvent) + Send + Copy + 'static>,
+    status: impl FnMut() -> bool + Send + 'static,
+) -> impl IntoView {
     view! {
-        <div tabindex="-1" class="fixed bg-crust-dark bg-opacity-80 max-h-full w-full h-full top-0 left-0 z-10 overflow-x-hidden overflow-y-auto p-4 md:inset-0" id="size-chart">
-            <div class="relative w-full max-w-lg max-h-full">
+        <div
+            tabindex="-1"
+            class="fixed bg-crust-dark bg-opacity-80 max-h-full w-full h-full top-0 left-0 z-10 overflow-x-hidden overflow-y-auto p-4 md:inset-0"
+            id="size-chart"
+            class:hidden=status
+        >
+            <div class="m-auto w-full max-w-lg max-h-full">
                 <div class="relative bg-base-dark rounded-lg w-full">
                     <div class="flex items-center justify-between border-b border-surface-dark rounded-t py-2">
                         <h3 class="text-text-dark font-sans text-xl py-3 px-8">
                             "size chart"
                         </h3>
-                        <button class="text-overlay-dark-200 px-6">
+                        <button on:click=*Arc::clone(&toggle_status) class="text-overlay-dark-200 px-6">
                             <Icon icon={icondata::BsXLg} width="20px" height="20px" />
                         </button>
                     </div>
@@ -48,7 +57,7 @@ fn SizeChartModal() -> impl IntoView {
                         <p class="text-text-dark font-inter">"Add the chart here"</p>
                     </div>
                     <div class="flex flex-row-reverse border-t border-surface-dark rounded-b px-4 py-3">
-                        <button class="text-text-dark font-inter bg-surface-dark py-2 px-4 rounded hover:bg-surface-dark-100 hover:text-blue-dark">
+                        <button on:click=*toggle_status class="text-text-dark font-inter bg-surface-dark py-2 px-4 rounded hover:bg-surface-dark-100 hover:text-blue-dark">
                             "return"
                         </button>
                     </div>
@@ -56,6 +65,26 @@ fn SizeChartModal() -> impl IntoView {
             </div>
         </div>
 
+    }
+}
+
+#[component]
+fn Breadcrumb(path: impl FnOnce() -> String + Send) -> impl IntoView {
+    let path = path();
+    let haref = format!("/shop/{path}");
+
+    view! {
+        <nav class="">
+            <ol class="items-center">
+                <li class="text-text-dark">
+                    <a href="/shop" class="font-inter hover:text-sapphire-dark">"shop"</a>
+                    <Icon icon={icondata::RiArrowRightSArrowsLine}/>
+                </li>
+                <li class="text-text-dark">
+                    <a href=haref class="font-inter hover:text-sapphire-dark">{path}</a>
+                </li>
+            </ol>
+        </nav>
     }
 }
 
@@ -67,6 +96,7 @@ struct ProductParams {
 #[component]
 pub fn Product() -> impl IntoView {
     let params = use_params::<ProductParams>();
+
     let id = move || {
         params
             .read()
@@ -74,25 +104,42 @@ pub fn Product() -> impl IntoView {
             .ok()
             .and_then(|p| p.name.clone())
             .unwrap_or("Invalid ID".to_string())
+            .replace('-', " ")
+            .trim()
+            .to_string()
     };
 
     let add_to_bag = view! {
-        <button class="flex items-center justify-center p-0.5 mt-4 shadow-lg shadow-mantle-dark rounded-lg group bg-gradient-to-br from-yellow-dark to-blue-dark">
+        <button class="flex items-center justify-center p-0.5 shadow-lg shadow-mantle-dark rounded-lg group bg-gradient-to-br from-yellow-dark to-blue-dark">
             <span
                 class="text-text-dark text-md text-center font-inter py-6 w-80 transition-all ease-in duration-75 bg-base-dark rounded-md hover:bg-opacity-0 hover:scale-105 hover:text-base-dark"
             >
                 "add to bag"
             </span>
         </button>
-
     };
 
+    let activity = RwSignal::new(false);
+    let toggle_modal = move |_| activity.update(|status| *status = !*status);
+    let status = move || !activity.get();
+
     view! {
-        //<SizeChartModal />
+        <SizeChartModal toggle_status=toggle_modal.into() status=status />
         <Nav/>
         <main class="main">
+            <Breadcrumb path=move || id() />
             {add_to_bag}
-            <p class="text-text-dark">"Product ID is: "{id}</p>
+            <p class="text-text-dark">"Product ID is: "{move || id()}</p>
+            <div class="m-auto">
+                <h3 class="text-text-dark font-sans">"Product Title"</h3>
+                <p class="text-text-dark font-inter">"Product description"</p>
+                <button
+                    on:click=toggle_modal
+                    class="text-text-dark font-inter"
+                >
+                    "Size Chart"
+                </button>
+            </div>
         </main>
     }
 }
