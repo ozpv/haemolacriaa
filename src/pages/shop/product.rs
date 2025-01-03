@@ -33,7 +33,7 @@ pub fn Card(
 
 #[component]
 fn SizeChartModal(
-    toggle_status: Arc<impl FnMut(MouseEvent) + Send + Copy + 'static>,
+    toggle_status: Arc<impl FnMut(MouseEvent) + Copy + 'static>,
     status: impl FnMut() -> bool + Send + 'static,
 ) -> impl IntoView {
     view! {
@@ -128,10 +128,8 @@ pub fn Product() -> impl IntoView {
         <Nav/>
         <main class="main">
             <Breadcrumb path=move || id() />
-            {add_to_bag}
-            <p class="text-text-dark">"Product ID is: "{move || id()}</p>
             <div class="m-auto">
-                <h3 class="text-text-dark font-sans">"Product Title"</h3>
+                <h3 class="text-text-dark text-lg font-sans">"Product Title"</h3>
                 <p class="text-text-dark font-inter">"Product description"</p>
                 <button
                     on:click=toggle_modal
@@ -139,6 +137,7 @@ pub fn Product() -> impl IntoView {
                 >
                     "Size Chart"
                 </button>
+                {add_to_bag}
             </div>
         </main>
     }

@@ -44,16 +44,27 @@ pub fn Nav() -> impl IntoView {
             <div class="flex flex-wrap items-center justify-between max-w-screen-xl mx-auto p-4">
                 <span class="text-center text-xl text-text-dark font-inter px-5">{env!("CARGO_PKG_NAME")}</span>
 
-                <div class="flex items-center">
-                    <div class="hidden w-full md:flex md:w-auto md:order-2" class:hidden=hidden_status>
-                        <ul class="flex flex-col bg-base-dark font-inter mt-6 md:flex-row md:mt-0">
+                <div class="flex items-center gap-7">
+                    <div class="flex md:order-1 gap-7">
+                        <a href="/bag" class="flex flew-row items-center text-text-dark text-sm hover:text-sapphire-dark">
+                            <Icon icon={icondata::BsBag} width="16px" height="16px" />
+                            <p class="font-inter" node_ref=shop_count>"0"</p>
+                        </a>
+
+                        <button on:click=toggle_active class="text-sm text-overlay-dark-200 md:hidden">
+                            <Icon icon=active_icon width="24px" height="24px"/>
+                        </button>
+                    </div>
+
+                    <div class="w-full md:flex md:w-auto md:order-2 md:mr-5" class:hidden=hidden_status>
+                        <ul class="flex flex-col bg-base-dark font-inter mt-6 ml-10 md:flex-row md:gap-12 md:mt-0 md:p-0">
                             {NAV_ITEMS
                                 .iter()
                                 .map(|item| view! {
-                                    <li class="p-2" on:click=toggle_active>
+                                    <li on:click=toggle_active>
                                         {html::a()
                                             .href(item.path)
-                                            .class("text-text-dark font-inter p-2.5 md:hover:text-sapphire-dark")
+                                            .class("text-text-dark font-inter md:hover:text-sapphire-dark")
                                             .rel(item.external.then_some("external"))
                                             .inner_html(item.name)
                                         }
@@ -62,17 +73,6 @@ pub fn Nav() -> impl IntoView {
                                 .collect_view()
                             }
                         </ul>
-                    </div>
-
-                    <div class="flex md:order-1">
-                        <a href="/bag" class="flex flew-row items-center text-text-dark text-sm mx-2 hover:text-sapphire-dark">
-                            <Icon icon={icondata::BsBag} width="16px" height="16px" />
-                            <p class="font-inter mx-3" node_ref=shop_count>"0"</p>
-                        </a>
-
-                        <button on:click=toggle_active class="text-sm text-overlay-dark-200 mx-2 md:hidden">
-                            <Icon icon=active_icon width="24px" height="24px"/>
-                        </button>
                     </div>
                 </div>
             </div>

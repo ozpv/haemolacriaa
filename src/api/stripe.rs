@@ -7,6 +7,7 @@ use crate::util::err;
 use crate::types::product::{Product, Size};
 use crate::util::Result;
 
+#[cfg(feature = "ssr")]
 static PRODUCTS: OnceLock<RwLock<Vec<Product>>> = OnceLock::new();
 
 #[server(RegenItemsPage, "/api", "Url", endpoint = "regen_items_page")]

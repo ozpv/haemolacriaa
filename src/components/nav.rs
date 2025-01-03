@@ -27,15 +27,15 @@ pub fn Nav() -> impl IntoView {
                     <Icon icon=active_icon width="24" height="24"/>
                 </button>
 
-                <div class="w-full md:block md:w-auto" class:hidden=hidden_status id="navbar-default">
-                    <ul class="flex flex-col bg-base-dark font-inter mt-8 md:flex-row md:mt-0">
+                <div class="w-full md:block md:w-auto md:mr-5" class:hidden=hidden_status id="navbar-default">
+                    <ul class="flex flex-col bg-base-dark font-inter mt-6 ml-10 gap-12 md:p-0 md:flex-row md:mt-0">
                         {NAV_ITEMS
                             .iter()
                             .map(|item| view! {
-                                <li class="p-2" on:click=toggle_active>
+                                <li on:click=toggle_active>
                                     {html::a()
                                         .href(item.path)
-                                        .class("text-text-dark font-inter p-2.5 hover:text-sapphire-dark")
+                                        .class("text-text-dark font-inter hover:text-sapphire-dark")
                                         .rel(item.external.then_some("external"))
                                         .inner_html(item.name)
                                     }
