@@ -24,8 +24,8 @@ pub fn Card(
         <a href=redirect class="content-none">
             <div class="bg-mantle-dark shadow md:rounded-lg hover:ease-in hover:duration-200 md:p-3 hover:bg-surface-dark">
                 <img src=image class="h-auto max-w-full bg-transparent text-text-dark md:rounded-lg" alt=format!("{name} product image")/>
-                <p class="text-text-dark text-lg font-inter pl-2 pt-3">{name}</p>
-                <p class="text-subtext-dark font-inter pl-2 py-3">{price}</p>
+                <p class="text-text-dark text-md text-center font-sans pt-6">{name}</p>
+                <p class="text-subtext-dark text-md text-center font-inter py-3">{price}</p>
             </div>
         </a>
     }

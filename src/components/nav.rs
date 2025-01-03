@@ -21,7 +21,7 @@ pub fn Nav() -> impl IntoView {
     view! {
         <nav class="bg-base-dark border-gray-200">
             <div class="flex flex-wrap max-w-screen-xl items-center justify-between mx-auto p-4">
-                <span class="flex items-center text-xl text-text-dark font-inter px-5">{env!("CARGO_PKG_NAME")}</span>
+                <span class="flex items-center text-xl text-text-dark font-inter px-5 mt-px">{env!("CARGO_PKG_NAME")}</span>
 
                 <button on:click=toggle_active class="text-sm text-overlay-dark-200 mx-2 md:hidden">
                     <Icon icon=active_icon width="24" height="24"/>

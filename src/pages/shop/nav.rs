@@ -42,7 +42,7 @@ pub fn Nav() -> impl IntoView {
     view! {
         <nav class="bg-base-dark border-gray-200">
             <div class="flex flex-wrap items-center justify-between max-w-screen-xl mx-auto p-4">
-                <span class="text-center text-xl text-text-dark font-inter px-5">{env!("CARGO_PKG_NAME")}</span>
+                <span class="text-center text-xl text-text-dark font-inter px-5 mt-px">{env!("CARGO_PKG_NAME")}</span>
 
                 <div class="flex items-center gap-7">
                     <div class="flex md:order-1 gap-7">

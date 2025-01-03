@@ -8,7 +8,9 @@ use leptos::prelude::*;
 #[component]
 fn OutOfStock() -> impl IntoView {
     view! {
-        <p class="text-text-dark text-4xl text-center font-sans py-5">"No items found"</p>
+        <p class="text-text-dark text-2xl text-center font-sans py-5 lg:text-3xl xl:text-4xl">
+            "No products found"
+        </p>
     }
 }
 
@@ -51,8 +53,8 @@ pub fn Home() -> impl IntoView {
         Suspend::new(async move {
             items_resource.await.map(|items| {
                 items.map_or(OutOfStock.into_any(), |products| view! {
-                    <h1 class="text-text-dark text-5xl text-center font-sans py-5">"shop"</h1>
-                    <div class="grid grid-cols-2 gap-5 p-4 xl:mx-[15%] md:grid-cols-3">
+                    <h1 class="text-text-dark text-3xl text-center font-sans py-5 lg:text-4xl xl:text-5xl">"shop"</h1>
+                    <div class="grid grid-cols-1 gap-5 p-4 xl:mx-[10%] lg:grid-cols-3">
                         {
                             products
                                 .into_iter()

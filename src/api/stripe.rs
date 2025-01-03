@@ -34,9 +34,7 @@ pub async fn get_products() -> Result<Option<Vec<Product>>> {
     #[cfg(feature = "ssr")]
     tracing::info!("Fetching items from stripe");
 
-    let products = PRODUCTS
-        .get()
-        .map(|inner| inner.read());
+    let products = PRODUCTS.get().map(|inner| inner.read());
 
     if let Some(res) = products {
         let res = res
