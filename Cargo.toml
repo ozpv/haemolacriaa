@@ -10,6 +10,7 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+# either 
 console_error_panic_hook = "0.1"
 leptos = { version = "0.7" }
 leptos_meta = { version = "0.7.0" }
@@ -23,7 +24,7 @@ leptos_icons = "0.4.0"
 icondata = "0.5.0"
 futures = "0.3.31"
 
-# frontend only
+# frontend
 web-sys = { version = "0.3.70", features = ["Storage"], optional = true }
 wasm-bindgen = { version = "=0.2.99", optional = true }
 js-sys = { version = "0.3.76", optional = true }
@@ -31,7 +32,7 @@ js-sys = { version = "0.3.76", optional = true }
 # compile time
 const_format = "0.2.32"
 
-# server only
+# server
 http = { version = "1", optional = true }
 axum = { version = "0.7", features = [], optional = true }
 leptos_axum = { version = "0.7", optional = true }
@@ -82,7 +83,6 @@ ssr = [
   "leptos_meta/ssr",
   "leptos_router/ssr",
 ]
-async-stripe = ["dep:async-stripe"]
 
 # size-optimized profile for the WASM bundle in release mode
 [profile.wasm-release]
@@ -96,23 +96,13 @@ panic = "abort"
 
 [package.metadata.leptos]
 output-name = "haemolacriaa"
-# The site root folder is where cargo-leptos generate all output. WARNING: all content of this folder will be erased on a rebuild. Use it in your server setup.
 site-root = "target/site"
-# The site-root relative folder where all compiled output (JS, WASM and CSS) is written
 site-pkg-dir = "pkg"
-# tailwind css
 tailwind-input-file = "style/tailwind.css"
-# style-file = "style/main.css"
 assets-dir = "assets"
-# The IP and port (ex: 127.0.0.1:3000) where the server serves the content. Use it in your server setup.
 site-addr = "127.0.0.1:3000"
-# The port to use for automatic reload monitoring
 reload-port = 3001
-#  The browserlist query used for optimizing the CSS.
 browserquery = "defaults"
-# Set by cargo-leptos watch when building with that tool. Controls whether autoreload JS will be included in the head
-watch = false
-# The environment Leptos will run in, usually either "DEV" or "PROD"
 env = "PROD"
 bin-features = ["ssr"]
 bin-default-features = false
