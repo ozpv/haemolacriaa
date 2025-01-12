@@ -44,7 +44,7 @@ fn SizeChartModal(
             class:hidden=status
         >
             <div class="m-auto w-full max-w-lg max-h-full">
-                <div class="relative bg-base-dark rounded-lg w-full">
+                <div class="relative bg-black rounded-lg w-full">
                     <div class="flex items-center justify-between border-b border-surface-dark rounded-t py-2">
                         <h3 class="text-text-dark font-sans text-xl py-3 px-8">
                             "size chart"
@@ -110,9 +110,9 @@ pub fn Product() -> impl IntoView {
     };
 
     let add_to_bag = view! {
-        <button class="flex items-center justify-center p-0.5 shadow-lg shadow-mantle-dark rounded-lg group bg-gradient-to-br from-yellow-dark to-blue-dark">
+        <button class="flex items-center justify-center p-0.5 shadow-lg shadow-mantle-dark rounded-lg group bg-gradient-to-br from-yellow-dark to-lavender-dark">
             <span
-                class="text-text-dark text-md text-center font-inter py-6 w-80 transition-all ease-in duration-75 bg-base-dark rounded-md hover:bg-opacity-0 hover:scale-105 hover:text-base-dark"
+                class="text-text-dark text-md text-center font-inter py-6 w-80 transition-all ease-in duration-75 bg-black rounded-md hover:bg-opacity-0 hover:scale-105 hover:text-base-dark"
             >
                 "add to bag"
             </span>

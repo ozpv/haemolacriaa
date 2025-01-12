@@ -40,7 +40,7 @@ pub fn Nav() -> impl IntoView {
     }
 
     view! {
-        <nav class="bg-base-dark border-gray-200">
+        <nav class="bg-black border-gray-200">
             <div class="flex flex-wrap items-center justify-between max-w-screen-xl mx-auto p-4">
                 <span class="text-center text-xl text-text-dark font-inter px-5 mt-px">{env!("CARGO_PKG_NAME")}</span>
 
@@ -57,7 +57,7 @@ pub fn Nav() -> impl IntoView {
                     </div>
 
                     <div class="w-full md:flex md:w-auto md:order-2" class:hidden=hidden_status>
-                        <ul class="flex flex-col pl-8 mt-4 bg-base-dark md:pl-0 md:flex-row md:mt-0 md:border-0">
+                        <ul class="flex flex-col pl-8 mt-4 bg-black md:pl-0 md:flex-row md:mt-0 md:border-0">
                             {NAV_ITEMS
                                 .iter()
                                 .map(|item| view! {

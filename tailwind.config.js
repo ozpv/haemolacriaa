@@ -11,6 +11,7 @@ export default {
 /* dark: mocha */
   theme: {
     colors: {
+		black: '#000000',
 		rosewater: {
 			DEFAULT: '#dc8a78',
 			dark: '#f5e0dc',

@@ -5,7 +5,7 @@ use leptos_icons::Icon;
 #[component]
 pub fn Footer() -> impl IntoView {
     view! {
-        <footer class="sticky top-full bg-base-dark pt-2 pb-9">
+        <footer class="sticky top-full bg-black pt-2 pb-9">
             <div class="flex items-center justify-center">
                 <nav class="flex pt-2.5 gap-[8vw] my-2.5 text-sm text-text-dark font-inter md:gap-[2vw]">
                     {SOCIAL_MEDIA_ITEMS.iter().map(|item| {

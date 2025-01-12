@@ -4,9 +4,9 @@ use leptos_icons::Icon;
 #[component]
 pub fn LinkButton(href: String, id: String, children: Children) -> impl IntoView {
     view! {
-        <a class="flex items-center justify-center p-px mt-4 shadow-lg shadow-mantle-dark rounded-lg group bg-gradient-to-br from-yellow-dark to-blue-dark" href=href id=id>
+        <a class="flex items-center justify-center p-px mt-4 shadow-lg shadow-mantle-dark rounded-lg group bg-gradient-to-br from-yellow-dark to-lavender-dark" href=href id=id>
             <span
-                class="flex justify-center transition-all ease-in duration-75 bg-base-dark rounded-md group-hover:bg-opacity-0 text-text-dark text-md font-inter py-6 w-80 hover:scale-105 hover:text-base-dark"
+                class="flex justify-center transition-all ease-in duration-75 bg-black rounded-md group-hover:bg-opacity-0 text-text-dark text-md font-inter py-6 w-80 hover:scale-105 hover:text-black"
             >
                 { children() }
             </span>

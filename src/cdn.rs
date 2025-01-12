@@ -1,15 +1,11 @@
 use axum::{
-    async_trait,
-    extract::{
-        path::ErrorKind, rejection::PathRejection, FromRequestParts, Path as AxumPath, Query, State,
-    },
-    http::{header, request::Parts, StatusCode},
+    extract::{Path as AxumPath, Query, State},
+    http::{header, StatusCode},
     response::{IntoResponse, Response},
-    Json,
 };
 use image::{imageops::FilterType, ImageFormat, ImageReader};
 use leptos::prelude::LeptosOptions;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::Deserialize;
 use std::{
     fs::{write, File},
     io::{BufReader, Cursor, Read},
@@ -17,102 +13,6 @@ use std::{
 };
 use thiserror::Error;
 use tokio::task;
-
-#[derive(Serialize)]
-pub struct ImageFileError {
-    message: String,
-    location: Option<String>,
-}
-
-pub struct ImageFile<T>(T);
-
-#[async_trait]
-impl<T, S> FromRequestParts<S> for ImageFile<T>
-where
-    T: DeserializeOwned + Send,
-    S: Send + Sync,
-{
-    type Rejection = (StatusCode, Json<ImageFileError>);
-
-    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let path_frq = match AxumPath::<T>::from_request_parts(parts, state).await {
-            Ok(value) => Ok(Self(value.0)),
-            Err(rejection) => {
-                let (status, body) = match rejection {
-                    PathRejection::FailedToDeserializePathParams(inner) => {
-                        let mut status = StatusCode::BAD_REQUEST;
-
-                        let kind = inner.into_kind();
-                        let body = match &kind {
-                            ErrorKind::WrongNumberOfParameters { .. } => ImageFileError {
-                                message: kind.to_string(),
-                                location: None,
-                            },
-
-                            ErrorKind::ParseErrorAtKey { key, .. } => ImageFileError {
-                                message: kind.to_string(),
-                                location: Some(key.clone()),
-                            },
-
-                            ErrorKind::ParseErrorAtIndex { index, .. } => ImageFileError {
-                                message: kind.to_string(),
-                                location: Some(index.to_string()),
-                            },
-
-                            ErrorKind::ParseError { .. } => ImageFileError {
-                                message: kind.to_string(),
-                                location: None,
-                            },
-
-                            ErrorKind::InvalidUtf8InPathParam { key } => ImageFileError {
-                                message: kind.to_string(),
-                                location: Some(key.clone()),
-                            },
-
-                            ErrorKind::UnsupportedType { .. } => {
-                                status = StatusCode::INTERNAL_SERVER_ERROR;
-                                ImageFileError {
-                                    message: kind.to_string(),
-                                    location: None,
-                                }
-                            }
-
-                            ErrorKind::Message(msg) => ImageFileError {
-                                message: msg.clone(),
-                                location: None,
-                            },
-
-                            _ => ImageFileError {
-                                message: format!("Unhandled deserialization error: {kind}"),
-                                location: None,
-                            },
-                        };
-
-                        (status, body)
-                    }
-                    PathRejection::MissingPathParams(error) => (
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        ImageFileError {
-                            message: error.to_string(),
-                            location: None,
-                        },
-                    ),
-                    _ => (
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        ImageFileError {
-                            message: format!("Unhandled path rejection: {rejection}"),
-                            location: None,
-                        },
-                    ),
-                };
-
-                Err((status, axum::Json(body)))
-            }
-        };
-        // add extra checks
-        path_frq
-    }
-}
 
 #[derive(Deserialize)]
 pub struct Dimensions {
@@ -172,7 +72,7 @@ impl IntoResponse for CdnError {
 
 // TODO: make a generic to handle all types of images
 pub async fn handle_webp_image(
-    ImageFile(file_name): ImageFile<String>,
+    AxumPath(file_name): AxumPath<String>,
     dimensions: Query<Dimensions>,
     State(leptos_options): State<LeptosOptions>,
 ) -> Result<impl IntoResponse, CdnError> {
