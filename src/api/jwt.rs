@@ -31,7 +31,7 @@ pub async fn encode_jwt(exp: Option<u64>, sub: String) -> Result<String> {
     use chrono::Duration;
     use jsonwebtoken::{encode, EncodingKey, Header};
 
-    let exp = exp.unwrap_or((Utc::now() + Duration::days(7)).timestamp() as u64);
+    let exp = exp.unwrap_or_else(|| (Utc::now() + Duration::days(7)).timestamp() as u64);
 
     let claims = Claims { sub, exp };
 

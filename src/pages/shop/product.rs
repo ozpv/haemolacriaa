@@ -103,7 +103,7 @@ pub fn Product() -> impl IntoView {
             .as_ref()
             .ok()
             .and_then(|p| p.name.clone())
-            .unwrap_or("Invalid ID".to_string())
+            .unwrap_or_else(|| "Invalid ID".to_string())
             .replace('-', " ")
             .trim()
             .to_string()
