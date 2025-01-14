@@ -12,7 +12,7 @@ use std::{
     path::Path as FilePath,
 };
 use thiserror::Error;
-use tokio::task;
+use tokio::{sync::oneshot, task};
 
 #[derive(Deserialize)]
 pub struct Dimensions {
@@ -49,7 +49,7 @@ pub enum CdnError {
     ReadError,
     #[error("The requested resource was not found on the server")]
     NotFound,
-    #[error("Failed to execute spawn_blocking")]
+    #[error("Failed to spawn blocking task")]
     SpawnBlockingError,
     #[error("Failed to write DynamicImage to the response buffer")]
     BufWriteError,
@@ -66,7 +66,7 @@ impl IntoResponse for CdnError {
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         };
 
-        (status, format!("{}", self)).into_response()
+        (status, self.to_string()).into_response()
     }
 }
 
@@ -95,62 +95,57 @@ pub async fn handle_webp_image(
         dimensions.height
     ));
 
-    #[allow(unused_mut)]
-    let (mut res, len) = if img_path.exists() {
-        let res = task::spawn_blocking(move || {
-            let file = File::open(img_path).map_err(|_| CdnError::FileOpenError)?;
-            let mut buf_reader = BufReader::new(file);
+    let (tx, rx) = oneshot::channel();
+    rayon::spawn(move || {
+        let mut image = Vec::with_capacity(200000);
 
-            // ~200000 bytes is around the size of a 400x400 webp
-            let mut image = Vec::with_capacity(200000);
+        let res = if img_path.exists() {
+            File::open(img_path).map_or_else(
+                |_| Err(CdnError::FileOpenError),
+                |file| {
+                    let mut buf_reader = BufReader::new(file);
 
-            buf_reader
-                .read_to_end(&mut image)
-                .map_err(|_| CdnError::ReadError)?;
+                    buf_reader.read_to_end(&mut image).map_or_else(
+                        |_| Err(CdnError::ReadError),
+                        |len| Ok(((StatusCode::OK, image).into_response(), len)),
+                    )
+                },
+            )
+        } else if plain_path.exists() {
+            ImageReader::open(plain_path).map_or_else(
+                |_| Err(CdnError::FileOpenError),
+                |reader| {
+                    reader.decode().map_or_else(
+                        |_| Err(CdnError::DecodeError),
+                        |reader| {
+                            reader
+                                .resize_exact(
+                                    dimensions.width,
+                                    dimensions.height,
+                                    FilterType::Lanczos3,
+                                )
+                                .write_to(&mut Cursor::new(&mut image), ImageFormat::WebP)
+                                .map_or_else(
+                                    |_| Err(CdnError::BufWriteError),
+                                    |()| {
+                                        // save the image on the server for caching
+                                        let _ = write(img_path, image.clone());
+                                        let len = image.len();
+                                        Ok(((StatusCode::OK, image).into_response(), len))
+                                    },
+                                )
+                        },
+                    )
+                },
+            )
+        } else {
+            Err(CdnError::NotFound)
+        };
 
-            let len = image.len();
-            let mut res = (StatusCode::OK, image).into_response();
+        let _ = tx.send(res);
+    });
 
-            Ok((res, len))
-        })
-        .await
-        .map_err(|_| CdnError::SpawnBlockingError)?;
-
-        res?
-    } else if plain_path.exists() {
-        tracing::info!(
-            "Requested file {} doesn't exist; resizing it",
-            plain_path.display()
-        );
-
-        let res = task::spawn_blocking(move || {
-            let dyn_image = ImageReader::open(plain_path)
-                .map_err(|_| CdnError::FileOpenError)?
-                .decode()
-                .map_err(|_| CdnError::DecodeError)?
-                .resize_exact(dimensions.width, dimensions.height, FilterType::Lanczos3);
-
-            let mut image = Vec::with_capacity(200000);
-
-            dyn_image
-                .write_to(&mut Cursor::new(&mut image), ImageFormat::WebP)
-                .map_err(|_| CdnError::BufWriteError)?;
-
-            // write the image on the server for caching
-            let _ = write(img_path, image.clone());
-
-            let len = image.len();
-            let mut res = (StatusCode::OK, image).into_response();
-
-            Ok((res, len))
-        })
-        .await
-        .map_err(|_| CdnError::SpawnBlockingError)?;
-
-        res?
-    } else {
-        return Err(CdnError::NotFound);
-    };
+    let (mut res, len) = rx.await.map_err(|_| CdnError::SpawnBlockingError)??;
 
     // set up response
     res.headers_mut().insert(

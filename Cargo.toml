@@ -47,7 +47,8 @@ jsonwebtoken = { version = "9.3.0", optional = true }
 tracing-subscriber = { version = "0.3.19", optional = true }
 tracing = { version = "0.1.41", optional = true }
 image = { version = "0.25.5", optional = true }
-async-stripe = { version = "0.39.1", default-features = false, features = ["runtime-tokio-hyper"], optional = true }
+rayon = { version = "1.10.0", optional = true }
+# async-stripe = { version = "0.39.1", default-features = false, features = ["runtime-tokio-hyper"], optional = true }
 
 [build-dependencies]
 image = { version = "0.25.5" }
@@ -78,11 +79,17 @@ ssr = [
   "dep:jsonwebtoken",
   "dep:tracing",
   "dep:tracing-subscriber",
-  "dep:async-stripe",
+  "dep:rayon",
+# "dep:async-stripe",
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",
 ]
+
+# server speed optimized
+[profile.release]
+codegen-units = 1
+lto = true
 
 # size-optimized profile for the WASM bundle in release mode
 [profile.wasm-release]

@@ -9,8 +9,6 @@ use std::sync::{OnceLock, RwLock};
 use crate::types::product::Product;
 #[cfg(feature = "ssr")]
 use crate::types::product::Size;
-#[cfg(feature = "ssr")]
-use crate::util::err;
 use crate::util::Result;
 
 #[cfg(feature = "ssr")]
