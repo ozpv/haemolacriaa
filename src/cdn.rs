@@ -12,7 +12,7 @@ use std::{
     path::Path as FilePath,
 };
 use thiserror::Error;
-use tokio::{sync::oneshot, task};
+use tokio::{sync::oneshot};
 
 #[derive(Deserialize)]
 pub struct Dimensions {
