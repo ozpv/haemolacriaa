@@ -3,7 +3,7 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::module_inception)]
 
-pub mod api;
+//pub mod api;
 pub mod app;
 pub mod components;
 pub mod config;

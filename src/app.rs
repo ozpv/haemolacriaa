@@ -9,13 +9,14 @@ use leptos_router::{
     SsrMode,
 };
 
-use crate::{components::footer::Footer, pages::shop::product};
+//use crate::{components::footer::Footer, pages::shop::product};
+use crate::components::footer::Footer;
 //use crate::components::forms::{logged_in, Login, LoginForm};
 use crate::components::nav;
 use crate::error::ErrorPage;
 //use crate::pages::admin::Admin;
 use crate::pages::home;
-use crate::pages::shop::shop;
+//use crate::pages::shop::shop;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -67,7 +68,9 @@ pub fn App() -> impl IntoView {
             <Router>
                 <FlatRoutes fallback=ErrorPage>
                     <Route path=path!("") view=home::Home />
-                    <Route
+
+                    <Route path=path!("/shop") view=Todo />
+                    /*<Route
                         path=path!("/shop")
                         view=shop::Home
                         ssr=SsrMode::Static(
@@ -79,7 +82,7 @@ pub fn App() -> impl IntoView {
                         view=product::Product
                         ssr=SsrMode::Static(StaticRoute::new())
                     />
-                    <Route path=path!("/bag") view=shop::Bag />
+                    <Route path=path!("/bag") view=shop::Bag />*/
     /*
                     <ProtectedRoute
                         path=StaticSegment("/login")
