@@ -80,21 +80,25 @@ pub async fn handle_webp_image(
         return Err(CdnError::BadDimensions);
     }
 
-    if file_name.strip_suffix(".webp").is_none() {
+    let Some(file_name) = file_name.strip_suffix(".webp") else {
         return Err(CdnError::IncorrectFormat);
-    }
+    };
 
     let site_root = leptos_options.site_root;
 
-    let plain_path = FilePath::new(&site_root.to_string()).join(&file_name);
+    let mut plain_path = FilePath::new(&site_root.to_string())
+        .join(&file_name);
+    plain_path.set_extension("webp");
 
     let img_path = FilePath::new(&site_root.to_string()).join(format!(
         "{}-{}x{}.webp",
-        file_name.strip_suffix(".webp").unwrap_or(""),
+        file_name,
         dimensions.width,
         dimensions.height
     ));
 
+    // either get the file if it already was resized
+    // or resize it
     let (tx, rx) = oneshot::channel();
     rayon::spawn(move || {
         let mut image = Vec::with_capacity(200000);
