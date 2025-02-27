@@ -1,6 +1,5 @@
-use super::nav::Nav;
-use super::product::{Card, Product};
-use crate::components::buttons::ReturnButton;
+use super::products::{Card, Product};
+use crate::components::nav::ShopNav;
 #[allow(unused)]
 use crate::types;
 use leptos::prelude::*;
@@ -78,7 +77,7 @@ pub fn Home() -> impl IntoView {
     };
 
     view! {
-        <Nav/>
+        <ShopNav />
         <main class="main">
             <button on:click=add_item>
                 "Add item"
@@ -99,17 +98,6 @@ pub fn Home() -> impl IntoView {
                     {items_view}
                 </ErrorBoundary>
             </Suspense>
-        </main>
-    }
-}
-
-#[component]
-pub fn Bag() -> impl IntoView {
-    view! {
-        <Nav />
-        <main class="main">
-            <h1 class="text-text-dark text-center pt-10 pb-7 text-2xl font-sans">"your bag is empty"</h1>
-            <ReturnButton body="continue shopping" href="/shop" external=true />
         </main>
     }
 }

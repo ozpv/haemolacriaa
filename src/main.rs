@@ -1,14 +1,16 @@
 use axum::{routing::get, Router};
+use haemolacriaa::api::cdn::handle_webp_image;
 use haemolacriaa::app::*;
-use haemolacriaa::cdn::handle_webp_image;
 use http::{header, Method};
 use leptos::prelude::{get_configuration, provide_context};
 use leptos_axum::{file_and_error_handler, generate_route_list_with_ssg, LeptosRoutes};
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
 use std::time::Duration;
+use tokio::net::TcpListener;
 use tower_http::{
     compression::CompressionLayer, cors::CorsLayer, timeout::TimeoutLayer, trace::TraceLayer,
 };
+use tracing::Level;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -21,8 +23,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::DEBUG)
-        //.with_max_level(tracing::Level::INFO)
+        .with_max_level(Level::DEBUG)
+        //.with_max_level(Level::INFO)
         .init();
 
     // build the postgres connection pool
@@ -43,8 +45,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .database(&db)
         .ssl_mode(PgSslMode::Require);
 
-    tracing::info!("Connecting to DB");
-
     // setup postgres connection pool
     let db_pool = PgPoolOptions::new()
         .max_connections(5)
@@ -52,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .connect_with(db_options)
         .await?;
 
-    tracing::info!("Running migrations");
+    tracing::info!("Connected to postgres");
 
     // run migrations
     sqlx::migrate!()
@@ -80,7 +80,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         })
         .route("/assets/:file_name", get(handle_webp_image))
         .fallback(file_and_error_handler(shell))
-        .with_state(leptos_options)
         .layer(TraceLayer::new_for_http())
         .layer(CompressionLayer::new().gzip(true))
         .layer(TimeoutLayer::new(Duration::from_secs(30)))
@@ -88,13 +87,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             CorsLayer::new()
                 .allow_methods([Method::GET, Method::POST])
                 .allow_headers([header::AUTHORIZATION, header::CONTENT_TYPE]),
-        );
+        )
+        .with_state(leptos_options);
 
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    let listener = TcpListener::bind(&addr).await?;
+
     tracing::info!("Listening on http://{}", &addr);
-    axum::serve(listener, app.into_make_service())
-        .await
-        .unwrap();
+    axum::serve(listener, app.into_make_service()).await?;
 
     Ok(())
 }

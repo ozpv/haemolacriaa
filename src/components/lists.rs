@@ -34,9 +34,9 @@ pub fn StreamingList(
             <img
                 class="block text-text-dark mx-auto pt-4 shadow-2xl shadow-crust-dark"
                 src=move || list_info.get().image.cdn_path()
-                width=move || list_info.get().image.width
-                height=move || list_info.get().image.height
-                alt=move || list_info.get().name
+                width="400"
+                height="400"
+                alt=move || format!("{} cover", list_info.get().name)
             />
             <h1 class="block text-text-dark text-center text-3xl font-bold font-sans pt-9">
                     {move || list_info.get().name}
@@ -53,7 +53,8 @@ pub fn StreamingList(
                             view! {
                                 <LinkButton
                                     href=info.song_url
-                                    id=format!("{}-link-button", info.platform_name)
+                                    {..}
+                                    aria_label=format!("{}-link-button", info.platform_name)
                                 >
                                     <Icon icon=info.platform_icon width="24" height="24" />
                                     <p class="pl-5">{info.platform_name}</p>

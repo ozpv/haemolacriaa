@@ -9,14 +9,14 @@ use leptos_router::{
     SsrMode,
 };
 
-//use crate::{components::footer::Footer, pages::shop::product};
-use crate::components::footer::Footer;
+use crate::{
+    components::{buttons::ReturnButton, footer::Footer, nav::Nav},
+    pages::shop::products,
+};
 //use crate::components::forms::{logged_in, Login, LoginForm};
-use crate::components::nav;
-use crate::error::ErrorPage;
 //use crate::pages::admin::Admin;
 use crate::pages::home;
-//use crate::pages::shop::shop;
+use crate::pages::shop;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -66,23 +66,23 @@ pub fn App() -> impl IntoView {
             <Title text="haemolacriaa"/>
 
             <Router>
-                <FlatRoutes fallback=ErrorPage>
-                    <Route path=path!("") view=home::Home />
+                <FlatRoutes fallback=NotFound>
+                    <Route path=path!("") view=home::Home ssr=SsrMode::Async />
 
-                    <Route path=path!("/shop") view=Todo />
-                    /*<Route
+                    // shop
+                    <Route
                         path=path!("/shop")
-                        view=shop::Home
+                        view=shop::home::Home
                         ssr=SsrMode::Static(
                             StaticRoute::new().regenerate(|_| watch_value())
                         )
                     />
                     <Route
                         path=path!("/shop/:name")
-                        view=product::Product
+                        view=products::Product
                         ssr=SsrMode::Static(StaticRoute::new())
                     />
-                    <Route path=path!("/bag") view=shop::Bag />*/
+                    <Route path=path!("/bag") view=shop::bag::Bag ssr=SsrMode::PartiallyBlocked />
     /*
                     <ProtectedRoute
                         path=StaticSegment("/login")
@@ -107,7 +107,7 @@ pub fn App() -> impl IntoView {
 #[component]
 pub fn Todo() -> impl IntoView {
     view! {
-        <nav::Nav />
+        <Nav />
         <main class="bg-black min-h-screen">
             <h2 class="text-text-dark text-center pt-10 pb-7 text-2xl font-inter">"Coming soon"</h2>
             <div class="flex justify-center">
@@ -119,5 +119,16 @@ pub fn Todo() -> impl IntoView {
                 </a>
             </div>
         </main>
+    }
+}
+
+#[component]
+pub fn NotFound() -> impl IntoView {
+    view! {
+        <Nav/>
+        <div class="bg-black min-h-screen">
+            <h2 class="text-text-dark text-center pt-10 pb-7 text-2xl font-sans">"page not found"</h2>
+            <ReturnButton href="/">"return home"</ReturnButton>
+        </div>
     }
 }

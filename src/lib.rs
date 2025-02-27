@@ -3,11 +3,10 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::module_inception)]
 
-//pub mod api;
+pub mod api;
 pub mod app;
 pub mod components;
 pub mod config;
-pub mod error;
 pub mod pages;
 pub mod types;
 
@@ -33,8 +32,6 @@ pub mod util {
     pub(crate) use err;
 }
 
-#[cfg(feature = "ssr")]
-pub mod cdn;
 #[cfg(feature = "ssr")]
 pub mod pool;
 #[cfg(feature = "ssr")]

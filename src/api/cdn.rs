@@ -12,7 +12,7 @@ use std::{
     path::Path as FilePath,
 };
 use thiserror::Error;
-use tokio::{sync::oneshot};
+use tokio::sync::oneshot;
 
 #[derive(Deserialize)]
 pub struct Dimensions {
@@ -86,15 +86,12 @@ pub async fn handle_webp_image(
 
     let site_root = leptos_options.site_root;
 
-    let mut plain_path = FilePath::new(&site_root.to_string())
-        .join(&file_name);
+    let mut plain_path = FilePath::new(&site_root.to_string()).join(&file_name);
     plain_path.set_extension("webp");
 
     let img_path = FilePath::new(&site_root.to_string()).join(format!(
         "{}-{}x{}.webp",
-        file_name,
-        dimensions.width,
-        dimensions.height
+        file_name, dimensions.width, dimensions.height
     ));
 
     // either get the file if it already was resized

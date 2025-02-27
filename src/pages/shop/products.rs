@@ -3,7 +3,7 @@ use leptos_icons::Icon;
 use leptos_router::{hooks::use_params, params::Params};
 use std::sync::Arc;
 
-use super::nav::Nav;
+use crate::components::nav::ShopNav;
 
 #[component]
 pub fn Card(
@@ -125,7 +125,7 @@ pub fn Product() -> impl IntoView {
 
     view! {
         <SizeChartModal toggle_status=toggle_modal.into() status=status />
-        <Nav/>
+        <ShopNav />
         <main class="main">
             <Breadcrumb path=move || id() />
             <div class="m-auto">
