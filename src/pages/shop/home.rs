@@ -1,4 +1,4 @@
-use super::products::{Card, Product};
+use super::products::Card;
 use crate::components::nav::ShopNav;
 #[allow(unused)]
 use crate::types;

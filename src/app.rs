@@ -83,6 +83,8 @@ pub fn App() -> impl IntoView {
                         ssr=SsrMode::Static(StaticRoute::new())
                     />
                     <Route path=path!("/bag") view=shop::bag::Bag ssr=SsrMode::PartiallyBlocked />
+
+                    <Route path=path!("/form_test") view=crate::api::csrf::CsrfFormTest ssr=SsrMode::PartiallyBlocked />
     /*
                     <ProtectedRoute
                         path=StaticSegment("/login")

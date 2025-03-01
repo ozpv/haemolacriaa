@@ -14,7 +14,7 @@ use tracing::Level;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let conf = get_configuration(None).unwrap();
+    let conf = get_configuration(None)?;
     let leptos_options = conf.leptos_options;
     let addr = leptos_options.site_addr;
     let (routes, static_routes) = generate_route_list_with_ssg({
@@ -80,14 +80,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         })
         .route("/assets/:file_name", get(handle_webp_image))
         .fallback(file_and_error_handler(shell))
-        .layer(TraceLayer::new_for_http())
         .layer(CompressionLayer::new().gzip(true))
         .layer(TimeoutLayer::new(Duration::from_secs(30)))
         .layer(
             CorsLayer::new()
+                // leptos server fns are RPC-based
                 .allow_methods([Method::GET, Method::POST])
-                .allow_headers([header::AUTHORIZATION, header::CONTENT_TYPE]),
+                .allow_headers([header::AUTHORIZATION, header::CONTENT_TYPE, header::COOKIE]),
         )
+        .layer(TraceLayer::new_for_http())
         .with_state(leptos_options);
 
     let listener = TcpListener::bind(&addr).await?;

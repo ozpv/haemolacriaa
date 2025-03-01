@@ -13,8 +13,6 @@ pub mod types;
 pub mod util {
     pub type Result<T, E = server_fn::ServerFnError> = std::result::Result<T, E>;
 
-    /// err(REASON) <- to abstract and hide real error info
-    /// err(REASON, STATUSCODE) <- set the STATUSCODE of the response
     // stuff is used but it says that it isn't
     #[allow(unused_macros)]
     macro_rules! err {
