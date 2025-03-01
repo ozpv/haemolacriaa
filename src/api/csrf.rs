@@ -1,29 +1,9 @@
 use leptos::{ev::SubmitEvent, html, leptos_dom::logging::console_log, prelude::*};
-use thiserror::Error;
-
-#[cfg(feature = "ssr")]
-use base64::{engine::general_purpose, Engine};
-
-#[derive(Debug, Error)]
-pub enum AuthError {
-    #[error("Something went wrong")]
-    Internal,
-}
-
-#[cfg(feature = "ssr")]
-#[inline]
-pub fn gen_rand_string<const N: usize>() -> String {
-    let mut bytes = [0u8; N];
-
-    rand::fill(&mut bytes[..]);
-
-    general_purpose::STANDARD.encode(bytes)
-}
 
 #[server]
 pub async fn get_csrf_token() -> Result<String, ServerFnError> {
-    // TODO: add to a session store
-    Ok(gen_rand_string::<32>())
+    // TODO: add to a session store and set-cookie
+    Ok(super::auth::gen_rand_string::<32>())
 }
 
 #[component]
@@ -40,6 +20,8 @@ pub fn CsrfForm(
         on_submit(ev, token);
     };
 
+    // load the token on the server
+    // may require the route to be SsrMode::PartiallyBlocked
     let token_element = Suspend::new(async move {
         match csrf_token.await {
             Ok(token) => view! {
