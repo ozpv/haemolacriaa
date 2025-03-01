@@ -1,18 +1,27 @@
 use axum::{
     extract::{Path as AxumPath, Query, State},
-    http::{header, StatusCode},
-    response::{IntoResponse, Response},
+    http::{header, HeaderValue, StatusCode},
+    response::IntoResponse,
 };
-use image::{imageops::FilterType, ImageFormat, ImageReader};
+use axum_thiserror_tracing::IntoResponse;
+use fast_image_resize::{images::Image, IntoImageView, Resizer};
+use image::{codecs::webp::WebPEncoder, ImageReader};
 use leptos::prelude::LeptosOptions;
 use serde::Deserialize;
 use std::{
-    fs::{write, File},
-    io::{BufReader, Cursor, Read},
+    collections::HashSet,
+    // TODO: use async version
+    io::BufWriter,
     path::Path as FilePath,
+    sync::LazyLock,
 };
 use thiserror::Error;
-use tokio::sync::oneshot;
+use tokio::{
+    fs::{write, File},
+    io::{AsyncReadExt, BufReader},
+};
+
+use crate::utils::InsertMany;
 
 #[derive(Deserialize)]
 pub struct Dimensions {
@@ -22,55 +31,37 @@ pub struct Dimensions {
 
 impl Dimensions {
     fn supported(&self) -> bool {
-        match (self.width, self.height) {
-            (1000, 1000) => true,
-            (900, 900) => true,
-            (800, 800) => true,
-            (700, 700) => true,
-            (600, 600) => true,
-            (500, 500) => true,
-            (400, 400) => true,
-            _ => false,
-        }
+        static SUPPORTED_DIMENSIONS: LazyLock<HashSet<(u32, u32)>> = LazyLock::new(|| {
+            HashSet::from([
+                (1000, 1000),
+                (900, 900),
+                (800, 800),
+                (700, 700),
+                (600, 600),
+                (500, 500),
+                (400, 400),
+            ])
+        });
+
+        SUPPORTED_DIMENSIONS.contains(&(self.width, self.height))
     }
 }
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, IntoResponse)]
 pub enum CdnError {
+    #[status(StatusCode::BAD_REQUEST)]
     #[error("Unsupported dimensions")]
     BadDimensions,
+    #[status(StatusCode::BAD_REQUEST)]
     #[error("The requested resource must be a WebP image")]
     IncorrectFormat,
-    #[error("Failed to open the requested file on the server")]
-    FileOpenError,
-    #[error("Failed to decode the requested file")]
-    DecodeError,
-    #[error("Located the requested resource on the server but failed to read it")]
-    ReadError,
+    #[status(StatusCode::NOT_FOUND)]
     #[error("The requested resource was not found on the server")]
     NotFound,
-    #[error("Failed to spawn blocking task")]
-    SpawnBlockingError,
-    #[error("Failed to write DynamicImage to the response buffer")]
-    BufWriteError,
-    #[error("Failed to set the CONTENT_TYPE header")]
-    ResponseError,
+    #[error("{0}")]
+    Internal(&'static str),
 }
 
-impl IntoResponse for CdnError {
-    fn into_response(self) -> Response {
-        let status = match self {
-            Self::BadDimensions => StatusCode::BAD_REQUEST,
-            Self::IncorrectFormat => StatusCode::BAD_REQUEST,
-            Self::NotFound => StatusCode::BAD_REQUEST,
-            _ => StatusCode::INTERNAL_SERVER_ERROR,
-        };
-
-        (status, self.to_string()).into_response()
-    }
-}
-
-// TODO: make a generic to handle all types of images
 pub async fn handle_webp_image(
     AxumPath(file_name): AxumPath<String>,
     dimensions: Query<Dimensions>,
@@ -94,80 +85,85 @@ pub async fn handle_webp_image(
         file_name, dimensions.width, dimensions.height
     ));
 
-    // either get the file if it already was resized
-    // or resize it
-    let (tx, rx) = oneshot::channel();
-    rayon::spawn(move || {
-        let mut image = Vec::with_capacity(200000);
+    // if the image is already resized then just send it
+    if img_path.exists() {
+        let mut image = Vec::with_capacity(200_000);
 
-        let res = if img_path.exists() {
-            File::open(img_path).map_or_else(
-                |_| Err(CdnError::FileOpenError),
-                |file| {
-                    let mut buf_reader = BufReader::new(file);
+        let file = File::open(img_path)
+            .await
+            .map_err(|_| CdnError::Internal("Something went wrong"))?;
 
-                    buf_reader.read_to_end(&mut image).map_or_else(
-                        |_| Err(CdnError::ReadError),
-                        |len| Ok(((StatusCode::OK, image).into_response(), len)),
-                    )
-                },
+        let mut buf_reader = BufReader::new(file);
+
+        let mut length = 0;
+        let mut res = buf_reader
+            .read_to_end(&mut image)
+            .await
+            .map(|len| {
+                length = len;
+                (StatusCode::OK, image).into_response()
+            })
+            .map_err(|_| CdnError::Internal("Failed to read image"))?;
+
+        #[rustfmt::skip]
+        res.headers_mut().insert_many([
+            (header::CONTENT_LENGTH, length.into()),
+            (header::CONTENT_TYPE, HeaderValue::from_static("image/webp")),
+            (header::ACCEPT_RANGES, HeaderValue::from_static("bytes")),
+            (header::CACHE_CONTROL, HeaderValue::from_static("public, max-age=15552000")),
+        ]);
+
+        Ok(res)
+        // if the image doesn't exist, resize it
+    } else if plain_path.exists() {
+        let original_image = ImageReader::open(plain_path)
+            .ok()
+            .and_then(|image| image.decode().ok())
+            .ok_or_else(|| CdnError::Internal("Something went wrong reading an image"))?;
+
+        let mut resized_image = Image::new(
+            dimensions.width,
+            dimensions.height,
+            original_image
+                .pixel_type()
+                .ok_or_else(|| CdnError::Internal("Failed to detect pixel type"))?,
+        );
+
+        let mut resizer = Resizer::new();
+        resizer
+            .resize(&original_image, &mut resized_image, None)
+            .map_err(|_| CdnError::Internal("Failed to resize image"))?;
+
+        let mut result_image = BufWriter::new(Vec::new());
+        WebPEncoder::new_lossless(&mut result_image)
+            .encode(
+                resized_image.buffer(),
+                dimensions.width,
+                dimensions.height,
+                original_image.color().into(),
             )
-        } else if plain_path.exists() {
-            ImageReader::open(plain_path).map_or_else(
-                |_| Err(CdnError::FileOpenError),
-                |reader| {
-                    reader.decode().map_or_else(
-                        |_| Err(CdnError::DecodeError),
-                        |reader| {
-                            reader
-                                .resize_exact(
-                                    dimensions.width,
-                                    dimensions.height,
-                                    FilterType::Lanczos3,
-                                )
-                                .write_to(&mut Cursor::new(&mut image), ImageFormat::WebP)
-                                .map_or_else(
-                                    |_| Err(CdnError::BufWriteError),
-                                    |()| {
-                                        // save the image on the server for caching
-                                        let _ = write(img_path, image.clone());
-                                        let len = image.len();
-                                        Ok(((StatusCode::OK, image).into_response(), len))
-                                    },
-                                )
-                        },
-                    )
-                },
-            )
-        } else {
-            Err(CdnError::NotFound)
-        };
+            .map_err(|_| CdnError::Internal("Failed to encode image"))?;
 
-        let _ = tx.send(res);
-    });
+        let image = result_image
+            .into_inner()
+            .map_err(|_| CdnError::Internal("Failed to flush buffer"))?;
 
-    let (mut res, len) = rx.await.map_err(|_| CdnError::SpawnBlockingError)??;
+        // save on the server
+        _ = write(img_path, &image).await;
 
-    // set up response
-    res.headers_mut().insert(
-        header::CONTENT_TYPE,
-        "image/webp".parse().map_err(|_| CdnError::ResponseError)?,
-    );
+        let length = image.len();
+        let mut res = (StatusCode::OK, image).into_response();
 
-    res.headers_mut().insert(header::CONTENT_LENGTH, len.into());
+        #[rustfmt::skip]
+        res.headers_mut().insert_many([
+            (header::CONTENT_LENGTH, length.into()),
+            (header::CONTENT_TYPE, HeaderValue::from_static("image/webp")),
+            (header::ACCEPT_RANGES, HeaderValue::from_static("bytes")),
+            (header::CACHE_CONTROL, HeaderValue::from_static("public, max-age=15552000")),
+        ]);
 
-    res.headers_mut().insert(
-        header::ACCEPT_RANGES,
-        "bytes".parse().map_err(|_| CdnError::ResponseError)?,
-    );
-
-    // cache this image for up to 6 months
-    res.headers_mut().insert(
-        header::CACHE_CONTROL,
-        "public, max-age=15552000"
-            .parse()
-            .map_err(|_| CdnError::ResponseError)?,
-    );
-
-    Ok(res)
+        Ok(res)
+    } else {
+        Err(CdnError::NotFound)
+    }
 }

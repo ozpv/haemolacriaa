@@ -33,6 +33,8 @@ pub mod util {
 #[cfg(feature = "ssr")]
 pub mod pool;
 #[cfg(feature = "ssr")]
+pub mod utils;
+#[cfg(feature = "ssr")]
 pub mod lazy {
     use crate::types::product::Product;
     use std::sync::LazyLock;

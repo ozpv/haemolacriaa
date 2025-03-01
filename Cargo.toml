@@ -50,6 +50,8 @@ rayon = { version = "1.10.0", optional = true }
 rand = { version = "0.9.0", optional = true }
 base64 = { version = "0.22.1", optional = true }
 axum_thiserror_tracing = { version = "0.1.0", features = ["tracing"], optional = true }
+fast_image_resize = { version = "5.1.2", features = ["image", "rayon"], optional = true }
+parking_lot = { version = "0.12.3", optional = true }
 # async-stripe = { version = "0.39.1", default-features = false, features = ["runtime-tokio-hyper"], optional = true }
 
 [build-dependencies]
@@ -82,7 +84,9 @@ ssr = [
 # "dep:async-stripe",
   "dep:base64",
   "dep:rand",
+  "dep:fast_image_resize",
   "dep:axum_thiserror_tracing",
+  "dep:parking_lot",
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",

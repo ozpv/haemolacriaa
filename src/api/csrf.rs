@@ -3,7 +3,7 @@ use leptos::{ev::SubmitEvent, html, leptos_dom::logging::console_log, prelude::*
 #[server]
 pub async fn get_csrf_token() -> Result<String, ServerFnError> {
     // TODO: add to a session store and set-cookie
-    Ok(super::auth::gen_rand_string::<32>())
+    Ok(crate::utils::gen_rand_string::<32>())
 }
 
 #[component]

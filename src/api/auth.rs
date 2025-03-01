@@ -6,11 +6,12 @@ use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
 #[cfg(feature = "ssr")]
 use axum_thiserror_tracing::IntoResponse;
 #[cfg(feature = "ssr")]
-use base64::{engine::general_purpose, Engine};
-#[cfg(feature = "ssr")]
 use chrono::{DateTime, Duration, Utc};
 #[cfg(feature = "ssr")]
 use thiserror::Error;
+
+#[cfg(feature = "ssr")]
+use crate::utils::gen_rand_string;
 
 #[cfg(feature = "ssr")]
 #[derive(Debug, Error, IntoResponse)]
@@ -48,7 +49,7 @@ impl Session {
     }
 
     fn exp_in(mut self, duration: Duration) -> Self {
-        self.exp = Utc::now() + duration; 
+        self.exp = Utc::now() + duration;
         self
     }
 
@@ -88,14 +89,4 @@ pub async fn login() -> Result<(), ServerFnError> {
     // TODO: store this
 
     Err(AuthError::Internal("Not implemented yet").into())
-}
-
-#[cfg(feature = "ssr")]
-#[inline]
-pub fn gen_rand_string<const N: usize>() -> String {
-    let mut bytes = [0u8; N];
-
-    rand::fill(&mut bytes[..]);
-
-    general_purpose::STANDARD.encode(bytes)
 }
