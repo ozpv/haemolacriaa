@@ -80,7 +80,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         })
         .route("/assets/:file_name", get(handle_webp_image))
         .fallback(file_and_error_handler(shell))
-        .layer(CompressionLayer::new().gzip(true))
+        .layer(CompressionLayer::new().br(true))
         .layer(TimeoutLayer::new(Duration::from_secs(30)))
         .layer(
             CorsLayer::new()

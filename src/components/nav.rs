@@ -49,7 +49,7 @@ pub fn Nav() -> impl IntoView {
         </nav>
     }
 }
-
+/*
 #[component]
 pub fn ShopNav() -> impl IntoView {
     let activity = RwSignal::new(false);
@@ -123,4 +123,4 @@ pub fn ShopNav() -> impl IntoView {
             </div>
         </nav>
     }
-}
+}*/

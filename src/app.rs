@@ -11,12 +11,12 @@ use leptos_router::{
 
 use crate::{
     components::{buttons::ReturnButton, footer::Footer, nav::Nav},
-    pages::shop::products,
+    //pages::shop::products,
 };
 //use crate::components::forms::{logged_in, Login, LoginForm};
 //use crate::pages::admin::Admin;
 use crate::pages::home;
-use crate::pages::shop;
+//use crate::pages::shop;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -67,9 +67,9 @@ pub fn App() -> impl IntoView {
 
             <Router>
                 <FlatRoutes fallback=NotFound>
-                    <Route path=path!("") view=home::Home ssr=SsrMode::Async />
+                    <Route path=path!("") view=home::Home />
 
-                    // shop
+                    /*// shop
                     <Route
                         path=path!("/shop")
                         view=shop::home::Home
@@ -85,6 +85,7 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/bag") view=shop::bag::Bag ssr=SsrMode::PartiallyBlocked />
 
                     <Route path=path!("/form_test") view=crate::api::csrf::CsrfFormTest ssr=SsrMode::PartiallyBlocked />
+    */
     /*
                     <ProtectedRoute
                         path=StaticSegment("/login")

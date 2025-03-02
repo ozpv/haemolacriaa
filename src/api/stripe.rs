@@ -4,7 +4,9 @@ use leptos::prelude::*;
 #[cfg(feature = "ssr")]
 use leptos_axum::ResponseOptions;
 #[cfg(feature = "ssr")]
-use std::sync::{OnceLock, RwLock};
+use parking_lot::RwLock;
+#[cfg(feature = "ssr")]
+use std::sync::OnceLock;
 
 use crate::types::product::Product;
 #[cfg(feature = "ssr")]
@@ -21,14 +23,13 @@ pub async fn regen_items_page() -> Result<()> {
     let products =
         PRODUCTS.get_or_init(|| RwLock::new(vec![Product::new("some product", 10000, Size::S)]));
 
-    if products.read().is_ok_and(|v| v.len() > 100) {
+    if products.read().len() > 100 {
         expect_context::<ResponseOptions>().set_status(StatusCode::IM_A_TEAPOT);
         return Err(ServerFnError::new("Too may items inside of PRODUCTS"));
     }
 
     products
         .write()
-        .map_err(|_| ServerFnError::new("Failed to get write lock on PRODUCTS"))?
         .push(Product::new("Hello, World!", 10000, Size::XS));
 
     UPDATE_ITEMS
@@ -47,9 +48,7 @@ pub async fn get_products() -> Result<Option<Vec<Product>>> {
     let products = PRODUCTS.get().map(|inner| inner.read());
 
     if let Some(res) = products {
-        let res = res
-            .map_err(|_| ServerFnError::new("Failed to read products"))?
-            .clone();
+        let res = res.clone();
 
         Ok(Some(res))
     } else {
