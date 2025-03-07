@@ -1,6 +1,6 @@
 use axum::{routing::get, Router};
 use haemolacriaa::api::cdn::handle_webp_image;
-use haemolacriaa::app::*;
+use haemolacriaa::app::shell;
 use http::{header, Method};
 use leptos::prelude::{get_configuration, provide_context};
 use leptos_axum::{file_and_error_handler, generate_route_list_with_ssg, LeptosRoutes};

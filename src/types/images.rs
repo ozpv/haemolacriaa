@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::borrow::ToOwned;
 
+/// Image type
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(sqlx::Type))]
-/// Dimensions default to what makes sense (400px)
 pub struct Image<T = &'static str> {
     /// The image name and the extension
     pub name: T,

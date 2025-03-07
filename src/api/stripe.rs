@@ -28,9 +28,11 @@ pub async fn regen_items_page() -> Result<()> {
         return Err(ServerFnError::new("Too may items inside of PRODUCTS"));
     }
 
-    products
-        .write()
-        .push(Product::new("Hello, World!", 10000, Size::XS));
+    {
+        products
+            .write()
+            .push(Product::new("Hello, World!", 10000, Size::XS));
+    }
 
     UPDATE_ITEMS
         .0

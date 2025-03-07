@@ -8,20 +8,15 @@ use fast_image_resize::{images::Image, IntoImageView, Resizer};
 use image::{codecs::webp::WebPEncoder, ImageReader};
 use leptos::prelude::LeptosOptions;
 use serde::Deserialize;
-use std::{
-    collections::HashSet,
-    // TODO: use async version
-    io::BufWriter,
-    path::Path as FilePath,
-    sync::LazyLock,
-};
+use std::{collections::HashSet, io::BufWriter, path::Path as FilePath, sync::LazyLock};
 use thiserror::Error;
 use tokio::{
-    fs::{write, File},
+    fs::write,
+    fs::File,
     io::{AsyncReadExt, BufReader},
 };
 
-use crate::utils::InsertMany;
+use crate::util::InsertMany;
 
 #[derive(Deserialize)]
 pub struct Dimensions {
@@ -77,7 +72,7 @@ pub async fn handle_webp_image(
 
     let site_root = leptos_options.site_root;
 
-    let mut plain_path = FilePath::new(&site_root.to_string()).join(&file_name);
+    let mut plain_path = FilePath::new(&site_root.to_string()).join(file_name);
     plain_path.set_extension("webp");
 
     let img_path = FilePath::new(&site_root.to_string()).join(format!(
@@ -116,37 +111,43 @@ pub async fn handle_webp_image(
         Ok(res)
         // if the image doesn't exist, resize it
     } else if plain_path.exists() {
-        let original_image = ImageReader::open(plain_path)
-            .ok()
-            .and_then(|image| image.decode().ok())
-            .ok_or_else(|| CdnError::Internal("Something went wrong reading an image"))?;
+        let image = tokio::task::spawn_blocking(move || {
+            let original_image = ImageReader::open(plain_path)
+                .ok()
+                .and_then(|image| image.decode().ok())
+                .ok_or(CdnError::Internal("Something went wrong reading an image"))?;
 
-        let mut resized_image = Image::new(
-            dimensions.width,
-            dimensions.height,
-            original_image
-                .pixel_type()
-                .ok_or_else(|| CdnError::Internal("Failed to detect pixel type"))?,
-        );
-
-        let mut resizer = Resizer::new();
-        resizer
-            .resize(&original_image, &mut resized_image, None)
-            .map_err(|_| CdnError::Internal("Failed to resize image"))?;
-
-        let mut result_image = BufWriter::new(Vec::new());
-        WebPEncoder::new_lossless(&mut result_image)
-            .encode(
-                resized_image.buffer(),
+            let mut resized_image = Image::new(
                 dimensions.width,
                 dimensions.height,
-                original_image.color().into(),
-            )
-            .map_err(|_| CdnError::Internal("Failed to encode image"))?;
+                original_image
+                    .pixel_type()
+                    .ok_or(CdnError::Internal("Failed to detect pixel type"))?,
+            );
 
-        let image = result_image
-            .into_inner()
-            .map_err(|_| CdnError::Internal("Failed to flush buffer"))?;
+            let mut resizer = Resizer::new();
+            resizer
+                .resize(&original_image, &mut resized_image, None)
+                .map_err(|_| CdnError::Internal("Failed to resize image"))?;
+
+            let mut result_image = BufWriter::new(Vec::new());
+            WebPEncoder::new_lossless(&mut result_image)
+                .encode(
+                    resized_image.buffer(),
+                    dimensions.width,
+                    dimensions.height,
+                    original_image.color().into(),
+                )
+                .map_err(|_| CdnError::Internal("Failed to encode image"))?;
+
+            let image = result_image
+                .into_inner()
+                .map_err(|_| CdnError::Internal("Failed to flush buffer"))?;
+
+            Ok(image)
+        })
+        .await
+        .map_err(|_| CdnError::Internal("Blocking task panicked"))??;
 
         // save on the server
         _ = write(img_path, &image).await;

@@ -10,31 +10,48 @@ use crate::types::{
     song::Song,
 };
 
+/// Defines the copyleft year to show in the footer
+///
+/// e.g. copyleft 2023-2025  
 pub const YEARS_ACTIVE: [&str; 2] = ["2023", "2025"];
 
-/// Information section
-// Assumes you only have one, synchronized name.
+/// The username on most platforms
 pub const USERNAME: &str = "haemolacriaa";
 
-// Add other users here
+// add other usernames here
+
+/// Tiktok username
+///
+/// e.g. https://tiktok.com/@{TIKTOK_USERNAME}
 const TIKTOK_USERNAME: &str = "haemolacriaamusic";
+
+/// Github username
+///
+/// e.g. https://github.com/{GITHUB_USERNAME}
 const GITHUB_USERNAME: &str = "ozpv";
 
-// Every ID is derived from the final id on each profile URL,
-// make sure to ignore tracking info; this is usually contained
-// after the a '?' in the url.
+/// Spotify artist id
+///
+/// e.g. https://open.spotify.com/artist/{SPOTIFY_ARTIST_ID}
 const SPOTIFY_ARTIST_ID: &str = "4RzQ0uG5y64uVDj7Az5VkN";
 
-// Apple Music Region and ID
+/// Apple music region
+///
+/// e.g. https://music.apple.com/{APPLE_MUSIC_REGION}/artist/haemolacriaa/1739972984
 const APPLE_MUSIC_REGION: &str = "us";
+
+/// Apple music id
+///
+/// e.g. https://music.apple.com/en/artist/haemolacriaa/{APPLE_MUSIC_ID}
 const APPLE_MUSIC_ID: &str = "1549699645";
 
-// Youtube channel ID, could also be your '@'
+/// Youtube Channel ID
+///
+/// e.g. https://www.youtube.com/channel/{YOUTUBE_CHANNEL_ID}
 const YOUTUBE_CHANNEL_ID: &str = "UCQDQqA9iaWtlNkwXiCQogYQ";
 
-/// Navbar
-// Each route displayed in the navbar.
-pub static NAV_ITEMS: [RouteInfo; 2] = [
+/// Defines the items shown in the navbar
+pub const NAV_ITEMS: [RouteInfo; 2] = [
     RouteInfo {
         name: "home",
         path: "/",
@@ -47,8 +64,7 @@ pub static NAV_ITEMS: [RouteInfo; 2] = [
     },
 ];
 
-/// Body
-// Current song, set it to be displayed on home page.
+/// The main song to be displayed on the home page
 pub const CURRENT_SONG: Song<&'static str> = LEAVE_SONG;
 
 // Define any other songs or albums below
@@ -70,7 +86,8 @@ pub const LEAVE_SONG: Song<&'static str> = Song {
     publish_date: chrono::NaiveDate::from_ymd_opt(2024, 9, 13),
 };
 
-pub static OTHER_SONGS: [Song<&'static str>; 3] = [
+/// Other songs to be added to the homepage
+pub const OTHER_SONGS: [Song<&'static str>; 3] = [
     Song {
         name: "swarm",
         author: USERNAME,
@@ -121,9 +138,8 @@ pub static OTHER_SONGS: [Song<&'static str>; 3] = [
     },
 ];
 
-// Each item to be displayed on the footer.
-// From left to right.
-pub static SOCIAL_MEDIA_ITEMS: [SocialMediaInfo; 8] = [
+/// Defines the links shown in the footer
+pub const SOCIAL_MEDIA_ITEMS: [SocialMediaInfo; 8] = [
     SocialMediaInfo {
         icon: icondata::SiGithub,
         url: formatcp!("https://github.com/{GITHUB_USERNAME}"),

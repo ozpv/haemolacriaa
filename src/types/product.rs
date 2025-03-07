@@ -8,6 +8,7 @@ pub enum SizeError {
     ParseError,
 }
 
+/// Size variants for products
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Size {
     XS,

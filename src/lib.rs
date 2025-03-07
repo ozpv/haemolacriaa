@@ -10,30 +10,10 @@ pub mod config;
 pub mod pages;
 pub mod types;
 
-pub mod util {
-    pub type Result<T, E = server_fn::ServerFnError> = std::result::Result<T, E>;
-
-    // stuff is used but it says that it isn't
-    #[allow(unused_macros)]
-    macro_rules! err {
-        ($s:tt) => {
-            Err(server_fn::ServerFnError::new($s))
-        };
-
-        ($s:tt, $c:expr) => {
-            leptos::expect_context::<ResponseOptions>().set_status($c);
-            Err(server_fn::ServerFnError::new($s))
-        };
-    }
-
-    #[allow(unused_imports)]
-    pub(crate) use err;
-}
-
 #[cfg(feature = "ssr")]
 pub mod pool;
 #[cfg(feature = "ssr")]
-pub mod utils;
+pub mod util;
 #[cfg(feature = "ssr")]
 pub mod lazy {
     use crate::types::product::Product;
