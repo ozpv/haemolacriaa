@@ -57,6 +57,12 @@ pub enum CdnError {
     Internal(&'static str),
 }
 
+/// serves webp images and resizes them
+/// GET /assets/{file_name}.webp?width={width}&height={height}
+///
+/// # Errors
+///
+/// if the image isn't .webp or if the dimensions are missing or unsupported
 pub async fn handle_webp_image(
     AxumPath(file_name): AxumPath<String>,
     dimensions: Query<Dimensions>,

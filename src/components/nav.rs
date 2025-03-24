@@ -36,7 +36,6 @@ pub fn Nav() -> impl IntoView {
                                     {html::a()
                                         .href(item.path)
                                         .class("text-text-dark font-inter pr-10 hover:text-sapphire-dark")
-                                        .rel(item.external.then_some("external"))
                                         .child(item.name)
                                     }
                                 </li>
@@ -111,7 +110,6 @@ pub fn ShopNav() -> impl IntoView {
                                     {html::a()
                                         .href(item.path)
                                         .class("text-text-dark font-inter pr-10 hover:text-sapphire-dark")
-                                        .rel(item.external.then_some("external"))
                                         .child(item.name)
                                     }
                                 </li>

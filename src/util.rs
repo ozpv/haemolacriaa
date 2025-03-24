@@ -25,7 +25,7 @@ pub fn gen_rand_string<const N: usize>() -> String {
     general_purpose::STANDARD.encode(bytes)
 }
 
-/// alias for Result<T, ServerFnError>
+/// alias for Result<T, `ServerFnError`>
 pub type Result<T, E = server_fn::ServerFnError> = std::result::Result<T, E>;
 
 // stuff is used but it says that it isn't

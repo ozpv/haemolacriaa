@@ -1,44 +1,72 @@
+use chrono::{Datelike, NaiveDate};
 use leptos::prelude::*;
 use leptos_meta::Meta;
 
-use crate::components::{card::SongCard, lists::StreamingList, nav::Nav};
+use crate::components::nav;
 use crate::config::{CURRENT_SONG, OTHER_SONGS};
+use crate::types::images::Image;
+
+#[component]
+fn SongCard(
+    image: Image<&'static str>,
+    author: &'static str,
+    name: &'static str,
+    publish_date: Option<NaiveDate>,
+) -> impl IntoView {
+    view! {
+        <a class="content-none" href=format!("/releases/{name}")>
+            <img src=image.cdn_path()
+                width=image.width.unwrap_or("400")
+                height=image.height.unwrap_or("400")
+                class="text-text-dark transition duration-100 hover:scale-[103%]"
+                alt=format!("{name} album art")
+            />
+            <h2 class="text-text-dark text-lg tracking-[2px] font-sans pt-2">{author}</h2>
+            <p class=format!("text-text-dark{}", publish_date.map_or(" pb-2", |_| ""))>
+                {name}
+            </p>
+            {
+                if let Some(date) = publish_date {
+                    let date =
+                        format!("{}.{}.{}", date.month(), date.day(), date.year());
+
+                    view! {
+                        <p class="text-subtext-dark pb-2">{date}</p>
+                    }.into_any()
+                } else {
+                    ().into_any()
+                }
+            }
+        </a>
+    }
+}
 
 #[component]
 pub fn Home() -> impl IntoView {
-    let active_list = RwSignal::new(CURRENT_SONG);
-
     view! {
-        <Nav/>
+        <nav::Nav/>
         <Meta name="description" content="leave by haemolacriaa is out now" />
         <main class="main">
-            <StreamingList list_info=active_list />
-
-            <div class="border border-surface-dark shadow mt-9 pb-9 xl:rounded xl:mx-60" aria_label="previous song releases">
-                <span class="flex justify-center mt-9">
-                    <span class="text-center text-3xl font-semibold font-sans text-transparent bg-clip-text bg-gradient-to-r from-text-dark via-yellow-dark to-lavender-dark">
-                        "previous releases"
-                    </span>
-                </span>
-
-                <ul class="flex flex-wrap justify-center p-5" aria_label="release buttons">
-                    {OTHER_SONGS
-                        .iter()
-                        .map(|song| {
-                            view! {
-                                <li>
-                                    <SongCard
-                                        on:click=move |_| active_list.set(*song)
-                                        title=song.name
-                                        image=song.image
-                                        class="my-5 ease-in duration-100 md:hover:scale-105"
-                                    />
-                                </li>
-                            }
-                        })
-                        .collect_view()
+            <div class="flex flex-row justify-center mx-5">
+                <ol>
+                    <SongCard image=CURRENT_SONG.image
+                        author=CURRENT_SONG.author
+                        name=CURRENT_SONG.name
+                        publish_date=CURRENT_SONG.publish_date
+                    />
+                    {
+                        OTHER_SONGS
+                            .iter()
+                            .map(|song| view! {
+                                <SongCard image=song.image
+                                    author=song.author
+                                    name=song.name
+                                    publish_date=song.publish_date
+                                />
+                            })
+                            .collect_view()
                     }
-                </ul>
+                </ol>
             </div>
         </main>
     }

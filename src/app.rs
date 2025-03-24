@@ -16,6 +16,7 @@ use crate::{
 //use crate::components::forms::{logged_in, Login, LoginForm};
 //use crate::pages::admin::Admin;
 use crate::pages::home;
+use crate::pages::releases::Releases;
 //use crate::pages::shop;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
@@ -62,14 +63,16 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-            <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>
-            <Title text="haemolacriaa"/>
+        <Stylesheet id="leptos" href="/pkg/haemolacriaa.css"/>
+        <Title text="haemolacriaa"/>
 
-            <Router>
-                <FlatRoutes fallback=NotFound>
-                    <Route path=path!("") view=home::Home />
+        <Router>
+            <FlatRoutes fallback=NotFound>
+                <Route path=path!("") view=home::Home />
+                <Route path=path!("/releases/:name") view=Releases ssr=SsrMode::Async/>
+                <Route path=path!("/shop") view=move || view! { <Todo message="no items found" /> }/>
 
-                    /*// shop
+                /* shop
                     <Route
                         path=path!("/shop")
                         view=shop::home::Home
@@ -83,36 +86,19 @@ pub fn App() -> impl IntoView {
                         ssr=SsrMode::Static(StaticRoute::new())
                     />
                     <Route path=path!("/bag") view=shop::bag::Bag ssr=SsrMode::PartiallyBlocked />
-
-                    <Route path=path!("/form_test") view=crate::api::csrf::CsrfFormTest ssr=SsrMode::PartiallyBlocked />
-    */
-    /*
-                    <ProtectedRoute
-                        path=StaticSegment("/login")
-                        view=LoginForm
-                        condition=move || Some(logged_in.get().is_none_or(|res| res.is_err()))
-                        redirect_path=|| "/admin"
-                    />
-                    <ProtectedRoute
-                        path=StaticSegment("/admin")
-                        view=Admin
-                        condition=move || Some(logged_in.get().is_some_and(|res| res.is_ok()))
-                        redirect_path=|| "/login"
-                        ssr=SsrMode::InOrder
-                    />
-    */
-                </FlatRoutes>
-                <Footer/>
-            </Router>
-        }
+                */
+            </FlatRoutes>
+            <Footer/>
+        </Router>
+    }
 }
 
 #[component]
-pub fn Todo() -> impl IntoView {
+pub fn Todo(message: &'static str) -> impl IntoView {
     view! {
         <Nav />
         <main class="bg-black min-h-screen">
-            <h2 class="text-text-dark text-center pt-10 pb-7 text-2xl font-inter">"Coming soon"</h2>
+            <h1 class="text-text-dark text-center pt-10 pb-7 text-2xl font-inter">{message}</h1>
             <div class="flex justify-center">
                 <a href="/" class="flex justify-center bg-surface-dark rounded-full text-text-dark pr-6 pl-8 py-3 hover:bg-surface-dark-100 hover:text-blue-dark">
                     <p class="text-center font-inter pr-3">
@@ -130,7 +116,7 @@ pub fn NotFound() -> impl IntoView {
     view! {
         <Nav/>
         <div class="bg-black min-h-screen">
-            <h2 class="text-text-dark text-center pt-10 pb-7 text-2xl font-sans">"page not found"</h2>
+            <h1 class="text-text-dark text-center pt-10 pb-7 text-2xl font-sans">"page not found"</h1>
             <ReturnButton href="/">"return home"</ReturnButton>
         </div>
     }

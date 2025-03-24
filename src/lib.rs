@@ -13,10 +13,11 @@ pub mod types;
 #[cfg(feature = "ssr")]
 pub mod pool;
 #[cfg(feature = "ssr")]
+pub mod router;
+#[cfg(feature = "ssr")]
 pub mod util;
 #[cfg(feature = "ssr")]
 pub mod lazy {
-    use crate::types::product::Product;
     use std::sync::LazyLock;
     use tokio::sync::{
         watch::{Receiver, Sender},
@@ -26,11 +27,11 @@ pub mod lazy {
     pub static JWT_SECRET: LazyLock<String> =
         LazyLock::new(|| std::env::var("JWT_SECRET").expect("Failed to parse jwt secret"));
 
-    pub static UPDATE_ITEMS: LazyLock<(Mutex<Sender<()>>, Mutex<Receiver<()>>)> =
-        LazyLock::new(|| {
-            let (tx, rx) = tokio::sync::watch::channel(());
-            (Mutex::new(tx), Mutex::new(rx))
-        });
+    type LazyWatchChannel = LazyLock<(Mutex<Sender<()>>, Mutex<Receiver<()>>)>;
+    pub static UPDATE_ITEMS: LazyWatchChannel = LazyLock::new(|| {
+        let (tx, rx) = tokio::sync::watch::channel(());
+        (Mutex::new(tx), Mutex::new(rx))
+    });
 }
 
 #[cfg(feature = "hydrate")]

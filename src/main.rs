@@ -1,26 +1,19 @@
-use axum::{routing::get, Router};
-use haemolacriaa::api::cdn::handle_webp_image;
-use haemolacriaa::app::shell;
-use http::{header, Method};
-use leptos::prelude::{get_configuration, provide_context};
-use leptos_axum::{file_and_error_handler, generate_route_list_with_ssg, LeptosRoutes};
+use haemolacriaa::router::app;
+use leptos::prelude::*;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
-use std::time::Duration;
 use tokio::net::TcpListener;
-use tower_http::{
-    compression::CompressionLayer, cors::CorsLayer, timeout::TimeoutLayer, trace::TraceLayer,
-};
+use tokio::signal;
 use tracing::Level;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let conf = get_configuration(None)?;
-    let leptos_options = conf.leptos_options;
-    let addr = leptos_options.site_addr;
-    let (routes, static_routes) = generate_route_list_with_ssg({
-        let leptos_options = leptos_options.clone();
-        move || shell(leptos_options.clone())
-    });
+    // rest of the configuration is in haemolacriaa::router
+    #[cfg(test)]
+    let conf = get_configuration(Some("Cargo.toml")).unwrap();
+    #[cfg(not(test))]
+    let conf = get_configuration(None).unwrap();
+
+    let addr = conf.leptos_options.site_addr;
 
     tracing_subscriber::fmt()
         .with_max_level(Level::DEBUG)
@@ -60,41 +53,40 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await?;
     */
 
-    static_routes.generate(&leptos_options).await;
-
-    let app = Router::new()
-        /*
-        .leptos_routes_with_context(
-            &leptos_options,
-            routes,
-            move || provide_context(db_pool.clone()),
-            {
-                let leptos_options = leptos_options.clone();
-                move || shell(leptos_options.clone())
-            },
-        )
-        */
-        .leptos_routes(&leptos_options, routes, {
-            let leptos_options = leptos_options.clone();
-            move || shell(leptos_options.clone())
-        })
-        .route("/assets/:file_name", get(handle_webp_image))
-        .fallback(file_and_error_handler(shell))
-        .layer(CompressionLayer::new().br(true))
-        .layer(TimeoutLayer::new(Duration::from_secs(30)))
-        .layer(
-            CorsLayer::new()
-                // leptos server fns are RPC-based
-                .allow_methods([Method::GET, Method::POST])
-                .allow_headers([header::AUTHORIZATION, header::CONTENT_TYPE, header::COOKIE]),
-        )
-        .layer(TraceLayer::new_for_http())
-        .with_state(leptos_options);
+    let app = app().await;
 
     let listener = TcpListener::bind(&addr).await?;
 
-    tracing::info!("Listening on http://{}", &addr);
-    axum::serve(listener, app.into_make_service()).await?;
+    tracing::info!("Listening on http://{addr}");
+    axum::serve(listener, app.into_make_service())
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
 
     Ok(())
+}
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .inspect_err(|_| tracing::error!("failed to install ctrl-c handler"))
+            .unwrap();
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .inspect_err(|_| tracing::error!("failed to install signal handler"))
+            .unwrap()
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        () = ctrl_c => { tracing::info!("recieved ctrl-c") },
+        () = terminate => {},
+    }
 }
