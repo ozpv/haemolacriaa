@@ -2,11 +2,11 @@
 
 pkgs.mkShell {
   packages = with pkgs; [
-	rustc
-	cargo
-	clippy
-	rustfmt
-	lld
+    rustc
+    cargo
+    clippy
+    rustfmt
+    lld
     cargo-binutils
     cargo-leptos
     cargo-generate
@@ -17,6 +17,7 @@ pkgs.mkShell {
     pkg-config
     twiggy
     openssl
-	wasm-bindgen-cli
+    cargo-msrv
+    wasm-bindgen-cli
   ];
 }

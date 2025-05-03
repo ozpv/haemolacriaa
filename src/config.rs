@@ -22,32 +22,32 @@ pub const USERNAME: &str = "haemolacriaa";
 
 /// Tiktok username
 ///
-/// e.g. https://tiktok.com/@{TIKTOK_USERNAME}
+/// e.g. <https://tiktok.com/@{TIKTOK_USERNAME}>
 const TIKTOK_USERNAME: &str = "haemolacriaamusic";
 
 /// Github username
 ///
-/// e.g. https://github.com/{GITHUB_USERNAME}
+/// e.g. <https://github.com/{GITHUB_USERNAME}>
 const GITHUB_USERNAME: &str = "ozpv";
 
 /// Spotify artist id
 ///
-/// e.g. https://open.spotify.com/artist/{SPOTIFY_ARTIST_ID}
+/// e.g. <https://open.spotify.com/artist/{SPOTIFY_ARTIST_ID}>
 const SPOTIFY_ARTIST_ID: &str = "4RzQ0uG5y64uVDj7Az5VkN";
 
 /// Apple music region
 ///
-/// e.g. https://music.apple.com/{APPLE_MUSIC_REGION}/artist/haemolacriaa/1739972984
+/// e.g. <https://music.apple.com/{APPLE_MUSIC_REGION}/artist/haemolacriaa/1739972984>
 const APPLE_MUSIC_REGION: &str = "us";
 
 /// Apple music id
 ///
-/// e.g. https://music.apple.com/en/artist/haemolacriaa/{APPLE_MUSIC_ID}
+/// e.g. <https://music.apple.com/en/artist/haemolacriaa/{APPLE_MUSIC_ID}>
 const APPLE_MUSIC_ID: &str = "1549699645";
 
 /// Youtube Channel ID
 ///
-/// e.g. https://www.youtube.com/channel/{YOUTUBE_CHANNEL_ID}
+/// e.g. <https://www.youtube.com/channel/{YOUTUBE_CHANNEL_ID}>
 const YOUTUBE_CHANNEL_ID: &str = "UCQDQqA9iaWtlNkwXiCQogYQ";
 
 /// Defines the items shown in the navbar
@@ -63,29 +63,44 @@ pub const NAV_ITEMS: [RouteInfo; 2] = [
 ];
 
 /// The main song to be displayed on the home page
-pub const CURRENT_SONG: Song<&'static str> = LEAVE_SONG;
+pub const CURRENT_SONG: Song<&'static str> = HHAEMOLACRIA_ALBUM;
 
 // Define any other songs or albums below
-
-pub const LEAVE_SONG: Song<&'static str> = Song {
-    name: "leave",
+pub const HHAEMOLACRIA_ALBUM: Song<&'static str> = Song {
+    name: "hhaemolacria",
     author: USERNAME,
     image: Image {
-        name: "leave.webp",
+        name: "hhaemolacria.webp",
         width: Some("600"),
         height: Some("600"),
     },
-    is_album: false,
-    spotify_id: Some(Spotify("5lcsNMrZi4BgbBdMCL1Esl")),
-    youtube_id: Some(YouTube("b23ieCaa_fs")),
-    soundcloud_id: Some(SoundCloud("leave")),
-    apple_music_id: Some(AppleMusic("1765816897")),
-    bandcamp_id: None,
-    publish_date: chrono::NaiveDate::from_ymd_opt(2024, 9, 13),
+    is_album: true,
+    spotify_id: Some(Spotify("5nF4NHzSf7HiMr4obJMBhi")),
+    youtube_id: Some(YouTube("OLAK5uy_mj8nJh2a0y1YRGiAsT8XcOrbyiqW8fwak")),
+    soundcloud_id: Some(SoundCloud("hhaemolacria")),
+    apple_music_id: Some(AppleMusic("1809538512")),
+    bandcamp_id: Some(Bandcamp("hhaemolacria")),
+    publish_date: chrono::NaiveDate::from_ymd_opt(2025, 5, 2),
 };
 
 /// Other songs to be added to the homepage
-pub const OTHER_SONGS: [Song<&'static str>; 3] = [
+pub const OTHER_SONGS: [Song<&'static str>; 4] = [
+    Song {
+        name: "leave",
+        author: USERNAME,
+        image: Image {
+            name: "leave.webp",
+            width: Some("600"),
+            height: Some("600"),
+        },
+        is_album: false,
+        spotify_id: Some(Spotify("5lcsNMrZi4BgbBdMCL1Esl")),
+        youtube_id: Some(YouTube("b23ieCaa_fs")),
+        soundcloud_id: Some(SoundCloud("leave")),
+        apple_music_id: Some(AppleMusic("1765816897")),
+        bandcamp_id: None,
+        publish_date: chrono::NaiveDate::from_ymd_opt(2024, 9, 13),
+    },
     Song {
         name: "swarm",
         author: USERNAME,

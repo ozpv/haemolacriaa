@@ -1,6 +1,6 @@
 use haemolacriaa::router::app;
 use leptos::prelude::*;
-use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
+//use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgSslMode};
 use tokio::net::TcpListener;
 use tokio::signal;
 use tracing::Level;
@@ -58,9 +58,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind(&addr).await?;
 
     tracing::info!("Listening on http://{addr}");
+
     axum::serve(listener, app.into_make_service())
         .with_graceful_shutdown(shutdown_signal())
-        .await?;
+        .await
+        .unwrap();
 
     Ok(())
 }

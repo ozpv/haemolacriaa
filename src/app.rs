@@ -1,12 +1,10 @@
-use futures::{channel::mpsc, Stream};
+//use futures::{channel::mpsc, Stream};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
 use leptos_router::{
-    components::{FlatRoutes, ProtectedRoute, Route, Router},
-    path,
-    static_routes::StaticRoute,
-    SsrMode,
+    components::{FlatRoutes, Route, Router},
+    path, SsrMode,
 };
 
 use crate::{
@@ -37,6 +35,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
     }
 }
 
+/*
 fn watch_value() -> impl Stream<Item = ()> {
     #[allow(unused)]
     let (mut tx, rx) = mpsc::channel(0);
@@ -57,6 +56,7 @@ fn watch_value() -> impl Stream<Item = ()> {
 
     rx
 }
+*/
 
 #[component]
 pub fn App() -> impl IntoView {

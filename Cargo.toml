@@ -12,15 +12,15 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 # either 
 console_error_panic_hook = "0.1"
-leptos = { version = "0.7" }
-leptos_meta = { version = "0.7" }
-leptos_router = { version = "0.7" }
+leptos = { version = "0.8" }
+leptos_meta = { version = "0.8" }
+leptos_router = { version = "0.8" }
 thiserror = "2"
 serde = "1"
 chrono = { version = "0.4", features = ["serde"] }
 serde_json = { version = "1", features = ["std"] }
 server_fn = { version = "0.7", features = ["multipart"] }
-leptos_icons = "0.5"
+leptos_icons = { git = "https://github.com/ozpv/leptos-icons", branch = "leptos-0.8.0" }
 icondata = "0.5"
 futures = "0.3"
 
@@ -34,8 +34,8 @@ const_format = "0.2"
 
 # server
 http = { version = "1", optional = true }
-axum = { version = "0.7", features = [], optional = true }
-leptos_axum = { version = "0.7", optional = true }
+axum = { version = "0.8", optional = true }
+leptos_axum = { version = "0.8", optional = true }
 tokio = { version = "1", features = ["rt-multi-thread", "sync", "signal"], optional = true }
 tower = { version = "0.5", features = ["util"], optional = true }
 tower-http = { version = "0.6", features = ["compression-br", "cors", "timeout", "trace"], optional = true }

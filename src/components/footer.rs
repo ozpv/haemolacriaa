@@ -9,11 +9,15 @@ pub fn Footer() -> impl IntoView {
             <div class="flex items-center justify-center">
                 <nav class="flex pt-2.5 gap-[8vw] my-2.5 text-sm text-text-dark font-inter md:gap-[2vw]">
                     {SOCIAL_MEDIA_ITEMS.iter().map(|item| {
-                        item.active.then(|| view! {
-                            <a class="p-2 rounded-sm transition-all ease-in duration-75 hover:-translate-y-1 hover:bg-surface-dark-100" href=item.url>
-                                <Icon icon=item.icon width="16" height="16" />
-                            </a>
-                        }.into_any()).unwrap_or(().into_any())
+                        if item.active {
+                            view! {
+                                <a class="p-2 rounded-sm transition-all ease-in duration-75 hover:-translate-y-1 hover:bg-surface-dark-100" href=item.url>
+                                    <Icon icon=item.icon width="16" height="16" />
+                                </a>
+                            }.into_any()
+                        } else {
+                            ().into_any()
+                        }
                     }).collect_view()}
                 </nav>
             </div>

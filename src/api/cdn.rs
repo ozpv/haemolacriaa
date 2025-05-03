@@ -58,7 +58,7 @@ pub enum CdnError {
 }
 
 /// serves webp images and resizes them
-/// GET /assets/{file_name}.webp?width={width}&height={height}
+/// GET `/assets/{file_name}.webp?width={width}&height={height}`
 ///
 /// # Errors
 ///

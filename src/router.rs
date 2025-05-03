@@ -9,6 +9,9 @@ use tower_http::{
     compression::CompressionLayer, cors::CorsLayer, timeout::TimeoutLayer, trace::TraceLayer,
 };
 
+/// # Panics
+///
+/// Should never panic when using cargo leptos
 pub async fn app() -> Router {
     #[cfg(test)]
     let conf = get_configuration(Some("Cargo.toml")).unwrap();
@@ -39,7 +42,7 @@ pub async fn app() -> Router {
             let leptos_options = leptos_options.clone();
             move || shell(leptos_options.clone())
         })
-        .route("/assets/:file_name", get(handle_webp_image))
+        .route("/assets/{*file_name}", get(handle_webp_image))
         .fallback(file_and_error_handler(shell))
         .layer(CompressionLayer::new().br(true))
         .layer(TimeoutLayer::new(Duration::from_secs(30)))
