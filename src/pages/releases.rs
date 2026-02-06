@@ -26,7 +26,7 @@ pub fn Releases() -> impl IntoView {
     });
 
     let name = move || use_params_map().with(|params| params.get("name"));
-    let name = Memo::new(move |_| name().unwrap());
+    let name = Memo::new(move |_| name().unwrap().to_ascii_lowercase());
 
     // ensure there's no flicker by doing this on the server
     let songs = move || {

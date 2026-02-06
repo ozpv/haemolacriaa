@@ -12,8 +12,8 @@ use crate::types::{
 
 /// Defines the copyleft year to show in the footer
 ///
-/// e.g. copyleft 2023-2025  
-pub const YEARS_ACTIVE: [&str; 2] = ["2023", "2025"];
+/// e.g. copyleft 2023-2026  
+pub const YEARS_ACTIVE: [&str; 2] = ["2023", "2026"];
 
 /// The username on most platforms
 pub const USERNAME: &str = "haemolacriaa";
@@ -23,7 +23,7 @@ pub const USERNAME: &str = "haemolacriaa";
 /// Tiktok username
 ///
 /// e.g. <https://tiktok.com/@{TIKTOK_USERNAME}>
-const TIKTOK_USERNAME: &str = "haemolacriaamusic";
+const TIKTOK_USERNAME: &str = "haemolacriaa0";
 
 /// Github username
 ///
@@ -63,67 +63,67 @@ pub const NAV_ITEMS: [RouteInfo; 2] = [
 ];
 
 /// The main song to be displayed on the home page
-pub const CURRENT_SONG: Song<&'static str> = HHAEMOLACRIA_ALBUM;
+pub const CURRENT_SONG: Song<&'static str> = CHRISTMAS;
 
 // Define any other songs or albums below
-pub const HHAEMOLACRIA_ALBUM: Song<&'static str> = Song {
-    name: "hhaemolacria",
+pub const CHRISTMAS: Song<&'static str> = Song {
+    name: "Christmas",
     author: USERNAME,
     image: Image {
-        name: "hhaemolacria.webp",
-        width: Some("600"),
-        height: Some("600"),
+        name: "bunny.webp",
+        width: Some("400"),
+        height: Some("400"),
     },
-    is_album: true,
-    spotify_id: Some(Spotify("5nF4NHzSf7HiMr4obJMBhi")),
-    youtube_id: Some(YouTube("OLAK5uy_mj8nJh2a0y1YRGiAsT8XcOrbyiqW8fwak")),
-    soundcloud_id: Some(SoundCloud("hhaemolacria")),
-    apple_music_id: Some(AppleMusic("1809538512")),
-    bandcamp_id: Some(Bandcamp("hhaemolacria")),
-    publish_date: chrono::NaiveDate::from_ymd_opt(2025, 5, 2),
+    is_album: false,
+    spotify_id: Some(Spotify("4H3ioGmAfbdVPjU8RUDZuD")),
+    youtube_id: Some(YouTube("XAMz6p6P01c")),
+    soundcloud_id: Some(SoundCloud("christmas")),
+    apple_music_id: Some(AppleMusic("1860213083")),
+    bandcamp_id: None,
+    publish_date: chrono::NaiveDate::from_ymd_opt(2025, 12, 12),
 };
 
 /// Other songs to be added to the homepage
-pub const OTHER_SONGS: [Song<&'static str>; 4] = [
+pub const OTHER_SONGS: [Song<&'static str>; 3] = [
     Song {
-        name: "leave",
+        name: "Waxing and Waning",
         author: USERNAME,
         image: Image {
-            name: "leave.webp",
-            width: Some("600"),
-            height: Some("600"),
+            name: "bunny.webp",
+            width: Some("400"),
+            height: Some("400"),
         },
         is_album: false,
-        spotify_id: Some(Spotify("5lcsNMrZi4BgbBdMCL1Esl")),
-        youtube_id: Some(YouTube("b23ieCaa_fs")),
-        soundcloud_id: Some(SoundCloud("leave")),
-        apple_music_id: Some(AppleMusic("1765816897")),
+        spotify_id: Some(Spotify("4GUdg8rDSlFVNPPhAH0Spz")),
+        youtube_id: Some(YouTube("AO5Jkvx12S8")),
+        soundcloud_id: Some(SoundCloud("waxing-and-waning")),
+        apple_music_id: Some(AppleMusic("1844154423")),
         bandcamp_id: None,
-        publish_date: chrono::NaiveDate::from_ymd_opt(2024, 9, 13),
+        publish_date: chrono::NaiveDate::from_ymd_opt(2025, 10, 10),
     },
     Song {
-        name: "swarm",
+        name: "hhaemolacria",
         author: USERNAME,
         image: Image {
-            name: "swarm.webp",
-            width: Some("600"),
-            height: Some("600"),
+            name: "hhaemolacria.webp",
+            width: Some("400"),
+            height: Some("400"),
         },
-        is_album: false,
-        spotify_id: Some(Spotify("7aLZxnXz0ZTkOJOlVmeqZQ")),
-        youtube_id: Some(YouTube("dbLlehkojoI")),
-        soundcloud_id: Some(SoundCloud("swarm")),
-        apple_music_id: Some(AppleMusic("1756360277")),
-        bandcamp_id: None,
-        publish_date: chrono::NaiveDate::from_ymd_opt(2024, 7, 19),
+        is_album: true,
+        spotify_id: Some(Spotify("5nF4NHzSf7HiMr4obJMBhi")),
+        youtube_id: Some(YouTube("OLAK5uy_mj8nJh2a0y1YRGiAsT8XcOrbyiqW8fwak")),
+        soundcloud_id: Some(SoundCloud("hhaemolacria")),
+        apple_music_id: Some(AppleMusic("1809538512")),
+        bandcamp_id: Some(Bandcamp("hhaemolacria")),
+        publish_date: chrono::NaiveDate::from_ymd_opt(2025, 5, 2),
     },
     Song {
         name: "haemolacriaa",
         author: USERNAME,
         image: Image {
             name: "haemolacriaa.webp",
-            width: Some("600"),
-            height: Some("600"),
+            width: Some("400"),
+            height: Some("400"),
         },
         is_album: true,
         spotify_id: Some(Spotify("5TmWqQ0YoJ9t8PHPSqhZLp")),
@@ -132,22 +132,6 @@ pub const OTHER_SONGS: [Song<&'static str>; 4] = [
         apple_music_id: Some(AppleMusic("1739982491")),
         bandcamp_id: Some(Bandcamp("haemolacriaa")),
         publish_date: chrono::NaiveDate::from_ymd_opt(2024, 4, 19),
-    },
-    Song {
-        name: "stay",
-        author: USERNAME,
-        image: Image {
-            name: "stay.webp",
-            width: Some("600"),
-            height: Some("600"),
-        },
-        is_album: false,
-        spotify_id: Some(Spotify("3rzuDN6mPujdByy2QfCArW")),
-        youtube_id: Some(YouTube("b_IEnLvLn3Y")),
-        soundcloud_id: Some(SoundCloud("stay")),
-        apple_music_id: Some(AppleMusic("1681486735")),
-        bandcamp_id: None,
-        publish_date: chrono::NaiveDate::from_ymd_opt(2023, 4, 14),
     },
 ];
 

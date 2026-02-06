@@ -30,7 +30,7 @@ fn encode_as_webp(path: &Path) -> Result<(), Box<dyn Error>> {
         res
     };
 
-    println!("Writing WebP to {new_path:?}");
+    println!("Writing WebP to {}", new_path.display());
 
     write(new_path, &*encoded)?;
 
@@ -56,7 +56,7 @@ fn add_hash_to_filename(path: &PathBuf) -> Result<(), Box<dyn Error>> {
         res
     };
 
-    println!("Renaming file to {new_path:?}");
+    println!("Renaming file to {}", new_path.display());
 
     rename(path, new_path)?;
 
@@ -80,7 +80,7 @@ fn remove_hash(path: &PathBuf) -> Result<(), Box<dyn Error>> {
         res
     };
 
-    println!("Renaming file to {new_path:?}");
+    println!("Renaming file to {}", new_path.display());
 
     rename(path, new_path)?;
 
@@ -90,24 +90,29 @@ fn remove_hash(path: &PathBuf) -> Result<(), Box<dyn Error>> {
 fn main() -> Result<(), Box<dyn Error>> {
     println!("cargo:rerun-if-changed=migrations");
     println!("cargo:rerun-if-changed=assets");
+    println!("cargo:rerun-if-changed=build.rs");
 
     // pass the var RM_HASH to remove instead
     // can be set to anything
     let opt_rm = std::env::var_os("RM_HASH");
-    let opt_encode = std::env::var_os("HASH");
+    let opt_hash = std::env::var_os("HASH");
+    let opt_encode = std::env::var_os("ENCODE");
 
-    if opt_rm.is_none() && opt_encode.is_none() {
+    if opt_rm.is_none() && opt_hash.is_none() && opt_encode.is_none() {
         return Ok(());
     }
 
     for entry in read_dir("./assets")?.filter_map(|entry| Some(entry.ok()?.path())) {
-        match (opt_rm.clone(), opt_encode.clone()) {
-            (Some(_), None) => {
+        match (opt_rm.clone(), opt_hash.clone(), opt_encode.clone()) {
+            (Some(_), _, _) => {
                 remove_hash(&entry)?;
             }
-            (None, Some(_)) => {
+            (_, Some(_), _) => {
                 encode_as_webp(&entry)?;
                 add_hash_to_filename(&entry)?;
+            }
+            (_, _, Some(_)) => {
+                encode_as_webp(&entry)?;
             }
             _ => {}
         }

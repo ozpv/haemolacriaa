@@ -20,19 +20,19 @@ pub fn Nav() -> impl IntoView {
 
     view! {
         <nav class="bg-black border-gray-200">
-            <div class="flex flex-wrap max-w-screen-xl items-center justify-between mx-auto p-4">
-                <span class="flex items-center text-xl text-text-dark font-inter px-5 mt-px">{env!("CARGO_PKG_NAME")}</span>
+            <div class="flex flex-wrap max-w-screen-xl items-center justify-between mx-auto p-[33px]">
+                <span class="flex items-center text-xl text-text-dark font-inter">{env!("CARGO_PKG_NAME")}</span>
 
                 <button on:click=toggle_active class="text-sm text-overlay-dark-200 mx-2 md:hidden" aria_label="open navigation menu">
                     <Icon icon=active_icon width="24" height="24"/>
                 </button>
 
                 <div class="w-full md:block md:w-auto" class:hidden=hidden_status>
-                    <ul class="flex flex-col pl-8 mt-4 bg-black md:pl-0 md:flex-row md:mt-0 md:border-0">
+                    <ul class="flex flex-col pl-8 mt-[26px] bg-black md:pl-0 md:flex-row md:mt-0 md:border-0">
                         {NAV_ITEMS
                             .iter()
                             .map(|item| view! {
-                                <li class="pb-4 md:pb-0" on:click=toggle_active>
+                                <li class="pb-[26px] md:pb-0" on:click=toggle_active>
                                     {html::a()
                                         .href(item.path)
                                         .class("text-text-dark font-inter pr-10 hover:text-sapphire-dark")

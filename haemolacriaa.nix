@@ -17,7 +17,6 @@ pkgs.mkShell {
     pkg-config
     twiggy
     openssl
-    cargo-msrv
     wasm-bindgen-cli
   ];
 }

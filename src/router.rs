@@ -1,7 +1,7 @@
 use crate::api::cdn::handle_webp_image;
 use crate::app::shell;
 use axum::{routing::get, Router};
-use http::{header, Method};
+use http::{header, Method, StatusCode};
 use leptos::prelude::*;
 use leptos_axum::{file_and_error_handler, generate_route_list_with_ssg, LeptosRoutes};
 use std::time::Duration;
@@ -45,7 +45,10 @@ pub async fn app() -> Router {
         .route("/assets/{*file_name}", get(handle_webp_image))
         .fallback(file_and_error_handler(shell))
         .layer(CompressionLayer::new().br(true))
-        .layer(TimeoutLayer::new(Duration::from_secs(30)))
+        .layer(TimeoutLayer::with_status_code(
+            StatusCode::REQUEST_TIMEOUT,
+            Duration::from_secs(30),
+        ))
         .layer(
             CorsLayer::new()
                 // leptos server fns are RPC-based

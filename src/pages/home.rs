@@ -45,9 +45,9 @@ fn SongCard(
 pub fn Home() -> impl IntoView {
     view! {
         <nav::Nav/>
-        <Meta name="description" content="leave by haemolacriaa is out now" />
+        <Meta name="description" content="Christmas by haemolacriaa is out now" />
         <main class="main">
-            <div class="flex flex-row justify-center mx-5">
+            <div class="flex flex-row justify-center px-5 pt-[30px]">
                 <ol>
                     <SongCard image=CURRENT_SONG.image
                         author=CURRENT_SONG.author

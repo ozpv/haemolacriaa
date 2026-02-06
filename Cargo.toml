@@ -20,9 +20,9 @@ serde = "1"
 chrono = { version = "0.4", features = ["serde"] }
 serde_json = { version = "1", features = ["std"] }
 server_fn = { version = "0.7", features = ["multipart"] }
-leptos_icons = { git = "https://github.com/ozpv/leptos-icons", branch = "leptos-0.8.0" }
 icondata = "0.5"
 futures = "0.3"
+leptos_icons = "0.7.1"
 
 # frontend
 web-sys = { version = "0.3", features = ["Storage"], optional = true }
@@ -116,7 +116,6 @@ assets-dir = "assets"
 site-addr = "127.0.0.1:3000"
 reload-port = 3001
 browserquery = "defaults"
-env = "PROD"
 bin-features = ["ssr"]
 bin-default-features = false
 lib-features = ["hydrate"]
